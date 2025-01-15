@@ -17,7 +17,7 @@ def main():
                            name=container_name,
                            volumes=[
                                "/tmp/.X11-unix:/tmp/.X11-unix",
-                                f"{str(cwd)}workspace:/home/rosuser/workspace"
+                                f"{str(cwd)}/workspace:/home/rosuser/workspace"
                            ],
                            environment={"DISPLAY": os.environ.get("DISPLAY")},
                            )

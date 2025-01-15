@@ -5,12 +5,12 @@ from pathlib import Path
 import rclpy
 import sys
 from rclpy.node import Node
-from semmap_interfaces.msg import log_message
+from semmap_interfaces.msg import LogMessage
 
 class LoggingNode(Node):
     def __init__(self, log_file: Path, log_level: int = logging.INFO) -> None:
         super().__init__("LoggingNode")
-        self.create_subscription(log_message, "/logging", self.log_callback, 10)
+        self.create_subscription(LogMessage, "/logging", self.log_callback, 10)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(log_level)
         fh = logging.FileHandler(log_file)
@@ -19,7 +19,7 @@ class LoggingNode(Node):
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
 
-    def log_callback(self, msg: log_message) -> None:
+    def log_callback(self, msg: LogMessage) -> None:
         self.logger.log(msg.level, f"{msg.source}:{msg.message}")
 
 

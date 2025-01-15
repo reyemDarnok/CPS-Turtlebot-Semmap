@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from semmap_interfaces.mst import object
+from semmap_interfaces.msg import Object
 from cv_bridge import CvBridge
 import numpy as np
 from ultralytics import YOLO
@@ -17,7 +17,7 @@ class ObjectDetectionNode(Node):
         self.depth_sub = self.create_subscription(
             Image, '/camera/depth/image_raw', self.depth_callback, 10
         )
-        self.object_pub = self.create_publisher(object, 'detected_objects', 10)
+        self.object_pub = self.create_publisher(Object, 'detected_objects', 10)
 
         self.model = YOLO("yolov8s.pt")
         self.horizontal_fov = 81  #check if its correct values of our turtlebot!!!
@@ -51,7 +51,7 @@ class ObjectDetectionNode(Node):
             x = int(x_center - width / 2)
             y = int(y_center - height / 2)
 
-            obj_msg = object()
+            obj_msg = Object()
             obj_msg.tag = self.model.names[int(class_idx)]
             depth = self.get_depth(int(x_center), int(y_center))
 

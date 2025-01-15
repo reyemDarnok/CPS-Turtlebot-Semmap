@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(semmap_intefaces)
+project(semmap_interfaces)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -26,12 +26,12 @@ endif()
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/invalidate_map.msg"
-  "msg/location.msg"
-  "msg/log_message.msg"
-  "msg/object.msg"
-  "msg/slam_map.msg"
-  "srv/semantic_map.srv"
+  "msg/InvalidateMap.msg"
+  "msg/Location.msg"
+  "msg/LogMessage.msg"
+  "msg/Object.msg"
+  "msg/SlamMap.msg"
+  "srv/SemanticMap.srv"
  )
 
 ament_package()
