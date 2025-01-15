@@ -1,1 +1,5 @@
-/home/ben/PycharmProjects/CPS-Turtlebot-Semmap/requirements.txt
+cv_bridge
+numpy~=2.2.1
+ultralytics~=8.3.61
+setuptools~=75.8.0
+docker~=7.1.0
