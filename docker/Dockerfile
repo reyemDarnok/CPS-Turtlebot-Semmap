@@ -23,7 +23,7 @@ RUN useradd --uid $UID --create-home --shell /bin/bash rosuser && \
 # Setup environment
 USER $USERNAME
 WORKDIR "/home/$USERNAME"
-COPY bashrc .bashrc
+COPY bashrc.sh .bashrc
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY --chmod=755 setup.sh setup.sh
