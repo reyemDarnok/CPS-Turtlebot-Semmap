@@ -23,10 +23,10 @@ class LoggingNode(Node):
         self.logger.log(msg.level, f"{msg.source}:{msg.message}")
 
 
-def main(argv=sys.argv[1]):
-    rclpy.init(args=argv)
-    args = parse_args(argv)
-    node = LoggingNode(log_file=args.log_file, log_level=args.log_level)
+def main():
+    rclpy.init()
+    args = parse_args()
+    node = LoggingNode(log_file=args.logfile, log_level=args.log_level)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
