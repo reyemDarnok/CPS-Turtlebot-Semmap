@@ -23,8 +23,12 @@ RUN useradd --uid $UID --create-home --shell /bin/bash rosuser && \
 # Setup environment
 USER $USERNAME
 WORKDIR "/home/$USERNAME"
-COPY --chown=$USERNAME bashrc .bashrc
+COPY bashrc .bashrc
+COPY requirements.txt requirements.txt
 
-#RUN rosdep update
+RUN rosdep update
+
+# install python dependencies
+RUN pip install -r requirements.txt
 
 CMD ["tail", "-f", "/dev/null"]
