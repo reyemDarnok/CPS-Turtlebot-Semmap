@@ -24,7 +24,7 @@ class LoggingNode(Node):
                         f"{msg.stamp.sec}.{msg.stamp.nanosec:08}:"
                         f"{msg.file}:"
                         f"{msg.function}:"
-                        f"{msg.line if msg.line != 0 else ''}"
+                        f"{msg.line if msg.line != 0 else ''}:"
                         f"{msg.msg}")
 
 
