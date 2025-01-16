@@ -12,7 +12,7 @@ RUN apt update && \
     apt upgrade -y
 
 # Install helper packages
-RUN apt install -y vim python3-pip
+RUN apt install -y vim python3-pip wget
 
 # Create User
 RUN useradd --uid $UID --create-home --shell /bin/bash rosuser && \

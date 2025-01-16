@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/src/turtlebot3/turtlebot3" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/src/turtlebot3/turtlebot3_msgs" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/src/turtlebot3/turtlebot3_simulations" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/src/utils/DynamixelSDK" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/src/utils/hls_lfcd_lds_driver" vcs="Git" />
   </component>
 </project>
