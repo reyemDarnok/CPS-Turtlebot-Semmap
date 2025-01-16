@@ -5,22 +5,27 @@ from pathlib import Path
 import rclpy
 import sys
 from rclpy.node import Node
-from semmap_interfaces.msg import LogMessage
+from rcl_interfaces.msg import Log
 
 class LoggingNode(Node):
     def __init__(self, log_file: Path, log_level: int = logging.INFO) -> None:
         super().__init__("LoggingNode")
-        self.create_subscription(LogMessage, "/logging", self.log_callback, 10)
+        self.create_subscription(Log, "/rosout", self.log_callback, 10)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(log_level)
         fh = logging.FileHandler(log_file)
         fh.setLevel(log_level)
-        formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+        formatter = logging.Formatter("%(message)s")
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
 
-    def log_callback(self, msg: LogMessage) -> None:
-        self.logger.log(msg.level, f"{msg.source}:{msg.message}")
+    def log_callback(self, msg: Log) -> None:
+        self.logger.log(msg.level,
+                        f"{msg.stamp.sec}.{msg.stamp.nanosec:08}:"
+                        f"{msg.file}:"
+                        f"{msg.function}:"
+                        f"{msg.line if msg.line != 0 else ''}"
+                        f"{msg.msg}")
 
 
 def main():

@@ -13,6 +13,7 @@
   <test_depend>python3-pytest</test_depend>
 
   <exec_depend>semmap_interfaces</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>numpy</exec_depend>
   <exec_depend>ultralytics</exec_depend>
