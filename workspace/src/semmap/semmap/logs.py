@@ -40,9 +40,7 @@ def main():
     node.destroy_node()
     rclpy.shutdown()
 
-def parse_args(args=None):
-    if args is None:
-        args = sys.argv
+def parse_args():
     parser = ArgumentParser()
     parser.add_argument("-f", "--file", dest="logfile", help="log file path", type=Path, default=Path("semmap.log"))
     parser.add_argument("-l", "--log-level", dest="log_level", help="log level", type=int, default=logging.INFO)
