@@ -13,7 +13,7 @@ from . import emergency_stop
 
 class LEDNode(Node):
     def __init__(self) -> None:
-        super().__init__("LoggingNode")
+        super().__init__("LEDNode")
         self.create_subscription(EmergencyStop, "/emergency_stop", self.e_stop_callback, 10)
 
         self.e_stop_publisher = self.create_publisher(EmergencyStop, "/emergency_stop", 10)

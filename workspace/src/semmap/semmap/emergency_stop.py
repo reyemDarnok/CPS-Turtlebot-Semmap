@@ -10,8 +10,7 @@ from semmap_interfaces.msg import EmergencyStop
 
 class StopNode(Node):
     def __init__(self) -> None:
-        super().__init__("LoggingNode")
-        self.create_subscription(Log, "/rosout", self.log_callback, 10)
+        super().__init__("EmergencyStopNode")
         #TODO
         # self.create_subscription(WheelWeight, "/wheelWeight", self.wheel_weight_callback, 10)
         #TODO
