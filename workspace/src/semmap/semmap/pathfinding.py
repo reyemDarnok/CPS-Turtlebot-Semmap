@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 from enum import Enum, auto
 from pathlib import Path
-
+from .priority_queue import PriorityQueue
 import rclpy
 import sys
 from rclpy.node import Node
@@ -15,7 +15,7 @@ from .emergency_stop import Causes
 class PathfindingNode(Node):
     def __init__(self) -> None:
         super().__init__("PathfindingNode")
-        self.task_list = []
+        self.task_list = [self.explore]
         self.e_stop_mode = False
         self.main_loop_timer = self.create_timer(0.2, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
@@ -70,7 +70,34 @@ class PathfindingNode(Node):
 
     def create_absolute_movement_task(self, target):
         def movement_task():
-            pass
+            current_pos = None
+            astar_map = self._create_astar_graph(current_pos, target)
+            astar_map.priority_queue = PriorityQueue()
+            while not len(astar_map.priority_queue) == 0:
+                prio, node = astar_map.priority_queue.pop()
+                if node == target:
+                    break
+                for distance, neighbor in node.neighbors:
+                    n_prio = prio + distance
+                    if n_prio < prio:
+                        neighbor.predecessor = node
+                        astar_map.priority_queue.update_elem(distance, (n_prio, neighbor))
+            start_node = None
+            current_node = astar_map.target_node
+            while current_node.predecessor is not None:
+                start_node = current_node
+            if self.is_aligned(start_node): # TODO implement
+                twist = Twist()
+                twist.linear.x = 0.0
+                twist.linear.y = 0.0
+                twist.linear.z = 0.0
+                twist.angular.x = 1.0
+                twist.angular.y = 0.0
+                twist.angular.z = 0.0
+                self.command_movement.publish(twist)
+                self.get_logger().info("Moving to next node")
+            else:
+                self.align_to(start_node) # TODO implement
         return movement_task
 
     def stop(self):
@@ -85,13 +112,13 @@ class PathfindingNode(Node):
         self.get_logger().info("Stopping turtlebot")
 
     def explore(self):
-        pass
+        pass # TODO
 
     def revisit(self):
-        pass
+        pass # TODO
 
     def return_to_dock(self):
-        pass
+        pass # TODO
 
 
 def main():
