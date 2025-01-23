@@ -14,6 +14,12 @@ from geometry_msgs.msg import Twist
 from .emergency_stop import Causes
 
 
+class AstarMap:
+    def __init__(self, area_map, pos, target):
+        self.target_node = target
+        self.priority_queue = PriorityQueue()
+        # TODO fill queue
+
 def _score_node(node, path_history, time):
     score = 0
     e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
@@ -94,11 +100,15 @@ class PathfindingNode(Node):
         twist = stop_twist()
         self.command_movement.publish(twist)
         self.get_logger().info("Finished backing up turtlebot")
+        # TODO make nice
+
+    def get_current_position(self):
+        return 0,0  # TODO implement
 
     def create_absolute_movement_task(self, target):
         def movement_task():
-            current_pos = None
-            astar_map = self._create_astar_graph(current_pos, target)
+            current_pos = self.get_current_position()
+            astar_map = AstarMap(self.get_map(), current_pos, target)
             astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
                 prio, node = astar_map.priority_queue.pop()
@@ -114,18 +124,13 @@ class PathfindingNode(Node):
             while current_node.predecessor is not None:
                 start_node = current_node
             if self.is_aligned(start_node): # TODO implement
-                twist = Twist()
-                twist.linear.x = 0.0
-                twist.linear.y = 0.0
-                twist.linear.z = 0.0
-                twist.angular.x = 0.1
-                twist.angular.y = 0.0
-                twist.angular.z = 0.0
+                twist = spin_twist()
                 self.command_movement.publish(twist)
                 self.get_logger().info("Moving to next node")
             else:
                 self.align_to(start_node) # TODO implement
         return movement_task
+
 
     def stop(self):
         twist = stop_twist()
@@ -146,6 +151,9 @@ class PathfindingNode(Node):
                 if any(neighbor.obstruction < 0.2 for neighbor in neighbors):
                     self.task_list.append(self.create_absolute_movement_task(node))
 
+    def get_map(self):
+        return AreaMap(None) # TODO implement
+
     def revisit(self):
         position_history = self.get_path_history()
         area_map = self.get_map()
@@ -160,6 +168,15 @@ class PathfindingNode(Node):
                     oldest_node = node
         self.task_list.append(self.create_absolute_movement_task(oldest_node))
 
+class AreaMap:
+    def __init__(self, map_message):
+        self.map_message = map_message
+
+    def all_nodes(self):
+        return [] # TODO implement
+
+    def __getitem__(self, item):
+        return self.map_message[item] # TODO implement
 
 def main():
     rclpy.init()
