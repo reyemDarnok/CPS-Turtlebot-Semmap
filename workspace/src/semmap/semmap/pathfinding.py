@@ -4,11 +4,13 @@ from argparse import ArgumentParser
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
+
 from .priority_queue import PriorityQueue
 import rclpy
 import sys
 from rclpy.node import Node
 from semmap_interfaces.msg import EmergencyStop
+from semmap_interfaces.srv import PositionHistory
 from geometry_msgs.msg import Twist
 
 from .emergency_stop import Causes
@@ -71,6 +73,7 @@ class PathfindingNode(Node):
         self.main_loop_timer = self.create_timer(0.2, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
         self._full_turn_rate = self.create_rate(1, self.get_clock())
+        self.positions_client = self.create_client(PositionHistory, "/position")
 
     def navigate(self):
         if not self.e_stop_mode:
@@ -103,7 +106,11 @@ class PathfindingNode(Node):
         # TODO make nice
 
     def get_current_position(self):
-        return 0,0  # TODO implement
+        request = PositionHistory.Request()
+        position_history_future = self.cli.call_async(request)
+        rclpy.spin_until_future_complete(self, position_history_future)
+        result = position_history_future.result()
+        return result.x[-1], result.y[-1]
 
     def create_absolute_movement_task(self, target):
         def movement_task():
