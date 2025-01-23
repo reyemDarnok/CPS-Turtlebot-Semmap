@@ -1,5 +1,7 @@
+import datetime
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
 from .priority_queue import PriorityQueue
@@ -10,6 +12,49 @@ from semmap_interfaces.msg import EmergencyStop
 from geometry_msgs.msg import Twist
 
 from .emergency_stop import Causes
+
+
+def _score_node(node, path_history, time):
+    score = 0
+    e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
+    for position in path_history:
+        distance = (position.x - node.x) ** 2 + (position.y - node.y) ** 2
+        time_delta = time - position.timestamp
+        score += distance * (e_factor ** time_delta)
+    return score
+
+
+def stop_twist():
+    twist = Twist()
+    twist.linear.x = 0.0
+    twist.linear.y = 0.0
+    twist.linear.z = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
+    twist.angular.z = 0.0
+    return twist
+
+
+def move_twist():
+    twist = Twist()
+    twist.linear.x = 0.1
+    twist.linear.y = 0.0
+    twist.linear.z = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
+    twist.angular.z = 0.0
+    return twist
+
+
+def spin_twist():
+    twist = Twist()
+    twist.linear.x = 0.0
+    twist.linear.y = 0.0
+    twist.linear.z = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
+    twist.angular.z = 0.1
+    return twist
 
 
 class PathfindingNode(Node):
@@ -40,31 +85,13 @@ class PathfindingNode(Node):
 
     def backup(self):
         logging.info("Backing turtlebot up")
-        twist = Twist()
-        twist.linear.x = 0.0
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = 1.0
+        twist = spin_twist()
         self.command_movement.publish(twist)
         self._full_turn_rate.sleep()
-        twist = Twist()
-        twist.linear.x = 1.0
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = 0.0
+        twist = move_twist()
         self.command_movement.publish(twist)
         self._full_turn_rate.sleep()
-        twist = Twist()
-        twist.linear.x = 0.0
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = 0.0
+        twist = stop_twist()
         self.command_movement.publish(twist)
         self.get_logger().info("Finished backing up turtlebot")
 
@@ -91,7 +118,7 @@ class PathfindingNode(Node):
                 twist.linear.x = 0.0
                 twist.linear.y = 0.0
                 twist.linear.z = 0.0
-                twist.angular.x = 1.0
+                twist.angular.x = 0.1
                 twist.angular.y = 0.0
                 twist.angular.z = 0.0
                 self.command_movement.publish(twist)
@@ -101,24 +128,37 @@ class PathfindingNode(Node):
         return movement_task
 
     def stop(self):
-        twist = Twist()
-        twist.linear.x = 0.0
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = 0.0
+        twist = stop_twist()
         self.command_movement.publish(twist)
         self.get_logger().info("Stopping turtlebot")
 
     def explore(self):
-        pass # TODO
+        area_map = self.get_map()
+        for node in area_map.all_nodes():
+            if node.obstruction == 0.5: #TODO check if that means unexplored
+                neighbors = [
+                    area_map[node.x + 1][node.y],
+                    area_map[node.x - 1][node.y],
+                    area_map[node.x][node.y + 1],
+                    area_map[node.x][node.y - 1],
+                ]
+
+                if any(neighbor.obstruction < 0.2 for neighbor in neighbors):
+                    self.task_list.append(self.create_absolute_movement_task(node))
 
     def revisit(self):
-        pass # TODO
-
-    def return_to_dock(self):
-        pass # TODO
+        position_history = self.get_path_history()
+        area_map = self.get_map()
+        oldest_node = area_map.all_nodes()[0]
+        best_score = float("inf")
+        most_recent_time = max(position.timestamp for position in position_history)
+        for node in area_map.all_nodes():
+            if node.obstruction < 0.2:
+                node_score = _score_node(node,position_history, most_recent_time)
+                if node_score < best_score:
+                    best_score = node_score
+                    oldest_node = node
+        self.task_list.append(self.create_absolute_movement_task(oldest_node))
 
 
 def main():

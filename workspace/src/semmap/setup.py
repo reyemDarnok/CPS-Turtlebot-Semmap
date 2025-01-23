@@ -24,8 +24,9 @@ setup(
             'logs = semmap.logs:main',
             'object_detection = semmap.object_detection:main',
             'pathfinding = semmap.pathfinding:main',
+            'position_history = semmap.position_history:main',
             'semantic_map = semmap.semantic_map:main',
-            'slam = semmap.slam:main',
+
         ],
     },
 )
