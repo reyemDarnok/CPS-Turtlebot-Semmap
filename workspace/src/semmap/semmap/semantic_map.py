@@ -19,7 +19,7 @@ class SemanticMapNode(Node):
         )
 
         self.create_subscription(
-            Location, 'robot_location', self.robot_location_callback, 10
+            Location, 'robot_location', self.robot_location_callback, 10 # TODO correct service
         )
 
         self.create_service(
@@ -72,7 +72,7 @@ class SemanticMapNode(Node):
         self.object_list.append((msg.tag, global_x, global_y, z))
         self.current_obj_detections.append((msg.tag, global_x, global_y, z))
 
-        #after every 5th detected object, check for ghost objects (might wanna change timing of when to check for ghosts?)
+        #after every 5th detected object, check for ghost objects (might want to change timing of when to check for ghosts?)
         if len(self.object_list) % 5 == 0:
             self.get_logger().info("Checking for ghost objects.")
             self.remove_ghost_objects(detected_objects=self.current_obj_detections)
