@@ -143,7 +143,6 @@ class PathfindingNode(Node):
 
     def create_absolute_movement_task(self, target: AreaNode):
         def movement_task():
-            # TODO fail on impossible routes
             current_pos = self.get_current_position()
             astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
@@ -156,6 +155,8 @@ class PathfindingNode(Node):
                     if n_prio < prio:
                         neighbor.predecessor = node
                         astar_map.priority_queue.update_elem(distance, (n_prio, neighbor))
+            else:
+                raise ImpossibleRouteException()
             start_node = None
             current_node = astar_map.target_node
             while current_node.predecessor is not None:

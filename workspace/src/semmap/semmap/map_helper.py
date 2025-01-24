@@ -36,6 +36,7 @@ class AreaNode:
         self.y = y
         self.obstruction = obstruction
         self.parent_map = parent_map
+        self.complete_unknown = obstruction == -1
         self.obstructed = self.is_obstruction_within(bot_size)
 
     def is_obstruction_within(self, search_distance: int) -> bool:
