@@ -1,12 +1,16 @@
 import datetime
 import logging
+import math
 from argparse import ArgumentParser
 from datetime import datetime
 from enum import Enum, auto
 from itertools import product
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 
+import numpy as np
+
+from .position_history import Position
 from .map_helper import AreaMap, free_threshold, obstruction_threshold, AreaNode
 from .priority_queue import PriorityQueue
 import rclpy
@@ -23,9 +27,9 @@ from .emergency_stop import Causes
 
 class AstarNode:
     def __init__(self, node, area_map: 'AreaMap'):
-        self.x = node.x
-        self.y = node.y
-        self.predecessor = None
+        self.x = node.x_pos
+        self.y = node.y_pos
+        self.predecessor: Optional[AstarNode] = None
         self.neighbors = node.neighbors
         self.parent_map = area_map
         self.obstructed = node.obstructed
@@ -37,7 +41,7 @@ class AstarMap:
         self.priority_queue = PriorityQueue()
         for node in area_map.all_nodes:
             astar_node = AstarNode(node, area_map)
-            if pos[0] - 1 < astar_node.x < pos[0] and pos[1] - 1 < astar_node.y < pos[1]:
+            if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
                 self.priority_queue.put((0, astar_node))
             elif not astar_node.obstructed:
                 self.priority_queue.put((float('inf'), astar_node))
@@ -46,7 +50,7 @@ def _score_node(node, path_history, time):
     score = 0
     e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
     for position in path_history:
-        distance = (position.x - node.x) ** 2 + (position.y - node.y) ** 2
+        distance = (position.x_pos - node.x_pos) ** 2 + (position.y_pos - node.y_pos) ** 2
         time_delta = time - position.timestamp
         score += distance * (e_factor ** time_delta)
     return score
@@ -54,33 +58,33 @@ def _score_node(node, path_history, time):
 
 def stop_twist():
     twist = Twist()
-    twist.linear.x = 0.0
-    twist.linear.y = 0.0
+    twist.linear.x_pos = 0.0
+    twist.linear.y_pos = 0.0
     twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
+    twist.angular.x_pos = 0.0
+    twist.angular.y_pos = 0.0
     twist.angular.z = 0.0
     return twist
 
 
 def move_twist():
     twist = Twist()
-    twist.linear.x = 0.1
-    twist.linear.y = 0.0
+    twist.linear.x_pos = 0.1
+    twist.linear.y_pos = 0.0
     twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
+    twist.angular.x_pos = 0.0
+    twist.angular.y_pos = 0.0
     twist.angular.z = 0.0
     return twist
 
 
 def spin_twist():
     twist = Twist()
-    twist.linear.x = 0.0
-    twist.linear.y = 0.0
+    twist.linear.x_pos = 0.0
+    twist.linear.y_pos = 0.0
     twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
+    twist.angular.x_pos = 0.0
+    twist.angular.y_pos = 0.0
     twist.angular.z = 0.1
     return twist
 
@@ -134,12 +138,9 @@ class PathfindingNode(Node):
         self.get_logger().info("Finished backing up turtlebot")
         # TODO make nice
 
-    def get_current_position(self)-> Tuple[float, float]:
-        request = PositionHistory.Request()
-        position_history_future = self.cli.call_async(request)
-        rclpy.spin_until_future_complete(self, position_history_future)
-        result = position_history_future.result()
-        return result.x[-1], result.y[-1]
+    def get_current_position(self)-> Position:
+        result = self._get_position_history()
+        return Position(result.x[-1], result.y[-1], result.timestamp[-1])
 
     def create_absolute_movement_task(self, target: AreaNode):
         def movement_task():
@@ -161,14 +162,31 @@ class PathfindingNode(Node):
             current_node = astar_map.target_node
             while current_node.predecessor is not None:
                 start_node = current_node
-            if self.is_aligned(start_node): # TODO implement
-                twist = spin_twist()
+            if self.is_aligned(start_node):
+                twist = move_twist()
                 self.command_movement.publish(twist)
                 self.get_logger().info("Moving to next node")
             else:
-                self.align_to(start_node) # TODO implement
+                twist = spin_twist()
+                self.command_movement.publish(twist)
+                self.get_logger().info("Spinning to align to next node")
         return movement_task
 
+    def is_aligned(self, node: AreaNode) -> bool:
+        result = self._get_position_history()
+        current_vector = (result.x[-1] - result.x[-2], result.y[-1] - result.y[-2])
+        current_vector = unit_vector(current_vector) # ignore IDE marking, the type works
+        goal_vector = (node.x - result.x[-1], node.y - result.y[-1])
+        goal_vector = unit_vector(goal_vector)
+        vector_angle = np.arccos(np.clip(np.dot(current_vector, goal_vector), -1.0, 1.0))
+        return vector_angle < 20 * math.pi / 180.0
+
+    def _get_position_history(self):
+        request = PositionHistory.Request()
+        position_history_future = self.cli.call_async(request)
+        rclpy.spin_until_future_complete(self, position_history_future)
+        result = position_history_future.result()
+        return result
 
     def stop(self):
         twist = stop_twist()
@@ -215,6 +233,10 @@ def main():
 def parse_args():
     parser = ArgumentParser()
     return parser.parse_args()
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
 
 
 if __name__ == "__main__":
