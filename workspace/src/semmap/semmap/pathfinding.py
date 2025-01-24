@@ -179,15 +179,8 @@ class PathfindingNode(Node):
     def explore(self):
         area_map = self.get_map()
         for node in area_map.all_nodes():
-            if node.obstruction == 0.5: #TODO check if that means unexplored
-                neighbors = [
-                    area_map[node.x + 1][node.y],
-                    area_map[node.x - 1][node.y],
-                    area_map[node.x][node.y + 1],
-                    area_map[node.x][node.y - 1],
-                ]
-
-                if any(neighbor.obstruction < 0.2 for neighbor in neighbors):
+            if free_threshold < node.obstruction < obstruction_threshold:
+                if any(neighbor.obstruction < 0.2 for neighbor in node.neighbors):
                     self.task_list.append(self.create_absolute_movement_task(node))
 
     def get_map(self):
