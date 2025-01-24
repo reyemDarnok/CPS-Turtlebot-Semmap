@@ -22,7 +22,7 @@ class AreaMap:
         return len(self.data_2d)
 
     @classmethod
-    def create_from_subscription(cls, msg):
+    def from_msg(cls, msg):
         width = msg.info.width
         height = msg.info.height
         data = msg.data

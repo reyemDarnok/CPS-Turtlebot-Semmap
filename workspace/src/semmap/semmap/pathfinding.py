@@ -15,6 +15,7 @@ from rclpy.node import Node
 from semmap_interfaces.msg import EmergencyStop
 from semmap_interfaces.srv import PositionHistory
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import OccupancyGrid
 
 from .emergency_stop import Causes
 
@@ -27,10 +28,6 @@ class AstarNode:
         self.predecessor = None
         self.neighbors = node.neighbors
         self.parent_map = area_map
-        # TODO implement area_map[node.x + 1][node.y],
-        #                     area_map[node.x - 1][node.y],
-        #                     area_map[node.x][node.y + 1],
-        #                     area_map[node.x][node.y - 1],
         self.obstructed = node.obstructed
 
 
@@ -97,10 +94,15 @@ class PathfindingNode(Node):
         super().__init__("PathfindingNode")
         self.task_list = [self.explore]
         self.e_stop_mode = False
+        self.map = AreaMap(0,0,[])
         self.main_loop_timer = self.create_timer(0.2, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
         self._full_turn_rate = self.create_rate(1, self.get_clock())
         self.positions_client = self.create_client(PositionHistory, "/position")
+        self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
+
+    def map_callback(self, msg):
+        self.map = AreaMap.from_msg(msg)
 
     def navigate(self):
         if not self.e_stop_mode:
@@ -143,7 +145,7 @@ class PathfindingNode(Node):
         def movement_task():
             # TODO fail on impossible routes
             current_pos = self.get_current_position()
-            astar_map = AstarMap(self.get_map(), current_pos, target)
+            astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
                 prio, node = astar_map.priority_queue.pop()
@@ -173,7 +175,7 @@ class PathfindingNode(Node):
         self.get_logger().info("Stopping turtlebot")
 
     def explore(self):
-        area_map = self.get_map()
+        area_map = self.map
         for node in area_map.all_nodes():
             if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
                 try:
@@ -182,12 +184,9 @@ class PathfindingNode(Node):
                 except ImpossibleRouteException:
                     pass
 
-    def get_map(self):
-        return AreaMap(None) # TODO replace with callback and local var
-
     def revisit(self):
         position_history = self.get_path_history()
-        area_map = self.get_map()
+        area_map = self.map
         oldest_node = area_map.all_nodes()[0]
         best_score = float("inf")
         most_recent_time = max(position.timestamp for position in position_history)
