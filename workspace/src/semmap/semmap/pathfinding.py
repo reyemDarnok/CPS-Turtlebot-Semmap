@@ -3,6 +3,7 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 from enum import Enum, auto
+from itertools import product
 from pathlib import Path
 
 from .priority_queue import PriorityQueue
@@ -15,12 +16,43 @@ from geometry_msgs.msg import Twist
 
 from .emergency_stop import Causes
 
+obstruction_threshold = 0.65
+free_threshold = 0.25
+resolution = 0.05 # in meters
+bot_size = 4 # radius in resolution steps - intentionallly to large
+
+class AstarNode:
+    def __init__(self, node, area_map: 'AreaMap'):
+        self.x = node.x
+        self.y = node.y
+        self.predecessor = None
+        self.neighbors = node.neighbors
+        self.parent_map = area_map
+        # TODO implement area_map[node.x + 1][node.y],
+        #                     area_map[node.x - 1][node.y],
+        #                     area_map[node.x][node.y + 1],
+        #                     area_map[node.x][node.y - 1],
+        self.obstructed = self.is_obstruction_within(bot_size)
+
+    def is_obstruction_within(self, search_distance: int) -> bool:
+        x_coords = [x for x in range(self.x - search_distance, self.x + search_distance)
+                    if 0 <= x < len(self.parent_map)]
+        y_coords = [y for y in range(self.x - search_distance, self.x + search_distance)
+                    if 0 <= y < len(self.parent_map[0])]
+        return any(node.obstruction > obstruction_threshold for node in (
+            self.parent_map[x][y] for x, y in product(x_coords, y_coords)
+        ))
 
 class AstarMap:
     def __init__(self, area_map, pos, target):
         self.target_node = target
         self.priority_queue = PriorityQueue()
-        # TODO fill queue
+        for node in area_map.all_nodes:
+            astar_node = AstarNode(node, area_map)
+            if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
+                self.priority_queue.put((0, astar_node))
+            elif not astar_node.obstructed:
+                self.priority_queue.put((float('inf'), astar_node))
 
 def _score_node(node, path_history, time):
     score = 0
@@ -184,6 +216,9 @@ class AreaMap:
 
     def __getitem__(self, item):
         return self.map_message[item] # TODO implement
+
+    def __len__(self):
+        return len(self.map_message)
 
 def main():
     rclpy.init()
