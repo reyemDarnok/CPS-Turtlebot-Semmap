@@ -5,7 +5,9 @@ from datetime import datetime
 from enum import Enum, auto
 from itertools import product
 from pathlib import Path
+from typing import Tuple
 
+from .map_helper import AreaMap, free_threshold, obstruction_threshold, AreaNode
 from .priority_queue import PriorityQueue
 import rclpy
 import sys
@@ -16,10 +18,7 @@ from geometry_msgs.msg import Twist
 
 from .emergency_stop import Causes
 
-obstruction_threshold = 0.65
-free_threshold = 0.25
-resolution = 0.05 # in meters
-bot_size = 4 # radius in resolution steps - intentionallly to large
+
 
 class AstarNode:
     def __init__(self, node, area_map: 'AreaMap'):
@@ -32,16 +31,8 @@ class AstarNode:
         #                     area_map[node.x - 1][node.y],
         #                     area_map[node.x][node.y + 1],
         #                     area_map[node.x][node.y - 1],
-        self.obstructed = self.is_obstruction_within(bot_size)
+        self.obstructed = node.obstructed
 
-    def is_obstruction_within(self, search_distance: int) -> bool:
-        x_coords = [x for x in range(self.x - search_distance, self.x + search_distance)
-                    if 0 <= x < len(self.parent_map)]
-        y_coords = [y for y in range(self.x - search_distance, self.x + search_distance)
-                    if 0 <= y < len(self.parent_map[0])]
-        return any(node.obstruction > obstruction_threshold for node in (
-            self.parent_map[x][y] for x, y in product(x_coords, y_coords)
-        ))
 
 class AstarMap:
     def __init__(self, area_map, pos, target):
@@ -49,7 +40,7 @@ class AstarMap:
         self.priority_queue = PriorityQueue()
         for node in area_map.all_nodes:
             astar_node = AstarNode(node, area_map)
-            if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
+            if pos[0] - 1 < astar_node.x < pos[0] and pos[1] - 1 < astar_node.y < pos[1]:
                 self.priority_queue.put((0, astar_node))
             elif not astar_node.obstructed:
                 self.priority_queue.put((float('inf'), astar_node))
@@ -97,6 +88,10 @@ def spin_twist():
     return twist
 
 
+class ImpossibleRouteException(Exception):
+    pass
+
+
 class PathfindingNode(Node):
     def __init__(self) -> None:
         super().__init__("PathfindingNode")
@@ -137,15 +132,16 @@ class PathfindingNode(Node):
         self.get_logger().info("Finished backing up turtlebot")
         # TODO make nice
 
-    def get_current_position(self):
+    def get_current_position(self)-> Tuple[float, float]:
         request = PositionHistory.Request()
         position_history_future = self.cli.call_async(request)
         rclpy.spin_until_future_complete(self, position_history_future)
         result = position_history_future.result()
         return result.x[-1], result.y[-1]
 
-    def create_absolute_movement_task(self, target):
+    def create_absolute_movement_task(self, target: AreaNode):
         def movement_task():
+            # TODO fail on impossible routes
             current_pos = self.get_current_position()
             astar_map = AstarMap(self.get_map(), current_pos, target)
             astar_map.priority_queue = PriorityQueue()
@@ -179,12 +175,15 @@ class PathfindingNode(Node):
     def explore(self):
         area_map = self.get_map()
         for node in area_map.all_nodes():
-            if free_threshold < node.obstruction < obstruction_threshold:
-                if any(neighbor.obstruction < 0.2 for neighbor in node.neighbors):
+            if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
+                try:
                     self.task_list.append(self.create_absolute_movement_task(node))
+                    break
+                except ImpossibleRouteException:
+                    pass
 
     def get_map(self):
-        return AreaMap(None) # TODO implement
+        return AreaMap(None) # TODO replace with callback and local var
 
     def revisit(self):
         position_history = self.get_path_history()
@@ -193,25 +192,12 @@ class PathfindingNode(Node):
         best_score = float("inf")
         most_recent_time = max(position.timestamp for position in position_history)
         for node in area_map.all_nodes():
-            if node.obstruction < 0.2:
+            if not node.obstructed:
                 node_score = _score_node(node,position_history, most_recent_time)
                 if node_score < best_score:
                     best_score = node_score
                     oldest_node = node
         self.task_list.append(self.create_absolute_movement_task(oldest_node))
-
-class AreaMap:
-    def __init__(self, map_message):
-        self.map_message = map_message
-
-    def all_nodes(self):
-        return [] # TODO implement
-
-    def __getitem__(self, item):
-        return self.map_message[item] # TODO implement
-
-    def __len__(self):
-        return len(self.map_message)
 
 def main():
     rclpy.init()

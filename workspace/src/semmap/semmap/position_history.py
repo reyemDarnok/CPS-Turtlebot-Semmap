@@ -20,7 +20,7 @@ class Position:
 class LoggingNode(Node):
     def __init__(self) -> None:
         super().__init__("PositionHistoryNode")
-        self.create_subscription(Log, "/trajectory_node_list", self.map_callback, 10)
+        self.create_subscription(MarkerArray, "/trajectory_node_list", self.map_callback, 10)
         self.create_service(PositionHistory, "/position_history", self.position_callback, 10)
         self.positions: List[Position] = []
 
