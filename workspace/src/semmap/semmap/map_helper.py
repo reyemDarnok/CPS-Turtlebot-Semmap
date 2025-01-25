@@ -8,18 +8,22 @@ bot_size = 4 # radius in resolution steps - intentionally to large
 
 class AreaMap:
     def __init__(self, height: int, width: int, data_2d: List[List[float]]):
-        self.data_2d = data_2d
         self.height = height
         self.width = width
+        self.node_2d = []
+        for x, row in enumerate(data_2d):
+            self.node_2d.append([])
+            for y, value in enumerate(row):
+                self.node_2d[x].append(AreaNode(x, y, value, self))
 
     def all_nodes(self):
-        return [x for x in [column for column in self.data_2d]]
+        return [x for column in self.node_2d for x in column]
 
     def __getitem__(self, item):
-        return self.data_2d[item]
+        return self.node_2d[item]
 
     def __len__(self):
-        return len(self.data_2d)
+        return len(self.node_2d)
 
     @classmethod
     def from_msg(cls, msg):
