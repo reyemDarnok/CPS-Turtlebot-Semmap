@@ -8,32 +8,33 @@ import rclpy
 import sys
 from rclpy.node import Node
 from rcl_interfaces.msg import Log
-from visualization.msg import MarkerArray
+from scipy.spatial.transform import Rotation
 from semmap_interfaces.srv import PositionHistory
+from nav_msgs.msg import Odometry
 
 @dataclass
 class Position:
-    x: int
-    y: int
+    x: float
+    y: float
+    rotation: float
     timestamp: float
 
 class LoggingNode(Node):
     def __init__(self) -> None:
         super().__init__("PositionHistoryNode")
-        self.create_subscription(MarkerArray, "/trajectory_node_list", self.map_callback, 10)
-        self.create_service(PositionHistory, "/position_history", self.position_callback, 10)
+        self.create_subscription(Odometry, "/odom", self.map_callback, 10)
+        self.create_service(PositionHistory, "/position_history", self.position_callback)
         self.positions: List[Position] = []
 
-    def map_callback(self, msg: MarkerArray) -> None:
-        if msg.id == 2:
-            sum_x = 0
-            sum_y = 0
-            for point in msg.points:
-                sum_x = sum_x + point.x
-                sum_y = sum_y + point.y
+    def map_callback(self, msg: Odometry) -> None:
+        if msg.child_frame_id == 'base_footprint':
+            quat = msg.pose.pose.orientation
+            rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
+            rot_euler = rot.as_euler('xyz')[2]
             current_position = Position(
-                x= sum_x / len(msg.points),
-                y = sum_y / len(msg.points),
+                x= msg.pose.pose.position.x,
+                y = msg.pose.pose.position.y,
+                rotation=rot_euler,
                 timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec/1e9
             )
             self.positions.append(current_position)
@@ -41,6 +42,7 @@ class LoggingNode(Node):
     def position_callback(self, msg: PositionHistory, response) -> None:
         response.x = [position.x for position in self.positions]
         response.y = [position.y for position in self.positions]
+        response.rotation = [position.rotation for position in self.positions]
         response.timestamp = [position.timestamp for position in self.positions]
         return response
 def main():
