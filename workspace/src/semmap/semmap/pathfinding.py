@@ -141,7 +141,7 @@ class PathfindingNode(Node):
 
     def get_current_position(self)-> Position:
         result = self._get_position_history()
-        return Position(result.x[-1], result.y[-1], result.timestamp[-1])
+        return Position(result.x[-1], result.y[-1], result.rotation[-1], result.timestamp[-1])
 
     def create_absolute_movement_task(self, target: AreaNode):
         def movement_task():
@@ -173,14 +173,19 @@ class PathfindingNode(Node):
                 self.get_logger().info("Spinning to align to next node")
         return movement_task
 
-    def is_aligned(self, node: AreaNode) -> bool:
+    def is_aligned(self, node: AreaNode, tolerance: float = 20 * math.pi / 180) -> bool:
+        if tolerance < 0: tolerance *= -1
         result = self._get_position_history()
-        current_vector = (result.x[-1] - result.x[-2], result.y[-1] - result.y[-2])
-        current_vector = unit_vector(current_vector) # ignore IDE marking, the type works
+        current_angle = result.rotation % (2* math.pi)
         goal_vector = (node.x - result.x[-1], node.y - result.y[-1])
+        # noinspection PyTypeChecker
         goal_vector = unit_vector(goal_vector)
-        vector_angle = np.arccos(np.clip(np.dot(current_vector, goal_vector), -1.0, 1.0))
-        return vector_angle < 20 * math.pi / 180.0
+        vector_angle = np.arccos(np.clip(np.dot((1,0), goal_vector), -1.0, 1.0))
+        vector_angle = vector_angle % (2*math.pi)
+        if vector_angle < current_angle:
+            vector_angle += 2 * math.pi
+        angle_difference = vector_angle - current_angle
+        return angle_difference < tolerance
 
     def _get_position_history(self):
         request = PositionHistory.Request()
