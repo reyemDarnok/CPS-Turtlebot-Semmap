@@ -44,8 +44,10 @@ class AstarMap:
             if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
                 self.priority_queue.put((0, astar_node))
             elif not astar_node.obstructed:
-                self.priority_queue.put((float('inf'), astar_node))
+                self.priority_queue.put(0, astar_node)
 
+def heuristic(nodea, nodeb):
+        return abs(nodea.x -nodeb.x) + abs(nodea.y -nodeb.y)
 def _score_node(node, path_history, time):
     score = 0
     e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
@@ -110,11 +112,13 @@ class PathfindingNode(Node):
         self.map = AreaMap.from_msg(msg, self.get_logger())
 
     def navigate(self):
+        self.get_logger().info(f'Checking current navigation task')
         if not self.e_stop_mode:
             self.task_list[-1]() # execute the most recent task
 
     def emergency_stop(self, message):
         self.stop()
+        self.get_logger().warning('Entering emergency stop')
         self.e_stop_mode = True
         if message.solvable_by_backup:
             self.backup() # move backwards
@@ -144,7 +148,9 @@ class PathfindingNode(Node):
         return Position(result.x[-1], result.y[-1], result.rotation[-1], result.timestamp[-1])
 
     def create_absolute_movement_task(self, target: AreaNode):
+        self.get_logger().info('Creating Movement Task')
         def movement_task():
+            self.get_logger().info(f'Planning movement towards {target.x}/{target.y}')
             current_pos = self.get_current_position()
             astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
@@ -189,7 +195,7 @@ class PathfindingNode(Node):
 
     def _get_position_history(self):
         request = PositionHistory.Request()
-        position_history_future = self.cli.call_async(request)
+        position_history_future = self.positions_client.call_async(request)
         rclpy.spin_until_future_complete(self, position_history_future)
         result = position_history_future.result()
         return result
@@ -200,14 +206,17 @@ class PathfindingNode(Node):
         self.get_logger().info("Stopping turtlebot")
 
     def explore(self):
+        self.get_logger().info("Executing explore task")
         area_map = self.map
         if area_map is None:
+            self.get_logger().info("No map available, waiting")
             return # System not yet initialized
         for node in area_map.all_nodes():
             if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
                 try:
                     self.task_list.append(self.create_absolute_movement_task(node))
-                    break
+                    self.get_logger().info(f'Creating Navigation to {node.x}/{node.y}')
+                    return
                 except ImpossibleRouteException:
                     pass
 
