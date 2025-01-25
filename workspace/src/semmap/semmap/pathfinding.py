@@ -104,6 +104,7 @@ class PathfindingNode(Node):
         self._full_turn_rate = self.create_rate(1, self.get_clock())
         self.positions_client = self.create_client(PositionHistory, "/position")
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
+        self.get_logger().info("Pathfinding node initialized")
 
     def map_callback(self, msg):
         self.map = AreaMap.from_msg(msg)
