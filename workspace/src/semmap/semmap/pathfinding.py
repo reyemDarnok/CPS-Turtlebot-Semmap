@@ -29,10 +29,12 @@ class AstarNode:
     def __init__(self, node, area_map: 'AreaMap'):
         self.x = node.x_pos
         self.y = node.y_pos
+        self.node = node
         self.predecessor: Optional[AstarNode] = None
         self.neighbors = node.neighbors
         self.parent_map = area_map
         self.obstructed = node.obstructed
+        self.score = float('inf')
 
 
 class AstarMap:
@@ -44,10 +46,10 @@ class AstarMap:
             if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
                 self.priority_queue.put((0, astar_node))
             elif not astar_node.obstructed:
-                self.priority_queue.put(0, astar_node)
+                self.priority_queue.put((float('inf'), astar_node))
 
-def heuristic(nodea, nodeb):
-        return abs(nodea.x -nodeb.x) + abs(nodea.y -nodeb.y)
+def heuristic(node_a, node_b):
+        return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
 def _score_node(node, path_history, time):
     score = 0
     e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
@@ -155,14 +157,15 @@ class PathfindingNode(Node):
             astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
-                prio, node = astar_map.priority_queue.pop()
+                node = astar_map.priority_queue.pop()
                 if node == target:
                     break
-                for distance, neighbor in node.neighbors:
-                    n_prio = prio + distance
-                    if n_prio < prio:
+                for neighbor in node.neighbors:
+                    neighbor_score_via_current = node.score + 1 + heuristic(neighbor, target)
+                    if neighbor_score_via_current < neighbor.score:
                         neighbor.predecessor = node
-                        astar_map.priority_queue.update_elem(distance, (n_prio, neighbor))
+                        neighbor.score = neighbor_score_via_current
+                        astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
             else:
                 raise ImpossibleRouteException()
             start_node = None
