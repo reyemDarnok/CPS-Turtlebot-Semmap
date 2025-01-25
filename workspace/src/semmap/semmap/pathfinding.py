@@ -98,7 +98,7 @@ class PathfindingNode(Node):
         super().__init__("PathfindingNode")
         self.task_list = [self.explore]
         self.e_stop_mode = False
-        self.map = AreaMap(0,0,[])
+        self.map = None
         self.main_loop_timer = self.create_timer(0.2, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
         self._full_turn_rate = self.create_rate(1, self.get_clock())
@@ -107,7 +107,7 @@ class PathfindingNode(Node):
         self.get_logger().info("Pathfinding node initialized")
 
     def map_callback(self, msg):
-        self.map = AreaMap.from_msg(msg)
+        self.map = AreaMap.from_msg(msg, self.get_logger())
 
     def navigate(self):
         if not self.e_stop_mode:
@@ -201,6 +201,8 @@ class PathfindingNode(Node):
 
     def explore(self):
         area_map = self.map
+        if area_map is None:
+            return # System not yet initialized
         for node in area_map.all_nodes():
             if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
                 try:
