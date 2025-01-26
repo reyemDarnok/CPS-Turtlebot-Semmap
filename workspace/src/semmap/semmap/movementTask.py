@@ -1,6 +1,7 @@
 import math
 from abc import abstractmethod, abstractproperty
 import datetime
+from random import choice
 
 import numpy as np
 from geometry_msgs.msg import Twist
@@ -170,7 +171,10 @@ class ExploreTask(MovementTask):
             if area_map is None:
                 self.pathfinding.get_logger().info("No map available, waiting")
                 return  # System not yet initialized
-            for node in area_map.all_nodes():
+            current_pos = self.pathfinding.get_current_position()
+            current_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x)]
+            while True:
+                node = choice(list(current_node.nodes_in_range(20)))
                 if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
                     try:
                         movement_task = AbsoluteMovementTask(self.pathfinding, node)
@@ -260,11 +264,7 @@ class AbsoluteMovementTask(MovementTask):
         while current_node.predecessor is not None:
             path = [current_node] + path
             current_node = current_node.predecessor
-            if (current_node.node.obstruction < free_threshold
-                    and not current_node.node.complete_unknown
-                    and self.pathfinding.has_sight_line(current_pos, current_node)):
-                break
         self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
         self.task_list = [SlamSpinTask(self.pathfinding),
-                          ForwardTask(self.pathfinding, path[0].node),
-                          RotationTask(self.pathfinding, path[0].node)]
+                          ForwardTask(self.pathfinding, path[1].node),
+                          RotationTask(self.pathfinding, path[1].node)]

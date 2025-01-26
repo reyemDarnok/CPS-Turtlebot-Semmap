@@ -62,23 +62,23 @@ class AreaNode:
 
     def post_init(self):
         self.obstructed = self.is_obstruction_within(bot_size)
-        x_coords, y_coords = self._coords_in_range(1)
-        self.neighbors = [self.parent_map[n_y][n_x] for n_x, n_y in product(x_coords, y_coords)
-                           if n_x != self.x or n_y != self.y]
+        self.neighbors = self.nodes_in_range(1)
 
 
 
     def is_obstruction_within(self, search_distance: int) -> bool:
-        x_coords, y_coords = self._coords_in_range(search_distance)
-        return any(node.obstruction > obstruction_threshold for node in (
-            self.parent_map[y][x] for x, y in product(x_coords, y_coords)
-        ))
+        return any(node.obstruction > obstruction_threshold for node in self.nodes_in_range(search_distance))
+
+    def nodes_in_range(self, search_distance):
+        return (
+            self.parent_map[y][x] for x, y in product(*self._coords_in_range(search_distance))
+        )
 
     def _coords_in_range(self, search_distance):
         x_coords = [x for x in range(self.x - search_distance, self.x + search_distance + 1)
-                    if 0 <= x < self.parent_map.width]
+                    if 0 <= x < self.parent_map.width and x != self.x]
         y_coords = [y for y in range(self.y - search_distance, self.y + search_distance + 1)
-                    if 0 <= y < self.parent_map.height]
+                    if 0 <= y < self.parent_map.height and y != self.y]
         return x_coords, y_coords
 
 
