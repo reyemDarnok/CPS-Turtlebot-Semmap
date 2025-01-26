@@ -1,2 +1,0 @@
-uint8 cause
-bool solvable_by_backup
