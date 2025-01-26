@@ -22,7 +22,7 @@ class AreaMap:
         for x, row in enumerate(data_2d):
             self.node_2d.append([])
             for y, value in enumerate(row):
-                self.node_2d[x].append(AreaNode(x, y, value, self))
+                self.node_2d[x].append(AreaNode(x, y, value, self, logger))
         for node in self.all_nodes():
             node.post_init()
 
@@ -46,7 +46,7 @@ class AreaMap:
         return cls(height, width, data_2d, logger)
 
 class AreaNode:
-    def __init__(self, x, y, obstruction, parent_map):
+    def __init__(self, x, y, obstruction, parent_map, logger):
         self.x = x
         self.y = y
         self.obstruction = obstruction
@@ -54,9 +54,10 @@ class AreaNode:
         self.complete_unknown = obstruction == -1
         self.obstructed = None
         self.neighbors = []
+        self.logger = logger
 
     def post_init(self):
-        self.is_obstruction_within(bot_size)
+        self.obstructed = self.is_obstruction_within(bot_size)
         x_coords, y_coords = self._coords_in_range(1)
         self.neighbors = [self.parent_map[n_x][n_y] for n_x, n_y in product(x_coords, y_coords)
                            if n_x != self.x or n_y != self.y]

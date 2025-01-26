@@ -1,6 +1,7 @@
 import datetime
 import logging
 import math
+import time
 from argparse import ArgumentParser
 from datetime import datetime
 from enum import Enum, auto
@@ -37,7 +38,7 @@ class AstarNode:
         self.astar_map = astar_map
 
     def post_init(self):
-        self.neighbors = [self.astar_map.nodes_2d[neighbor.x][neighbor.y] for neighbor in self.neighbors]
+        self.neighbors = [self.astar_map.nodes_2d[neighbor.x][neighbor.y] for neighbor in self.node.neighbors]
 
 class AstarMap:
     def __init__(self, area_map, pos, target):
@@ -177,9 +178,12 @@ class PathfindingNode(Node):
             astar_map = AstarMap(self.map, current_pos, target)
             while not len(astar_map.priority_queue) == 0:
                 node_score, node = astar_map.priority_queue.pop()
+                self.get_logger().info(f'Handling node {node.x}/{node.y} with score {node_score}')
+                time.sleep(1)
                 if node == target:
                     break
                 for neighbor in node.neighbors:
+                    self.get_logger().info(f'Checking Neighbor {neighbor.x}/{neighbor.y}')
                     neighbor_score_via_current = node_score + 1 + heuristic(neighbor, target)
                     if neighbor_score_via_current < neighbor.score:
                         neighbor.predecessor = node
