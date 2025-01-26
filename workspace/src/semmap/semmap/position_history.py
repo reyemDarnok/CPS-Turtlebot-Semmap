@@ -11,6 +11,7 @@ from rcl_interfaces.msg import Log
 from scipy.spatial.transform import Rotation
 from semmap_interfaces.msg import PositionHistory
 from nav_msgs.msg import Odometry, OccupancyGrid
+from semmap_interfaces import msg
 @dataclass
 class Position:
     x: float
@@ -26,6 +27,7 @@ class LoggingNode(Node):
         self.create_subscription(Odometry, "/odom", self.map_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.origin_callback, 10)
         self.p_history_publisher = self.create_publisher(PositionHistory, "/position_history", 10)
+        self.p_publisher = self.create_publisher(msg.Position, "/position", 10)
         self.positions: List[Position] = []
         self.map_offset_x = None
         self.map_offset_y = None
@@ -38,27 +40,27 @@ class LoggingNode(Node):
         self.map_offset_y = msg.info.height * resolution + msg.info.origin.position.y
         quat = msg.info.origin.orientation
         rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
-        self.rotation_offset = - rot.as_euler('xyz')[2]
+        self.rotation_offset = - rot.as_rotvec()[2]
 
 
-    def map_callback(self, msg: Odometry) -> None:
+    def map_callback(self, message: Odometry) -> None:
         if self.map_offset_x is None:
             self.get_logger().info("x_offset is not yet determined, ignoring position")
             return
         if self.odom_offset_x is None:
-            self.odom_offset_x = - msg.pose.pose.position.x
-            self.odom_offset_y = - msg.pose.pose.position.y
-        if msg.child_frame_id == 'base_footprint':
-            quat = msg.pose.pose.orientation
+            self.odom_offset_x = - message.pose.pose.position.x
+            self.odom_offset_y = - message.pose.pose.position.y
+        if message.child_frame_id == 'base_footprint':
+            quat = message.pose.pose.orientation
             rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
-            rot_euler = rot.as_euler('xyz')[2]
-            offset_corrected_x = msg.pose.pose.position.x + self.map_offset_x + self.odom_offset_x
-            offset_corrected_y = msg.pose.pose.position.y + self.map_offset_y + self.odom_offset_y
+            rot_euler = rot.as_rotvec()[2]
+            offset_corrected_x = message.pose.pose.position.x + self.map_offset_x + self.odom_offset_x
+            offset_corrected_y = message.pose.pose.position.y + self.map_offset_y + self.odom_offset_y
             current_position = Position(
                 x= offset_corrected_x / resolution,
                 y = offset_corrected_y / resolution,
                 rotation=rot_euler + self.rotation_offset,
-                timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec/1e9
+                timestamp = message.header.stamp.sec + message.header.stamp.nanosec/1e9
             )
             if len(self.positions) == 0 or current_position.timestamp - self.positions[-1].timestamp > time_resolution:
                 self.positions.append(current_position)
@@ -68,6 +70,12 @@ class LoggingNode(Node):
                 result.rotation = [position.rotation for position in self.positions]
                 result.timestamp = [position.timestamp for position in self.positions]
                 self.p_history_publisher.publish(result)
+                position = msg.Position()
+                position.x = current_position.x
+                position.y = current_position.y
+                position.rotation = current_position.rotation
+                position.timestamp = current_position.timestamp
+                self.p_publisher.publish(position)
 
 def main():
     rclpy.init()

@@ -31,6 +31,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Object.msg"
   "msg/SlamMap.msg"
   "msg/PositionHistory.msg"
+  "msg/Position.msg"
   "srv/SemanticMap.srv"
  )
 

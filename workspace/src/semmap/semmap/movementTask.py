@@ -94,7 +94,7 @@ class RotationTask(MovementTask):
             self._finished = True
             self.pathfinding.get_logger().info("Stopped spin")
             self.stop()
-        elif angle_offset < 0:
+        elif angle_offset > 0:
             twist = spin_twist()
             twist.angular.z = -0.1
             self.pathfinding.command_movement.publish(twist)
