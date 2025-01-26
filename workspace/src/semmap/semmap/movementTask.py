@@ -32,13 +32,11 @@ class MovementTask:
         goal_vector = unit_vector(goal_vector)
         vector_angle = np.arccos(np.clip(np.dot(goal_vector, (-1, 0)), -1.0, 1.0))
         vector_angle = vector_angle % (2 * math.pi)
-        self.pathfinding.get_logger().info(f'{vector_angle=}')
         if vector_angle > current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
         if angle_difference > math.pi:
             angle_difference = - (2 * math.pi - angle_difference)
-        self.pathfinding.get_logger().info(f'{angle_difference=}')
         return angle_difference
 
     def stop(self):
@@ -99,12 +97,11 @@ class RotationTask(MovementTask):
             twist = spin_twist()
             twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Started left spin towards node")
+
         else:
             twist = spin_twist()
             twist.angular.z = -0.1
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Started right spin towards node")
 
 
 
@@ -119,11 +116,11 @@ class ForwardTask(MovementTask):
         current_pos = self.pathfinding.get_current_position()
         if abs(current_pos.x - self.to_reach_node.x) < 1 and abs(current_pos.y - self.to_reach_node.y) < 1:
             self._finished = True
+            self.pathfinding.get_logger().info(f'Reached goal at {self.to_reach_node}')
             self.stop()
         else:
             twist = move_twist()
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Moving forward")
 
 class SlamSpinTask(MovementTask):
     def __init__(self, pathfinding):
@@ -131,18 +128,15 @@ class SlamSpinTask(MovementTask):
         self.started_spin_at = None
 
     def execute(self):
-        print('Spinning')
         if (self.started_spin_at is None
                 or self.started_spin_at + datetime.timedelta(seconds=2) > datetime.datetime.now()):
             self.stop()
             twist = move_twist()
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Spinning")
             if self.started_spin_at is None:
                 self.started_spin_at = datetime.datetime.now()
         else:
             self.stop()
-            print('Spinn finished')
             self._finished = True
 
 
@@ -211,18 +205,26 @@ class RevisitTask(MovementTask):
 class AbsoluteMovementTask(MovementTask):
     def __init__(self, pathfinding, target_node):
         super().__init__(pathfinding)
+        self.pathfinding.get_logger().info(f'Creating movement towards {target_node}')
         self.target_node = target_node
         self.task_list = []
         self.find_path()
 
     def execute(self):
-        global done_once
-        if done_once:
-            raise ValueError()
         self.task_list = [task for task in self.task_list if not task.finished()]
         if len(self.task_list) == 0:
-            self._finished = True
-            done_once = True
+            current_position = self.pathfinding.get_current_position()
+            if abs(current_position.x - self.target_node.x) < 1 and abs(current_position.y - self.target_node.y) < 1:
+                self._finished = True
+                self.pathfinding.get_logger().info(
+                    f'Finished route to {self.target_node}')
+
+            else:
+                try:
+                    self.find_path()
+                except ImpossibleRouteException:
+                    self.pathfinding.get_logger().info(f'Could not complete Route to {self.target_node} due to new obstacle')
+                    self._finished = True
         else:
             self.task_list[-1].execute()
 
@@ -238,9 +240,12 @@ class AbsoluteMovementTask(MovementTask):
 
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
         current_node = end_node
-        while current_node.predecessor is not None and not self.pathfinding.has_sight_line(current_pos, current_node):
-            self.pathfinding.get_logger().info(f'No sight line from {current_pos} ti {current_node}, checking next node')
+        path = []
+        while current_node.predecessor is not None:# and not self.pathfinding.has_sight_line(current_pos, current_node):
+            #self.pathfinding.get_logger().info(f'No sight line from {current_pos.x}/{current_pos.y} to {current_node}, checking next node')
+            path = [current_node] + path
             current_node = current_node.predecessor
+        print(*path)
         start_node = current_node.node
         self.task_list = [SlamSpinTask(self.pathfinding),
                           ForwardTask(self.pathfinding, start_node),

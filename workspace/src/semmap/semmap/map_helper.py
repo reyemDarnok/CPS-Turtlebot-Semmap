@@ -10,24 +10,25 @@ bot_size = 4 # radius in resolution steps - intentionally to large
 class AreaMap:
     def __init__(self, height: int, width: int, data_2d: List[List[float]], logger):
         self.height = height
-        if len(data_2d[0]) != height:
+        if len(data_2d) != height:
             logger.warning('Reported height of map does not match data height, using data height')
             self.height = len(data_2d[0])
         self.width = width
-        if len(data_2d) != width:
+        if len(data_2d[0]) != width:
             logger.warning('Reported width of map does not match data width, using data width')
             self.width = len(data_2d)
         self.node_2d = []
         self.logger = logger
-        for x, row in enumerate(data_2d):
+        for y, row in enumerate(data_2d):
             self.node_2d.append([])
-            for y, value in enumerate(row):
-                self.node_2d[x].append(AreaNode(x, y, value, self, logger))
+            for x, value in enumerate(row):
+                self.node_2d[y].append(AreaNode(x, y, value, self, logger))
         for node in self.all_nodes():
             node.post_init()
 
+
     def all_nodes(self):
-        return [x for column in self.node_2d for x in column]
+        return [x for row in self.node_2d for x in row]
 
     def __getitem__(self, item):
         return self.node_2d[item]
@@ -62,14 +63,15 @@ class AreaNode:
     def post_init(self):
         self.obstructed = self.is_obstruction_within(bot_size)
         x_coords, y_coords = self._coords_in_range(1)
-        self.neighbors = [self.parent_map[n_x][n_y] for n_x, n_y in product(x_coords, y_coords)
+        self.neighbors = [self.parent_map[n_y][n_x] for n_x, n_y in product(x_coords, y_coords)
                            if n_x != self.x or n_y != self.y]
+
 
 
     def is_obstruction_within(self, search_distance: int) -> bool:
         x_coords, y_coords = self._coords_in_range(search_distance)
         return any(node.obstruction > obstruction_threshold for node in (
-            self.parent_map[x][y] for x, y in product(x_coords, y_coords)
+            self.parent_map[y][x] for x, y in product(x_coords, y_coords)
         ))
 
     def _coords_in_range(self, search_distance):

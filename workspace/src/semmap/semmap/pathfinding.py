@@ -81,14 +81,12 @@ class PathfindingNode(Node):
         self.map = AreaMap.from_msg(msg, self.get_logger())
 
     def navigate(self):
-        self.get_logger().info(f'Checking current navigation task')
         self.task_list = [task for task in self.task_list if not task.finished()]
         self.task_list[-1].execute() # execute the most recent task
 
     def get_current_position(self)-> Position:
         result = self._get_position_history()
         try:
-            self.get_logger().info('Requested position is ' + str(result[-1]))
             return result[-1]
         except IndexError:
             raise ValueError('position not yet known')
@@ -101,7 +99,7 @@ class PathfindingNode(Node):
         pass_through_nodes = []
         for x in range(int(position.x), node.x + 1, direction):
             height = previous_y + slope
-            pass_through_nodes += [self.map.node_2d[x][y] for y in range(int(previous_y), int(height) +1)]
+            pass_through_nodes += [self.map.node_2d[y][x] for y in range(int(previous_y), int(height) +1)]
             print(previous_y, height, slope)
             previous_y = height
         print(*pass_through_nodes)
