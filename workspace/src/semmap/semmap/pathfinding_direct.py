@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import Tuple, Optional, List
 
 import numpy as np
+from jinja2.nodes import Impossible
 from scipy.spatial.transform import Rotation
 
+from workspace.src.semmap.semmap.astar import ImpossibleRouteException
 from .movementTask import ExploreTask, RevisitTask, AbsoluteMovementTask
 from .position_history import Position
 from .map_helper import AreaMap, free_threshold, obstruction_threshold, AreaNode
@@ -130,8 +132,14 @@ class PathfindingNode(Node):
         if self.task is not None:
             if self.task.finished():
                 self.task = None
-        if self.task :
-            self.task.execute()
+        if self.task:
+            try:
+                self.task.execute()
+            except ImpossibleRouteException:
+                twist = move_twist()
+                twist.linear.x = -0.1
+                self.command_movement.publish(twist)
+
 
     def get_current_position(self)-> Position:
         result = self._get_position_history()
