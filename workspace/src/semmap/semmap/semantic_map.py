@@ -10,7 +10,7 @@ class SemanticMapNode(Node):
         super().__init__('semantic_map_node')
 
         self.object_list = []
-        self.current_obj_detection = []
+        self.current_obj_detections = []
         self.robot_position = (0, 0, 0)
 
 #check if topic names are correct!!!
