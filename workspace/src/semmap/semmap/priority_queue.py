@@ -117,7 +117,7 @@ class PriorityQueue:
     def update_elem(self, elem_id, new_elem):
         idx = self._get_elem_idxs(elem_id=elem_id)
         if idx is None:
-            return
+            return False
 
         elem = self._heap[idx]
         self._heap[idx] = new_elem
@@ -127,6 +127,8 @@ class PriorityQueue:
             self._bubble_up(idx)
         elif self.has_higher_priority(elem, new_elem):
             self._bubble_down(idx)
+
+        return True
 
     def remove(self, elem_id):
         idx = self._get_elem_idxs(elem_id=elem_id)

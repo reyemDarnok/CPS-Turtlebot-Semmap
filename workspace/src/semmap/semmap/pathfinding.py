@@ -37,6 +37,12 @@ class AstarNode:
         self.score = float('inf')
         self.astar_map = astar_map
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
     def __str__(self):
         return f"{self.x}/{self.y}"
 
@@ -52,14 +58,15 @@ class AstarMap:
             self.nodes_2d.append([])
             for y, node in enumerate(row):
                 astar_node = AstarNode(node, area_map, self)
-                if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
-                    self.priority_queue.put((0, astar_node))
-                elif not astar_node.obstructed:
-                    self.priority_queue.put((float('inf'), astar_node))
+
                 self.nodes_2d[x].append(astar_node)
 
-        for node in self.priority_queue:
-            node[1].post_init()
+        pos_node = self.nodes_2d[int(pos.x)][int(pos.y)]
+        pos_node.score = 0
+        self.priority_queue.put((0, pos_node))
+        for node in (n for row in self.nodes_2d for n in row):
+            node.post_init()
+        self.target_node = self.nodes_2d[target.x][target.y]
 
 def heuristic(node_a, node_b):
         return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
@@ -183,20 +190,25 @@ class PathfindingNode(Node):
             while not len(astar_map.priority_queue) == 0:
                 node_score, node = astar_map.priority_queue.pop()
                 self.get_logger().info(f'Handling node {node.x}/{node.y} with score {node_score}')
-                time.sleep(1)
+                self.get_logger().info(f'Target is {target}')
                 if node == target:
+                    self.get_logger().info('Finished the path')
                     break
+                print(f'Number of neighbors {len(node.neighbors)}')
                 for neighbor in node.neighbors:
-                    self.get_logger().info(f'Checking Neighbor {neighbor.x}/{neighbor.y}')
+                    print(*node.neighbors)
                     neighbor_score_via_current = node_score + 1 + heuristic(neighbor, target)
                     if neighbor_score_via_current < neighbor.score:
                         neighbor.predecessor = node
                         neighbor.score = neighbor_score_via_current
-                        astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
+                        print('Updating ', neighbor, 'to score ', neighbor_score_via_current)
+                        updated = astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
+                        if not updated:
+                            astar_map.priority_queue.put((neighbor_score_via_current, neighbor))
             else:
                 self.task_list = self.task_list[:-1]
                 raise ImpossibleRouteException()
-            self.get_logger.info(f"Navigating towards {target.x}/{target.y}")
+            self.get_logger().info(f"Navigating towards {target.x}/{target.y}")
             start_node = None
             current_node = astar_map.target_node
             while current_node.predecessor is not None:
@@ -254,7 +266,7 @@ class PathfindingNode(Node):
                     return
                 except ImpossibleRouteException:
                     self.task_list.append(self.explore)
-                    pass
+                    raise
         self.get_logger.info('Switching to revisit mode')
         self.task_list.append(self.revisit)
 
