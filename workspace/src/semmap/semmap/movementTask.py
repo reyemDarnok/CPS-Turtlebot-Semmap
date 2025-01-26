@@ -131,8 +131,9 @@ class SlamSpinTask(MovementTask):
         self.started_spin_at = None
 
     def execute(self):
-        if self.started_spin_at is None or self.started_spin_at > datetime.datetime.now() + datetime.timedelta(
-                seconds=2):
+        print('Spinning')
+        if (self.started_spin_at is None
+                or self.started_spin_at + datetime.timedelta(seconds=2) > datetime.datetime.now()):
             twist = move_twist()
             self.pathfinding.command_movement.publish(twist)
             self.pathfinding.get_logger().info("Spinning")
@@ -140,6 +141,7 @@ class SlamSpinTask(MovementTask):
                 self.started_spin_at = datetime.datetime.now()
         else:
             self.stop()
+            print('Spinn finished')
             self._finished = True
 
 
@@ -213,16 +215,20 @@ class AbsoluteMovementTask(MovementTask):
         self.find_path()
 
     def execute(self):
+        global done_once
+        if done_once:
+            raise ValueError()
         self.task_list = [task for task in self.task_list if not task.finished()]
         if len(self.task_list) == 0:
             self._finished = True
+            done_once = True
         else:
             self.task_list[-1].execute()
 
     def find_path(self):
         try:
             current_pos = self.pathfinding.get_current_position()
-            self.target_node = self.target_node.parent_map[int(current_pos.x) + 5][int(current_pos.y)]  # TODO debug intercept
+            self.target_node = self.target_node.parent_map[int(current_pos.x)][int(current_pos.y) + 5]  # TODO debug intercept
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             return
@@ -239,3 +245,4 @@ class AbsoluteMovementTask(MovementTask):
                           ForwardTask(self.pathfinding, start_node),
                           RotationTask(self.pathfinding, start_node)]
 
+done_once = False

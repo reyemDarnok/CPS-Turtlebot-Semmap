@@ -82,7 +82,7 @@ class PathfindingNode(Node):
 
     def navigate(self):
         self.get_logger().info(f'Checking current navigation task')
-        self.task_list = [task for task in self.task_list if not task.finished]
+        self.task_list = [task for task in self.task_list if not task.finished()]
         self.task_list[-1].execute() # execute the most recent task
 
     def get_current_position(self)-> Position:
