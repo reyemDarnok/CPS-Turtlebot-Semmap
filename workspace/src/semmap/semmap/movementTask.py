@@ -27,11 +27,12 @@ class MovementTask:
             self.pathfinding.get_logger().info('Position not yet known')
             raise
         current_angle = current_position.rotation % (2 * math.pi)
-        goal_vector = (current_position.x - node.x, current_position.y - node.y)
+        goal_vector = (int(current_position.x) - node.x, int(current_position.y) - node.y)
         # noinspection PyTypeChecker
         goal_vector = unit_vector(goal_vector)
         vector_angle = np.arccos(np.clip(np.dot(goal_vector, (-1, 0)), -1.0, 1.0))
         vector_angle = vector_angle % (2 * math.pi)
+        self.pathfinding.get_logger().info(f'{vector_angle=}')
         if vector_angle > current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
@@ -88,7 +89,7 @@ class RotationTask(MovementTask):
         self.to_align_node = to_align_node
 
     def execute(self):
-        tolerance = 0.5 * math.pi / 180
+        tolerance = 1 * math.pi / 180
         angle_offset = self.get_angle_offset(self.to_align_node)
         if - tolerance < angle_offset < tolerance:
             self._finished = True
@@ -98,12 +99,12 @@ class RotationTask(MovementTask):
             twist = spin_twist()
             twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Started right spin towards node")
+            self.pathfinding.get_logger().info("Started left spin towards node")
         else:
             twist = spin_twist()
             twist.angular.z = -0.1
             self.pathfinding.command_movement.publish(twist)
-            self.pathfinding.get_logger().info("Started left spin towards node")
+            self.pathfinding.get_logger().info("Started right spin towards node")
 
 
 
@@ -113,7 +114,6 @@ class ForwardTask(MovementTask):
     def __init__(self, pathfinding, to_reach_node):
         super().__init__(pathfinding)
         self.to_reach_node = to_reach_node
-        self.started_spin_at = None
 
     def execute(self):
         current_pos = self.pathfinding.get_current_position()
@@ -134,6 +134,7 @@ class SlamSpinTask(MovementTask):
         print('Spinning')
         if (self.started_spin_at is None
                 or self.started_spin_at + datetime.timedelta(seconds=2) > datetime.datetime.now()):
+            self.stop()
             twist = move_twist()
             self.pathfinding.command_movement.publish(twist)
             self.pathfinding.get_logger().info("Spinning")
@@ -228,7 +229,7 @@ class AbsoluteMovementTask(MovementTask):
     def find_path(self):
         try:
             current_pos = self.pathfinding.get_current_position()
-            self.target_node = self.target_node.parent_map[int(current_pos.x) + 3][int(current_pos.y) + 3]  # TODO debug intercept
+            #self.target_node = self.target_node.parent_map[int(current_pos.x)][int(current_pos.y) + 5]  # TODO debug intercept
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             return
