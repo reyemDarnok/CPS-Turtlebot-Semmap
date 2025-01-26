@@ -53,7 +53,7 @@ class AstarMap:
     def __init__(self, area_map, pos, target):
         self.target_node = target
         self.priority_queue = PriorityQueue()
-        self.nodes_2d = []
+        self.nodes_2d: List[List[AstarNode]] = []
         for x, row in enumerate(area_map):
             self.nodes_2d.append([])
             for y, node in enumerate(row):
@@ -82,33 +82,33 @@ def _score_node(node, path_history, time):
 
 def stop_twist():
     twist = Twist()
-    twist.linear.x_pos = 0.0
-    twist.linear.y_pos = 0.0
+    twist.linear.x = 0.0
+    twist.linear.y = 0.0
     twist.linear.z = 0.0
-    twist.angular.x_pos = 0.0
-    twist.angular.y_pos = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
     twist.angular.z = 0.0
     return twist
 
 
 def move_twist():
     twist = Twist()
-    twist.linear.x_pos = 0.1
-    twist.linear.y_pos = 0.0
+    twist.linear.x = 0.1
+    twist.linear.y = 0.0
     twist.linear.z = 0.0
-    twist.angular.x_pos = 0.0
-    twist.angular.y_pos = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
     twist.angular.z = 0.0
     return twist
 
 
 def spin_twist():
     twist = Twist()
-    twist.linear.x_pos = 0.0
-    twist.linear.y_pos = 0.0
+    twist.linear.x = 0.0
+    twist.linear.y = 0.0
     twist.linear.z = 0.0
-    twist.angular.x_pos = 0.0
-    twist.angular.y_pos = 0.0
+    twist.angular.x = 0.0
+    twist.angular.y = 0.0
     twist.angular.z = 0.1
     return twist
 
@@ -190,18 +190,17 @@ class PathfindingNode(Node):
             while not len(astar_map.priority_queue) == 0:
                 node_score, node = astar_map.priority_queue.pop()
                 self.get_logger().info(f'Handling node {node.x}/{node.y} with score {node_score}')
-                self.get_logger().info(f'Target is {target}')
                 if node == target:
                     self.get_logger().info('Finished the path')
                     break
-                print(f'Number of neighbors {len(node.neighbors)}')
+                #print(f'Number of neighbors {len(node.neighbors)}')
                 for neighbor in node.neighbors:
-                    print(*node.neighbors)
                     neighbor_score_via_current = node_score + 1 + heuristic(neighbor, target)
                     if neighbor_score_via_current < neighbor.score:
+                        print(f'Setting predecessor of {neighbor} to {node}')
                         neighbor.predecessor = node
                         neighbor.score = neighbor_score_via_current
-                        print('Updating ', neighbor, 'to score ', neighbor_score_via_current)
+                        #print('Updating ', neighbor, 'to score ', neighbor_score_via_current)
                         updated = astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
                         if not updated:
                             astar_map.priority_queue.put((neighbor_score_via_current, neighbor))
@@ -212,8 +211,9 @@ class PathfindingNode(Node):
             start_node = None
             current_node = astar_map.target_node
             while current_node.predecessor is not None:
-                start_node = current_node
-            if self.is_aligned(start_node):
+                current_node = current_node.predecessor
+            start_node = current_node
+            if self.is_aligned(start_node.node):
                 twist = move_twist()
                 self.command_movement.publish(twist)
                 self.get_logger().info("Moving to next node")
