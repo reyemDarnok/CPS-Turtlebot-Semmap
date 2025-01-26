@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from semmap_interfaces.msg import Object
-from semmap_interfaces.msg import Location
+from semmap_interfaces.msg import Position
 from semantic_map.srv import SemanticMap
 import math
 
@@ -19,7 +19,7 @@ class SemanticMapNode(Node):
         )
 
         self.create_subscription(
-            Location, 'robot_location', self.robot_location_callback, 10 # TODO correct service
+            Position, '/position', self.robot_location_callback, 10 # TODO correct service
         )
 
         self.create_service(
@@ -33,7 +33,7 @@ class SemanticMapNode(Node):
 
         robot_x = msg.x
         robot_y = msg.y
-        robot_orientation = msg.orientation  #in radians
+        robot_orientation = msg.rotation  #in radians
 
         self.robot_position = (robot_x, robot_y, robot_orientation)
 
