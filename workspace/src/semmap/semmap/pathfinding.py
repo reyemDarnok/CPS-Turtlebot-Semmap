@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum, auto
 from itertools import product
 from pathlib import Path
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 import numpy as np
 
@@ -16,8 +16,7 @@ from .priority_queue import PriorityQueue
 import rclpy
 import sys
 from rclpy.node import Node
-from semmap_interfaces.msg import EmergencyStop
-from semmap_interfaces.srv import PositionHistory
+from semmap_interfaces.msg import EmergencyStop, PositionHistory
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import OccupancyGrid
 
@@ -41,7 +40,7 @@ class AstarMap:
     def __init__(self, area_map, pos, target):
         self.target_node = target
         self.priority_queue = PriorityQueue()
-        for node in area_map.all_nodes:
+        for node in area_map.all_nodes():
             astar_node = AstarNode(node, area_map)
             if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
                 self.priority_queue.put((0, astar_node))
@@ -54,7 +53,7 @@ def _score_node(node, path_history, time):
     score = 0
     e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
     for position in path_history:
-        distance = (position.x_pos - node.x_pos) ** 2 + (position.y_pos - node.y_pos) ** 2
+        distance = (position.x - node.x) ** 2 + (position.y - node.y) ** 2
         time_delta = time - position.timestamp
         score += distance * (e_factor ** time_delta)
     return score
@@ -103,12 +102,16 @@ class PathfindingNode(Node):
         self.task_list = [self.explore]
         self.e_stop_mode = False
         self.map = None
-        self.main_loop_timer = self.create_timer(0.2, self.navigate)
+        self.position_history: List[Position] = []
+        self.main_loop_timer = self.create_timer(0.5, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
         self._full_turn_rate = self.create_rate(1, self.get_clock())
-        self.positions_client = self.create_client(PositionHistory, "/position")
+        self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
         self.get_logger().info("Pathfinding node initialized")
+
+    def position_callback(self, msg):
+        self.position_history = [Position(x, y, rotation, timestamp) for x,y,rotation,timestamp in zip(msg.x, msg.y, msg.rotation, msg.timestamp)]
 
     def map_callback(self, msg):
         self.map = AreaMap.from_msg(msg, self.get_logger())
@@ -147,13 +150,21 @@ class PathfindingNode(Node):
 
     def get_current_position(self)-> Position:
         result = self._get_position_history()
-        return Position(result.x[-1], result.y[-1], result.rotation[-1], result.timestamp[-1])
+        try:
+            return result[-1]
+        except IndexError:
+            raise ValueError('position not yet known')
 
     def create_absolute_movement_task(self, target: AreaNode):
         self.get_logger().info('Creating Movement Task')
         def movement_task():
             self.get_logger().info(f'Planning movement towards {target.x}/{target.y}')
-            current_pos = self.get_current_position()
+            try:
+                current_pos = self.get_current_position()
+            except ValueError:
+                self.get_logger().info('Position not yet known, aborting movement planning')
+                return
+            self.get_logger().info(f'Current position: {current_pos}')
             astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
@@ -184,9 +195,13 @@ class PathfindingNode(Node):
 
     def is_aligned(self, node: AreaNode, tolerance: float = 20 * math.pi / 180) -> bool:
         if tolerance < 0: tolerance *= -1
-        result = self._get_position_history()
-        current_angle = result.rotation % (2* math.pi)
-        goal_vector = (node.x - result.x[-1], node.y - result.y[-1])
+        try:
+            current_position = self.get_current_position()
+        except ValueError:
+            self.get_logger().info('Position not yet known, assuming no alignment')
+            return False
+        current_angle = current_position.rotation % (2* math.pi)
+        goal_vector = (node.x - current_position.x, node.y - current_position.y)
         # noinspection PyTypeChecker
         goal_vector = unit_vector(goal_vector)
         vector_angle = np.arccos(np.clip(np.dot((1,0), goal_vector), -1.0, 1.0))
@@ -196,12 +211,10 @@ class PathfindingNode(Node):
         angle_difference = vector_angle - current_angle
         return angle_difference < tolerance
 
-    def _get_position_history(self):
-        request = PositionHistory.Request()
-        position_history_future = self.positions_client.call_async(request)
-        rclpy.spin_until_future_complete(self, position_history_future)
-        result = position_history_future.result()
-        return result
+    def _get_position_history(self) -> List[Position]:
+        #rclpy.spin_until_future_complete(self, self.position_history_future)
+        self.get_logger().info(f'Received Position History, length is {len(self.position_history)}')
+        return self.position_history
 
     def stop(self):
         twist = stop_twist()

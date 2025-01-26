@@ -9,7 +9,7 @@ import sys
 from rclpy.node import Node
 from rcl_interfaces.msg import Log
 from scipy.spatial.transform import Rotation
-from semmap_interfaces.srv import PositionHistory
+from semmap_interfaces.msg import PositionHistory
 from nav_msgs.msg import Odometry, OccupancyGrid
 @dataclass
 class Position:
@@ -19,13 +19,13 @@ class Position:
     timestamp: float
 
 resolution = 0.05
-
+time_resolution = 0.1
 class LoggingNode(Node):
     def __init__(self) -> None:
         super().__init__("PositionHistoryNode")
         self.create_subscription(Odometry, "/odom", self.map_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.origin_callback, 10)
-        self.create_service(PositionHistory, "/position_history", self.position_callback)
+        self.p_history_publisher = self.create_publisher(PositionHistory, "/position_history", 10)
         self.positions: List[Position] = []
         self.x_offset = None
         self.y_offset = None
@@ -36,7 +36,7 @@ class LoggingNode(Node):
         width = msg.info.width / resolution
         self.x_offset = - msg.info.origin.position.x
         self.y_offset = height + msg.info.origin.position.y
-        quat = msg.info.origion.orientation
+        quat = msg.info.origin.orientation
         rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
         self.rotation_offset = - rot.as_euler('xyz')[2]
 
@@ -55,14 +55,16 @@ class LoggingNode(Node):
                 rotation=rot_euler + self.rotation_offset,
                 timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec/1e9
             )
-            self.positions.append(current_position)
+            if len(self.positions) == 0 or current_position.timestamp - self.positions[-1].timestamp > time_resolution:
+                self.positions.append(current_position)
+                result = PositionHistory()
+                result.x = [position.x for position in self.positions]
+                result.y = [position.y for position in self.positions]
+                result.rotation = [position.rotation for position in self.positions]
+                result.timestamp = [position.timestamp for position in self.positions]
 
-    def position_callback(self, msg: PositionHistory, response) -> None:
-        response.x = [position.x for position in self.positions]
-        response.y = [position.y for position in self.positions]
-        response.rotation = [position.rotation for position in self.positions]
-        response.timestamp = [position.timestamp for position in self.positions]
-        return response
+                self.p_history_publisher.publish(result)
+
 def main():
     rclpy.init()
     args = parse_args()
