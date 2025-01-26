@@ -181,7 +181,7 @@ class PathfindingNode(Node):
         def movement_task():
             try:
                 current_pos = self.get_current_position()
-                target = outer_target.parent_map[int(current_pos.x) + 5][ int(current_pos.y)]
+                target = outer_target.parent_map[int(current_pos.x) + 5][ int(current_pos.y)] # TODO debug intercept
                 self.get_logger().info(f'moving from {current_pos.x}/{current_pos.y} towards {target.x}/{target.y}')
             except ValueError:
                 self.get_logger().info('Position not yet known, aborting movement planning')
@@ -210,18 +210,35 @@ class PathfindingNode(Node):
             self.get_logger().info(f"Navigating towards {target.x}/{target.y}")
             start_node = None
             current_node = astar_map.target_node
-            while current_node.predecessor is not None:
+            while current_node.predecessor is not None and not self.has_sight_line(current_pos, current_node):
                 current_node = current_node.predecessor
-            start_node = current_node
-            if self.is_aligned(start_node.node):
-                twist = move_twist()
-                self.command_movement.publish(twist)
-                self.get_logger().info("Moving to next node")
-            else:
-                twist = spin_twist()
-                self.command_movement.publish(twist)
-                self.get_logger().info("Spinning to align to next node")
+            start_node = current_node.node
+            def straight_line_navigation():
+                if not self.is_aligned(start_node):
+                    self.rotate_towards_node(start_node) # TODO implement
+                if abs(current_pos.x - start_node.x) > 1 or abs(current_pos.y - start_node.y) > 1:
+                    twist = move_twist()
+                    self.command_movement.publish(twist)
+                    self.get_logger().info("Moving to next node")
+                else:
+                    twist = stop_twist()
+                    self.command_movement.publish(twist)
+                    self.get_logger().info("Arrived at node")
+            self.task_list.append(straight_line_navigation)
         return movement_task
+
+    def has_sight_line(self, position, node):
+        x_distance = node.x - position.x
+        slope = (node.y - position.y) / x_distance
+        previous_y = int(position.y)
+        direction = 1 if slope > 0 else -1
+        pass_through_nodes = []
+        for x in range(int(position.x), node.x, direction):
+            height = previous_y + slope
+            pass_through_nodes += [self.map.node_2d[x][y] for y in range(int(previous_y), int(height) +1)]
+            previous_y = height
+
+        return any(p_node.obstructed for p_node in pass_through_nodes)
 
     def is_aligned(self, node: AreaNode, tolerance: float = 20 * math.pi / 180) -> bool:
         if tolerance < 0: tolerance *= -1
