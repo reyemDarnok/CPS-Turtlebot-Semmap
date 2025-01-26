@@ -32,7 +32,7 @@ class MovementTask:
         goal_vector = unit_vector(goal_vector)
         vector_angle = np.arccos(np.clip(np.dot(goal_vector, (-1, 0)), -1.0, 1.0))
         vector_angle = vector_angle % (2 * math.pi)
-        if vector_angle < current_angle:
+        if vector_angle > current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
         if angle_difference > math.pi:
@@ -88,7 +88,7 @@ class RotationTask(MovementTask):
         self.to_align_node = to_align_node
 
     def execute(self):
-        tolerance = 20 * math.pi / 180
+        tolerance = 0.5 * math.pi / 180
         angle_offset = self.get_angle_offset(self.to_align_node)
         if - tolerance < angle_offset < tolerance:
             self._finished = True
@@ -96,7 +96,7 @@ class RotationTask(MovementTask):
             self.stop()
         elif angle_offset > 0:
             twist = spin_twist()
-            twist.angular.z = -0.1
+            twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
             self.pathfinding.get_logger().info("Started right spin towards node")
         else:
@@ -228,7 +228,7 @@ class AbsoluteMovementTask(MovementTask):
     def find_path(self):
         try:
             current_pos = self.pathfinding.get_current_position()
-            self.target_node = self.target_node.parent_map[int(current_pos.x)][int(current_pos.y) + 5]  # TODO debug intercept
+            self.target_node = self.target_node.parent_map[int(current_pos.x) + 3][int(current_pos.y) + 3]  # TODO debug intercept
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             return
