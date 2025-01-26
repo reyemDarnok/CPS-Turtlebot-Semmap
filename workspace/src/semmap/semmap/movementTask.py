@@ -8,6 +8,12 @@ from geometry_msgs.msg import Twist
 from .astar import AstarMap, ImpossibleRouteException
 from .map_helper import free_threshold, obstruction_threshold
 
+def angle_between_vectors(u, v):
+    ax = u[0]
+    ay = u[1]
+    bx = v[0]
+    by = v[1]
+    return math.atan2(ax * by - ay * bx, ax * bx + ay * by)
 
 class MovementTask:
     def __init__(self, pathfinding):
@@ -20,23 +26,32 @@ class MovementTask:
 
     def finished(self):
         return self._finished
-    def get_angle_offset(self, node):
+    def get_angle_offset(self, node, verbose=False):
         try:
             current_position = self.pathfinding.get_current_position()
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known')
             raise
         current_angle = current_position.rotation % (2 * math.pi)
-        goal_vector = (int(current_position.x) - node.x, int(current_position.y) - node.y)
+        if verbose:
+            self.pathfinding.get_logger().info('Current angle: %f' % current_angle)
+        goal_vector = (int(node.x) - current_position.x, int(node.y) - current_position.y)
         # noinspection PyTypeChecker
-        goal_vector = unit_vector(goal_vector)
-        vector_angle = np.arccos(np.clip(np.dot(goal_vector, (-1, 0)), -1.0, 1.0))
+        try:
+            goal_vector = unit_vector(goal_vector)
+        except RuntimeError:
+            return True # happens when current_position == node -> aligned by decision
+        vector_angle = angle_between_vectors((1,0), goal_vector)
         vector_angle = vector_angle % (2 * math.pi)
+        if verbose:
+            self.pathfinding.get_logger().info('Target angle: %f' % vector_angle)
         if vector_angle > current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
         if angle_difference > math.pi:
             angle_difference = - (2 * math.pi - angle_difference)
+        if verbose:
+            self.pathfinding.get_logger().info('Angle difference: %f' % angle_difference)
         return angle_difference
 
     def stop(self):
@@ -84,11 +99,14 @@ def spin_twist():
 class RotationTask(MovementTask):
     def __init__(self, pathfinding, to_align_node):
         super().__init__(pathfinding)
+        self.pathfinding.get_logger().info(f'Rotating towards {to_align_node}')
         self.to_align_node = to_align_node
+        self.first_run = True
 
     def execute(self):
         tolerance = 1 * math.pi / 180
-        angle_offset = self.get_angle_offset(self.to_align_node)
+        angle_offset = self.get_angle_offset(self.to_align_node, verbose=self.first_run)
+        self.first_run = False
         if - tolerance < angle_offset < tolerance:
             self._finished = True
             self.pathfinding.get_logger().info("Stopped spin")
@@ -110,6 +128,7 @@ class RotationTask(MovementTask):
 class ForwardTask(MovementTask):
     def __init__(self, pathfinding, to_reach_node):
         super().__init__(pathfinding)
+        self.pathfinding.get_logger().info(f'Moving towards {to_reach_node}')
         self.to_reach_node = to_reach_node
 
     def execute(self):
@@ -214,7 +233,7 @@ class AbsoluteMovementTask(MovementTask):
         self.task_list = [task for task in self.task_list if not task.finished()]
         if len(self.task_list) == 0:
             current_position = self.pathfinding.get_current_position()
-            if abs(current_position.x - self.target_node.x) < 1 and abs(current_position.y - self.target_node.y) < 1:
+            if abs(current_position.x - self.target_node.x) < 2 and abs(current_position.y - self.target_node.y) < 2:
                 self._finished = True
                 self.pathfinding.get_logger().info(
                     f'Finished route to {self.target_node}')
@@ -231,7 +250,7 @@ class AbsoluteMovementTask(MovementTask):
     def find_path(self):
         try:
             current_pos = self.pathfinding.get_current_position()
-            #self.target_node = self.target_node.parent_map[int(current_pos.x)][int(current_pos.y) + 5]  # TODO debug intercept
+            #self.target_node = self.target_node.parent_map[int(current_pos.y-10)][int(current_pos.x+4)]
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             return
@@ -241,14 +260,14 @@ class AbsoluteMovementTask(MovementTask):
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
         current_node = end_node
         path = []
-        while current_node.predecessor is not None:# and not self.pathfinding.has_sight_line(current_pos, current_node):
-            #self.pathfinding.get_logger().info(f'No sight line from {current_pos.x}/{current_pos.y} to {current_node}, checking next node')
+        while current_node.predecessor is not None:
             path = [current_node] + path
             current_node = current_node.predecessor
-        print(*path)
-        start_node = current_node.node
+            if (current_node.node.obstruction < free_threshold
+                    and not current_node.node.complete_unknown
+                    and self.pathfinding.has_sight_line(current_pos, current_node)):
+                break
+        self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
         self.task_list = [SlamSpinTask(self.pathfinding),
-                          ForwardTask(self.pathfinding, start_node),
-                          RotationTask(self.pathfinding, start_node)]
-
-done_once = False
+                          ForwardTask(self.pathfinding, path[0].node),
+                          RotationTask(self.pathfinding, path[0].node)]

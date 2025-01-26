@@ -5,7 +5,7 @@ from typing import List
 obstruction_threshold = 0.65
 free_threshold = 0.25
 resolution = 0.05 # in meters
-bot_size = 4 # radius in resolution steps - intentionally to large
+bot_size = 2 # radius in resolution steps - intentionally to large
 
 class AreaMap:
     def __init__(self, height: int, width: int, data_2d: List[List[float]], logger):
