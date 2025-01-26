@@ -37,6 +37,9 @@ class AstarNode:
         self.score = float('inf')
         self.astar_map = astar_map
 
+    def __str__(self):
+        return f"{self.x}/{self.y}"
+
     def post_init(self):
         self.neighbors = [self.astar_map.nodes_2d[neighbor.x][neighbor.y] for neighbor in self.node.neighbors]
 
@@ -171,7 +174,8 @@ class PathfindingNode(Node):
         def movement_task():
             try:
                 current_pos = self.get_current_position()
-                target = outer_target.parent_map[int(current_pos.x) + 10][ int(current_pos.y)]
+                target = outer_target.parent_map[int(current_pos.x) + 5][ int(current_pos.y)]
+                self.get_logger().info(f'moving from {current_pos.x}/{current_pos.y} towards {target.x}/{target.y}')
             except ValueError:
                 self.get_logger().info('Position not yet known, aborting movement planning')
                 return

@@ -26,7 +26,6 @@ class AreaMap:
         for node in self.all_nodes():
             node.post_init()
 
-
     def all_nodes(self):
         return [x for column in self.node_2d for x in column]
 
@@ -56,6 +55,9 @@ class AreaNode:
         self.neighbors = []
         self.logger = logger
 
+    def __str__(self):
+        return f"{self.x}/{self.y}"
+
     def post_init(self):
         self.obstructed = self.is_obstruction_within(bot_size)
         x_coords, y_coords = self._coords_in_range(1)
@@ -70,9 +72,9 @@ class AreaNode:
         ))
 
     def _coords_in_range(self, search_distance):
-        x_coords = [x for x in range(self.x - search_distance, self.x + search_distance)
+        x_coords = [x for x in range(self.x - search_distance, self.x + search_distance + 1)
                     if 0 <= x < self.parent_map.width]
-        y_coords = [y for y in range(self.x - search_distance, self.x + search_distance)
+        y_coords = [y for y in range(self.y - search_distance, self.y + search_distance + 1)
                     if 0 <= y < self.parent_map.height]
         return x_coords, y_coords
 
