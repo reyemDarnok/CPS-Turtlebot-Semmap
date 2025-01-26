@@ -53,18 +53,27 @@ class AreaNode:
         self.parent_map = parent_map
         self.complete_unknown = obstruction == -1
         self.obstructed = None
+        self.neighbors = []
 
     def post_init(self):
         self.is_obstruction_within(bot_size)
+        x_coords, y_coords = self._coords_in_range(1)
+        self.neighbors = [self.parent_map[n_x][n_y] for n_x, n_y in product(x_coords, y_coords)
+                           if n_x != self.x or n_y != self.y]
+
 
     def is_obstruction_within(self, search_distance: int) -> bool:
+        x_coords, y_coords = self._coords_in_range(search_distance)
+        return any(node.obstruction > obstruction_threshold for node in (
+            self.parent_map[x][y] for x, y in product(x_coords, y_coords)
+        ))
+
+    def _coords_in_range(self, search_distance):
         x_coords = [x for x in range(self.x - search_distance, self.x + search_distance)
                     if 0 <= x < self.parent_map.width]
         y_coords = [y for y in range(self.x - search_distance, self.x + search_distance)
                     if 0 <= y < self.parent_map.height]
-        return any(node.obstruction > obstruction_threshold for node in (
-            self.parent_map[x][y] for x, y in product(x_coords, y_coords)
-        ))
+        return x_coords, y_coords
 
 
 def normalize(x):

@@ -26,8 +26,8 @@ from .emergency_stop import Causes
 
 class AstarNode:
     def __init__(self, node, area_map: 'AreaMap'):
-        self.x = node.x_pos
-        self.y = node.y_pos
+        self.x = node.x
+        self.y = node.y
         self.node = node
         self.predecessor: Optional[AstarNode] = None
         self.neighbors = node.neighbors
