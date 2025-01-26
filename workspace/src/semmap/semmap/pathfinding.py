@@ -25,27 +25,37 @@ from .emergency_stop import Causes
 
 
 class AstarNode:
-    def __init__(self, node, area_map: 'AreaMap'):
+    def __init__(self, node, area_map: 'AreaMap', astar_map: 'AstarMap'):
         self.x = node.x
         self.y = node.y
         self.node = node
         self.predecessor: Optional[AstarNode] = None
-        self.neighbors = node.neighbors
+        self.neighbors = []
         self.parent_map = area_map
         self.obstructed = node.obstructed
         self.score = float('inf')
+        self.astar_map = astar_map
 
+    def post_init(self):
+        self.neighbors = [self.astar_map.nodes_2d[neighbor.x][neighbor.y] for neighbor in self.neighbors]
 
 class AstarMap:
     def __init__(self, area_map, pos, target):
         self.target_node = target
         self.priority_queue = PriorityQueue()
-        for node in area_map.all_nodes():
-            astar_node = AstarNode(node, area_map)
-            if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
-                self.priority_queue.put((0, astar_node))
-            elif not astar_node.obstructed:
-                self.priority_queue.put((float('inf'), astar_node))
+        self.nodes_2d = []
+        for x, row in enumerate(area_map):
+            self.nodes_2d.append([])
+            for y, node in enumerate(row):
+                astar_node = AstarNode(node, area_map, self)
+                if pos.x - 1 < astar_node.x < pos.x and pos.y - 1 < astar_node.y < pos.y:
+                    self.priority_queue.put((0, astar_node))
+                elif not astar_node.obstructed:
+                    self.priority_queue.put((float('inf'), astar_node))
+                self.nodes_2d[x].append(astar_node)
+
+        for node in self.priority_queue:
+            node[1].post_init()
 
 def heuristic(node_a, node_b):
         return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
@@ -156,20 +166,21 @@ class PathfindingNode(Node):
             raise ValueError('position not yet known')
 
     def create_absolute_movement_task(self, target: AreaNode):
+        outer_target = target
         def movement_task():
             try:
                 current_pos = self.get_current_position()
+                target = outer_target.parent_map[int(current_pos.x) + 10][ int(current_pos.y)]
             except ValueError:
                 self.get_logger().info('Position not yet known, aborting movement planning')
                 return
             astar_map = AstarMap(self.map, current_pos, target)
-            astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
-                node = astar_map.priority_queue.pop()
+                node_score, node = astar_map.priority_queue.pop()
                 if node == target:
                     break
                 for neighbor in node.neighbors:
-                    neighbor_score_via_current = node.score + 1 + heuristic(neighbor, target)
+                    neighbor_score_via_current = node_score + 1 + heuristic(neighbor, target)
                     if neighbor_score_via_current < neighbor.score:
                         neighbor.predecessor = node
                         neighbor.score = neighbor_score_via_current
@@ -231,7 +242,7 @@ class PathfindingNode(Node):
                     movement_task = self.create_absolute_movement_task(node)
                     movement_task() # check possibility
                     self.task_list.append(movement_task)
-                    self.get_logger().info(f'Creating Navigation to {node.x}/{node.y}')
+                    self.get_logger().info(f'Created Navigation to {node.x}/{node.y}')
                     return
                 except ImpossibleRouteException:
                     self.task_list.append(self.explore)
