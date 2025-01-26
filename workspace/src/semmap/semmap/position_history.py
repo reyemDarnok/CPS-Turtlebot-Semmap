@@ -27,31 +27,36 @@ class LoggingNode(Node):
         self.create_subscription(OccupancyGrid, "/map", self.origin_callback, 10)
         self.p_history_publisher = self.create_publisher(PositionHistory, "/position_history", 10)
         self.positions: List[Position] = []
-        self.x_offset = None
-        self.y_offset = None
+        self.map_offset_x = None
+        self.map_offset_y = None
         self.rotation_offset = None
+        self.odom_offset_x = None
+        self.odom_offset_y = None
 
     def origin_callback(self, msg: OccupancyGrid) -> None:
-        height = msg.info.height / resolution
-        width = msg.info.width / resolution
-        self.x_offset = - msg.info.origin.position.x
-        self.y_offset = height + msg.info.origin.position.y
+        self.map_offset_x = - msg.info.origin.position.x
+        self.map_offset_y = msg.info.height * resolution + msg.info.origin.position.y
         quat = msg.info.origin.orientation
         rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
         self.rotation_offset = - rot.as_euler('xyz')[2]
 
 
     def map_callback(self, msg: Odometry) -> None:
-        if self.x_offset is None:
+        if self.map_offset_x is None:
             self.get_logger().info("x_offset is not yet determined, ignoring position")
             return
+        if self.odom_offset_x is None:
+            self.odom_offset_x = - msg.pose.pose.position.x
+            self.odom_offset_y = - msg.pose.pose.position.y
         if msg.child_frame_id == 'base_footprint':
             quat = msg.pose.pose.orientation
             rot = Rotation.from_quat([quat.x, quat.y, quat.z, quat.w])
             rot_euler = rot.as_euler('xyz')[2]
+            offset_corrected_x = msg.pose.pose.position.x + self.map_offset_x + self.odom_offset_x
+            offset_corrected_y = msg.pose.pose.position.y + self.map_offset_y + self.odom_offset_y
             current_position = Position(
-                x= (msg.pose.pose.position.x + self.x_offset) / resolution,
-                y = (msg.pose.pose.position.y + self.y_offset) / resolution,
+                x= offset_corrected_x / resolution,
+                y = offset_corrected_y / resolution,
                 rotation=rot_euler + self.rotation_offset,
                 timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec/1e9
             )
@@ -62,7 +67,6 @@ class LoggingNode(Node):
                 result.y = [position.y for position in self.positions]
                 result.rotation = [position.rotation for position in self.positions]
                 result.timestamp = [position.timestamp for position in self.positions]
-
                 self.p_history_publisher.publish(result)
 
 def main():

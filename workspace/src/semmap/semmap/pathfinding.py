@@ -156,15 +156,12 @@ class PathfindingNode(Node):
             raise ValueError('position not yet known')
 
     def create_absolute_movement_task(self, target: AreaNode):
-        self.get_logger().info('Creating Movement Task')
         def movement_task():
-            self.get_logger().info(f'Planning movement towards {target.x}/{target.y}')
             try:
                 current_pos = self.get_current_position()
             except ValueError:
                 self.get_logger().info('Position not yet known, aborting movement planning')
                 return
-            self.get_logger().info(f'Current position: {current_pos}')
             astar_map = AstarMap(self.map, current_pos, target)
             astar_map.priority_queue = PriorityQueue()
             while not len(astar_map.priority_queue) == 0:
@@ -178,7 +175,9 @@ class PathfindingNode(Node):
                         neighbor.score = neighbor_score_via_current
                         astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
             else:
+                self.task_list = self.task_list[:-1]
                 raise ImpossibleRouteException()
+            self.get_logger.info(f"Navigating towards {target.x}/{target.y}")
             start_node = None
             current_node = astar_map.target_node
             while current_node.predecessor is not None:
@@ -213,7 +212,6 @@ class PathfindingNode(Node):
 
     def _get_position_history(self) -> List[Position]:
         #rclpy.spin_until_future_complete(self, self.position_history_future)
-        self.get_logger().info(f'Received Position History, length is {len(self.position_history)}')
         return self.position_history
 
     def stop(self):
@@ -230,11 +228,16 @@ class PathfindingNode(Node):
         for node in area_map.all_nodes():
             if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
                 try:
-                    self.task_list.append(self.create_absolute_movement_task(node))
+                    movement_task = self.create_absolute_movement_task(node)
+                    movement_task() # check possibility
+                    self.task_list.append(movement_task)
                     self.get_logger().info(f'Creating Navigation to {node.x}/{node.y}')
                     return
                 except ImpossibleRouteException:
+                    self.task_list.append(self.explore)
                     pass
+        self.get_logger.info('Switching to revisit mode')
+        self.task_list.append(self.revisit)
 
     def revisit(self):
         position_history = self.get_path_history()
@@ -248,7 +251,15 @@ class PathfindingNode(Node):
                 if node_score < best_score:
                     best_score = node_score
                     oldest_node = node
-        self.task_list.append(self.create_absolute_movement_task(oldest_node))
+        try:
+            movement_task = self.create_absolute_movement_task(oldest_node)
+            movement_task()  # check possibility
+            self.task_list.append(movement_task)
+            self.get_logger().info(f'Creating Navigation to {oldest_node.x}/{oldest_node.y}')
+            return
+        except ImpossibleRouteException:
+            self.task_list.append(self.revisit)
+            pass
 
 def main():
     rclpy.init()
