@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Tuple, Optional, List
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from .movementTask import ExploreTask, RevisitTask, AbsoluteMovementTask
 from .position_history import Position
@@ -73,14 +74,9 @@ class PathfindingNode(Node):
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
         self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
-        self.create_subscription(semmap_interfaces.msg.Position, "/relative_movement", self.relative_movement, 10)
         self.create_subscription(semmap_interfaces.msg.Position, "/absolute_movement", self.absolute_movement, 10)
+        self.create_subscription(semmap_interfaces.msg.Position, "/relative_movement", self.relative_movement, 10)
         self.get_logger().info("Pathfinding node initialized")
-
-    def absolute_movement(self, position: Position) -> None:
-        if self.map is not None:
-            self.task = AbsoluteMovementTask(self, self.map[position.y][position.x])
-            self.get_logger().info("Absolute movement task started for position {}".format(position))
 
     def relative_movement(self, position: Position) -> None:
         if self.map is not None:
@@ -88,8 +84,41 @@ class PathfindingNode(Node):
                 current_position = self.get_current_position()
             except:
                 return
-            self.task = AbsoluteMovementTask(self, self.map[int(position.y + current_position.y)][int(position.x + current_position.x)])
-            self.get_logger().info("Relative movement task started for position {}".format(position))
+            if position.x == 0 and position.y == 0 and position.rotation == 0:
+                twist = stop_twist()
+                twist.angular.z = 0.0
+                self.command_movement.publish(twist)
+            elif position.rotation == 0:
+                current_rotation = Rotation.from_rotvec([0,0,current_position.rotation])
+                movement_vector = (position.x, position.y, 0)
+                final_vector = current_rotation.apply(movement_vector)
+                self.task = AbsoluteMovementTask(self, self.map[int(final_vector[1] + final_vector[0])][
+                    int(position.x + current_position.x)])
+                self.get_logger().info("Relative movement task started for position {}".format(position))
+            else:
+                twist = spin_twist()
+                twist.angular.z = position.rotation
+                self.command_movement.publish(twist)
+
+    def absolute_movement(self, position: Position) -> None:
+        if self.map is not None:
+            try:
+                current_position = self.get_current_position()
+            except:
+                return
+            if position.x == 0 and position.y == 0 and position.rotation == 0:
+                twist = stop_twist()
+                twist.angular.z = 0.0
+                self.command_movement.publish(twist)
+                self.get_logger().info("Stopping Movement Task")
+            elif position.rotation == 0:
+                self.task = AbsoluteMovementTask(self, self.map[int(position.y + current_position.y)][int(position.x + current_position.x)])
+                self.get_logger().info("Relative movement task started for position {}".format(position))
+            else:
+                twist = spin_twist()
+                twist.angular.z = position.rotation
+                self.command_movement.publish(twist)
+
 
     def position_callback(self, msg):
         self.position_history = [Position(x, y, rotation, timestamp) for x,y,rotation,timestamp in zip(msg.x, msg.y, msg.rotation, msg.timestamp)]
@@ -98,7 +127,10 @@ class PathfindingNode(Node):
         self.map = AreaMap.from_msg(msg, self.get_logger())
 
     def navigate(self):
-        if self.task:
+        if self.task is not None:
+            if self.task.finished():
+                self.task = None
+        if self.task :
             self.task.execute()
 
     def get_current_position(self)-> Position:
