@@ -126,7 +126,7 @@ class PathfindingNode(Node):
         self.position_history: List[Position] = []
         self.main_loop_timer = self.create_timer(0.5, self.navigate)
         self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
-        self._full_turn_rate = self.create_rate(1, self.get_clock())
+        self.turn_recheck_rate = self.create_rate(0.1, self.get_clock())
         self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
         self.get_logger().info("Pathfinding node initialized")
@@ -160,10 +160,10 @@ class PathfindingNode(Node):
         logging.info("Backing turtlebot up")
         twist = spin_twist()
         self.command_movement.publish(twist)
-        self._full_turn_rate.sleep()
+        self.turn_recheck_rate.sleep()
         twist = move_twist()
         self.command_movement.publish(twist)
-        self._full_turn_rate.sleep()
+        self.turn_recheck_rate.sleep()
         twist = stop_twist()
         self.command_movement.publish(twist)
         self.get_logger().info("Finished backing up turtlebot")
@@ -172,6 +172,7 @@ class PathfindingNode(Node):
     def get_current_position(self)-> Position:
         result = self._get_position_history()
         try:
+            self.get_logger().info('Requested position is ' + str(result[-1]))
             return result[-1]
         except IndexError:
             raise ValueError('position not yet known')
@@ -189,18 +190,14 @@ class PathfindingNode(Node):
             astar_map = AstarMap(self.map, current_pos, target)
             while not len(astar_map.priority_queue) == 0:
                 node_score, node = astar_map.priority_queue.pop()
-                self.get_logger().info(f'Handling node {node.x}/{node.y} with score {node_score}')
                 if node == target:
                     self.get_logger().info('Finished the path')
                     break
-                #print(f'Number of neighbors {len(node.neighbors)}')
                 for neighbor in node.neighbors:
                     neighbor_score_via_current = node_score + 1 + heuristic(neighbor, target)
                     if neighbor_score_via_current < neighbor.score:
-                        print(f'Setting predecessor of {neighbor} to {node}')
                         neighbor.predecessor = node
                         neighbor.score = neighbor_score_via_current
-                        #print('Updating ', neighbor, 'to score ', neighbor_score_via_current)
                         updated = astar_map.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
                         if not updated:
                             astar_map.priority_queue.put((neighbor_score_via_current, neighbor))
@@ -211,21 +208,50 @@ class PathfindingNode(Node):
             start_node = None
             current_node = astar_map.target_node
             while current_node.predecessor is not None and not self.has_sight_line(current_pos, current_node):
+                self.get_logger().info(f'No sight line from {current_pos} ti {current_node}, checking next node')
                 current_node = current_node.predecessor
             start_node = current_node.node
             def straight_line_navigation():
                 if not self.is_aligned(start_node):
-                    self.rotate_towards_node(start_node) # TODO implement
-                if abs(current_pos.x - start_node.x) > 1 or abs(current_pos.y - start_node.y) > 1:
-                    twist = move_twist()
-                    self.command_movement.publish(twist)
-                    self.get_logger().info("Moving to next node")
+                    self.rotate_towards_node(start_node)
+                elif abs(current_pos.x - start_node.x) > 1 or abs(current_pos.y - start_node.y) > 1:
+                    self.move_towards_node(start_node)
                 else:
                     twist = stop_twist()
                     self.command_movement.publish(twist)
                     self.get_logger().info("Arrived at node")
+                    self.task_list = self.task_list[:-1]
+                    raise ValueError('finished')
+
             self.task_list.append(straight_line_navigation)
         return movement_task
+
+    def move_towards_node(self, node):
+        current_pos = self.get_current_position()
+        twist = move_twist()
+        self.command_movement.publish(twist)
+        self.get_logger().info(f"Moving to next node {node} from {current_pos}")
+        print(current_pos.x - node.x, current_pos.y - node.y)
+
+
+
+    def rotate_towards_node(self, node):
+        angle_offset = self.get_angle_offset(node)
+        if angle_offset < 0:
+            twist = spin_twist()
+            twist.angular.z = -0.1
+            self.command_movement.publish(twist)
+            self.get_logger().info("Started right spin towards node")
+        else:
+            twist = spin_twist()
+            twist.angular.z = -0.1
+            self.command_movement.publish(twist)
+            self.get_logger().info("Started left spin towards node")
+        while not self.is_aligned(node):
+            self.turn_recheck_rate.sleep()
+        twist = stop_twist()
+        self.command_movement.publish(twist)
+        self.get_logger().info("Stopped spin")
 
     def has_sight_line(self, position, node):
         x_distance = node.x - position.x
@@ -233,30 +259,41 @@ class PathfindingNode(Node):
         previous_y = int(position.y)
         direction = 1 if slope > 0 else -1
         pass_through_nodes = []
-        for x in range(int(position.x), node.x, direction):
+        for x in range(int(position.x), node.x + 1, direction):
             height = previous_y + slope
             pass_through_nodes += [self.map.node_2d[x][y] for y in range(int(previous_y), int(height) +1)]
+            print(previous_y, height, slope)
             previous_y = height
-
-        return any(p_node.obstructed for p_node in pass_through_nodes)
+        print(*pass_through_nodes)
+        return any(p_node.obstructed for p_node in pass_through_nodes) or len(pass_through_nodes) == 0
 
     def is_aligned(self, node: AreaNode, tolerance: float = 20 * math.pi / 180) -> bool:
         if tolerance < 0: tolerance *= -1
         try:
+            angle_difference = self.get_angle_offset(node)
+        except ValueError:
+            return False
+        return - tolerance < angle_difference < tolerance
+
+    def get_angle_offset(self, node):
+        try:
             current_position = self.get_current_position()
         except ValueError:
-            self.get_logger().info('Position not yet known, assuming no alignment')
-            return False
-        current_angle = current_position.rotation % (2* math.pi)
-        goal_vector = (node.x - current_position.x, node.y - current_position.y)
+            self.get_logger().info('Position not yet known')
+            raise
+        current_angle = current_position.rotation % (2 * math.pi)
+        goal_vector = (current_position.x - node.x, current_position.y - node.y)
         # noinspection PyTypeChecker
         goal_vector = unit_vector(goal_vector)
-        vector_angle = np.arccos(np.clip(np.dot((1,0), goal_vector), -1.0, 1.0))
-        vector_angle = vector_angle % (2*math.pi)
+        vector_angle = np.arccos(np.clip(np.dot(goal_vector, (-1, 0)), -1.0, 1.0))
+        vector_angle = vector_angle % (2 * math.pi)
         if vector_angle < current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
-        return angle_difference < tolerance
+        if angle_difference > math.pi:
+            angle_difference = - (2 * math.pi - angle_difference)
+        self.get_logger().info(f'{angle_difference=}')
+        return angle_difference
 
     def _get_position_history(self) -> List[Position]:
         #rclpy.spin_until_future_complete(self, self.position_history_future)
