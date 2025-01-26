@@ -74,17 +74,22 @@ class PathfindingNode(Node):
         self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
         self.create_subscription(semmap_interfaces.msg.Position, "/relative_movement", self.relative_movement, 10)
-        self.create_subscritpion(semmap_interfaces.msg.Position, "/absolute_movement", self.absolute_movement, 10)
+        self.create_subscription(semmap_interfaces.msg.Position, "/absolute_movement", self.absolute_movement, 10)
         self.get_logger().info("Pathfinding node initialized")
 
     def absolute_movement(self, position: Position) -> None:
-        self.task = AbsoluteMovementTask(self, self.map[position.y][position.x])
-        self.get_logger().info("Absolute movement task started for position {}".format(position))
+        if self.map is not None:
+            self.task = AbsoluteMovementTask(self, self.map[position.y][position.x])
+            self.get_logger().info("Absolute movement task started for position {}".format(position))
 
     def relative_movement(self, position: Position) -> None:
-        current_position = self.get_current_position()
-        self.task = AbsoluteMovementTask(self, self.map[position.y + int(current_position.y)][position.x + int(current_position.x)])
-        self.get_logger().info("Relative movement task started for position {}".format(position))
+        if self.map is not None:
+            try:
+                current_position = self.get_current_position()
+            except:
+                return
+            self.task = AbsoluteMovementTask(self, self.map[int(position.y + current_position.y)][int(position.x + current_position.x)])
+            self.get_logger().info("Relative movement task started for position {}".format(position))
 
     def position_callback(self, msg):
         self.position_history = [Position(x, y, rotation, timestamp) for x,y,rotation,timestamp in zip(msg.x, msg.y, msg.rotation, msg.timestamp)]

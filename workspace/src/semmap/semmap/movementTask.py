@@ -36,11 +36,8 @@ class MovementTask:
         if verbose:
             self.pathfinding.get_logger().info('Current angle: %f' % current_angle)
         goal_vector = (int(node.x) - current_position.x, int(node.y) - current_position.y)
-        # noinspection PyTypeChecker
-        try:
-            goal_vector = unit_vector(goal_vector)
-        except RuntimeError:
-            return True # happens when current_position == node -> aligned by decision
+        if verbose:
+            self.pathfinding.get_logger().info(f'Goal vector: {goal_vector}')
         vector_angle = angle_between_vectors((1,0), goal_vector)
         vector_angle = vector_angle % (2 * math.pi)
         if verbose:
