@@ -184,7 +184,8 @@ class ExploreTask(MovementTask):
                     self.pathfinding.get_logger().info(f'Created Navigation to {node}')
                     return
                 except ImpossibleRouteException:
-                    pass
+                    self.task = RotationTask(self.pathfinding, area_map[0][0])
+                    return
 
 class RevisitTask(MovementTask):
     def __init__(self, pathfinding):
