@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from .map_helper import AreaMap
+from .map_helper import AreaMap, free_threshold
 from .priority_queue import PriorityQueue
 
 class ImpossibleRouteException(Exception):
@@ -61,7 +61,9 @@ class AstarMap:
                 self.logger.info('Finished the path to target')
                 return node
             for neighbor in node.neighbors:
-                if neighbor.obstructed:
+                if neighbor.obstructed or not (0 <= node.node.obstruction < free_threshold):
+                    print("Skipping node '{}'".format(neighbor))
+                    print("obstruction is '{}".format(node.node.obstruction))
                     continue
                 neighbor_score_via_current = node_score + 1 + self.heuristic(neighbor, target)
                 if neighbor_score_via_current < neighbor.score:

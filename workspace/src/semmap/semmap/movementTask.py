@@ -171,18 +171,20 @@ class ExploreTask(MovementTask):
             if area_map is None:
                 self.pathfinding.get_logger().info("No map available, waiting")
                 return  # System not yet initialized
-            current_pos = self.pathfinding.get_current_position()
-            current_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x)]
             while True:
-                node = choice(list(current_node.nodes_in_range(20)))
-                if node.complete_unknown or free_threshold < node.obstruction < obstruction_threshold:
-                    try:
-                        movement_task = AbsoluteMovementTask(self.pathfinding, node)
-                        self.task = movement_task
-                        self.pathfinding.get_logger().info(f'Created Navigation to {node}')
-                        return
-                    except ImpossibleRouteException:
-                        pass
+                candidates = list(node for node in self.pathfinding.map.all_nodes() if
+                                  not node.obstructed and (0 <= node.obstruction < free_threshold))
+                if len(candidates) == 0:
+                    self.task = RotationTask(self.pathfinding, area_map[0][0])
+                    return
+                node = choice(candidates)
+                try:
+                    movement_task = AbsoluteMovementTask(self.pathfinding, node)
+                    self.task = movement_task
+                    self.pathfinding.get_logger().info(f'Created Navigation to {node}')
+                    return
+                except ImpossibleRouteException:
+                    pass
 
 class RevisitTask(MovementTask):
     def __init__(self, pathfinding):
