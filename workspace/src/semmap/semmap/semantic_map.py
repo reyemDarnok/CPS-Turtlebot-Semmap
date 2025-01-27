@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from semmap_interfaces.msg import Object
 from semmap_interfaces.msg import Position
-from semantic_map.srv import SemanticMap
+from semmap_interfaces.srv import SemanticMap
 import math
 
 class SemanticMapNode(Node):
