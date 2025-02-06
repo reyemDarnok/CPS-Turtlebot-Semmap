@@ -1,26 +1,21 @@
 \babel@toc {english}{}\relax 
-\contentsline {section}{\numberline {1}No Cloning Theorem}{3}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Definition}{3}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Beweis}{3}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Folgen}{4}{subsection.1.3}%
-\contentsline {subsubsection}{\numberline {1.3.1}Quantenkommunikation}{4}{subsubsection.1.3.1}%
-\contentsline {subsubsection}{\numberline {1.3.2}Schutz der Quanteninformation}{5}{subsubsection.1.3.2}%
-\contentsline {subsubsection}{\numberline {1.3.3}Design von Algorithmen}{5}{subsubsection.1.3.3}%
-\contentsline {subsubsection}{\numberline {1.3.4}Speicherung von Quanteninformation}{5}{subsubsection.1.3.4}%
-\contentsline {subsubsection}{\numberline {1.3.5}Messungen und Messgenauigkeit}{6}{subsubsection.1.3.5}%
-\contentsline {section}{\numberline {2}Quantenteleportation}{7}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Einführung}{7}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Aufbau}{7}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Vorgang}{7}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Alices Bell Zustand Messung}{8}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {2.3.2}Klassische Kommunikation}{8}{subsubsection.2.3.2}%
-\contentsline {subsubsection}{\numberline {2.3.3}Bobs Quantenoperation}{8}{subsubsection.2.3.3}%
-\contentsline {subsection}{\numberline {2.4}Mathematik}{8}{subsection.2.4}%
-\contentsline {subsubsection}{\numberline {2.4.1}Verschränkung und Bell-Zustände}{8}{subsubsection.2.4.1}%
-\contentsline {subsubsection}{\numberline {2.4.2}Der zu teleportierende Zustand}{9}{subsubsection.2.4.2}%
-\contentsline {subsubsection}{\numberline {2.4.3}Verschränkung und Messung}{9}{subsubsection.2.4.3}%
-\contentsline {subsection}{\numberline {2.5}Herausforderungen}{10}{subsection.2.5}%
-\contentsline {subsubsection}{\numberline {2.5.1}Verschränkung Erzeugen und Erhalten}{10}{subsubsection.2.5.1}%
-\contentsline {subsubsection}{\numberline {2.5.2}Klassische Kommunikation}{10}{subsubsection.2.5.2}%
-\contentsline {subsubsection}{\numberline {2.5.3}Skalierbarkeit}{10}{subsubsection.2.5.3}%
-\contentsline {subsubsection}{\numberline {2.5.4}Fehlerquellen und Messgenauigkeit}{11}{subsubsection.2.5.4}%
+\contentsline {section}{\numberline {1}Einführung}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Zielsetzung}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Turtlebot}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Gazebo}{3}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Navigation}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Genutzte Sensoren}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}SLAM Bibliothek}{4}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Turtlebot Navigate}{4}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Übersetzung zwischen Koordinatensystemen}{4}{subsubsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.3}Findung des Navigationsziels}{4}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Erkundung}{4}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Wiederbesuch}{4}{subsubsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.4}Navigieren zum Ziel}{4}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Dijkstra Wegfindung}{4}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}A* Heuristik}{5}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Implementierung}{5}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Verwaltung der aktuellen Aufgabe}{5}{subsubsection.2.4.4}%
+\contentsline {section}{\numberline {3}Semantische Karte}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Objekterkennung}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Objekt Positionierung}{6}{subsection.3.2}%
