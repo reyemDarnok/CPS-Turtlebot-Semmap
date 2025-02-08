@@ -65,6 +65,137 @@ einer Heuristik.
 Um diese Richtung festzustellen, nutzt der Algorithmus eine Heuristik.
 Diese muss die Entfernung zwischen zwei beliebigen Knoten angeben und, damit A* tatsächlich die kürzeste Entfernung
 findet, muss diese Heuristik die Entfernung unterschätzen.
-Wenn dies nicht der Fall ist findet A*
+Wenn dies nicht der Fall ist, findet A* zwar immer noch einen Weg, dieser ist aber nicht mehr garantiert der Kürzeste.
+
+Der einzige Unterschied im Algorithmus zu Dijkstra ist, wie der nächste Knoten ausgewählt wird: Auch A* betrachtet nur
+Knoten, die noch nicht besucht wurden, nimmt aber nicht den Knoten mit der niedrigsten Distanz, sondern den Knoten mit der
+niedrigsten Summe aus Distanz und Heuristik bis zum Ziel.
+So werden Knoten bevorzugt, die näher am Zielknoten liegen.
+
+Sollte man sowohl Dijkstra als auch A* auf einer 2D-Ebene ausführen, lässt sich der Vorteil einfach visualisieren:
+Dijkstra besucht Punkte in einem Kreis um den Startpunkt bis der Kreis den Endpunkt beinhaltet während die besuchten Punkte
+von Dijkstra eine Ellipse bilden, die, wenn der Algorithmus beendet ist den Start und Endpunkt als Brennpunkte hat.
+
+<Graphik> % TODO
+
+Solange nur der Weg zu einem Knoten interessant ist, bietet A* gegenüber Dijkstra also eine bessere Performance.
+Da unser Anwendungsfall ist, zu einem bestimmten Punkt zu navigieren, ist das bei uns der Fall.
+Es gibt dennoch einen Aspekt des Problems, der zu wiederholter Ausführung des A* Algorithmus führen könnte, der womöglich
+Dijkstra performanter machen könnte: Es ist möglich, dass der Turtlebot einen Ort durch einen Spalt gesehen hat, durch
+den er nicht durchfahren kann und somit unmöglich Endpunkte probiert werden.
+Jeder dieser Endpunkte erzeugt eine eigene A* Rechnung, auch wenn sie sich eine Dijkstra Rechnung teilen könnten.
+Sollte dies in der Praxis ein Laufzeitproblem erstellen besteht hier die Option die Distanzen des A* Algorithmus mit
+einer neuen Heuristik für einen neuen Endpunkt wiederzuverwenden, da sich die Distanzen vom Startpunkt nicht mit
+verschiedenen Endpunkten ändern, nur die Reihenfolge in der die Knoten ausgewertet werden.
+Dieser Ansatz ist aber komplizierter in der Implementierung und war für unsere Performancebedürfnisse nicht notwendig und
+wurde daher von uns nicht implementiert.
 \subsubsection{Implementierung}
-\subsubsection{Verwaltung der aktuellen Aufgabe}
+Unsere Implementierung in Python besteht aus einer Methode, die Bewegungsaufgaben[\ref{subsubsec:taskmanagement}] erzeugt
+und einer Hilfsklasse, die den Algorithmus implementiert.
+
+Hier haben wir die Implementierung in drei Teile unterteilt: Das Erstellen des Graphen, die Anwendung des A* Algorithmus
+und die Extraktion der Route.
+
+Der erste Aspekt, die Erstellung des Graphen wird in der Initialisierung der AstarMap Hilfsklasse durchgeführt.
+Diese verlangt die AreaMap die bei der Positionsfindung erzeugt wurde und die aktuelle Position.
+Mit diesen Informationen erstellt sie dann eine 2D Liste in der aus jeder Node er AreaMap eine Node der AstarMap erstellt
+wird.
+
+Auch wird eine Priority Queue für die Nodes erstellt, in der die noch nicht besuchten, aber bereits bekannten, Nodes gelistet
+werden und es wird die Node der aktuellen Position mit der Distanz 0 hinzugefügt.
+Das weicht von der Referenzimplementation ab, wird aber näher bei dem Fragment für die $astar\_run$ Methode erklärt.
+\begin{lstlisting}[language=python,label={lst:astar_map_init}]
+def __init__(self, area_map, pos, logger, heuristic=manhatten_distance):
+self.logger = logger
+self.heuristic = heuristic
+self.priority_queue = PriorityQueue()
+self.nodes_2d: List[List[AstarNode]] = []
+for y, row in enumerate(area_map):
+    self.nodes_2d.append([])
+    for x, node in enumerate(row):
+        astar_node = AstarNode(node, area_map, self)
+        self.nodes_2d[y].append(astar_node)
+
+pos_node = self.nodes_2d[int(pos.y)][int(pos.x)]
+pos_node.score = 0
+self.priority_queue.put((0, pos_node))
+for node in (n for row in self.nodes_2d for n in row):
+    node.post_init()
+\end{lstlisting}
+
+Die referenzierte $post\_init$ Methode der AstarNode ist simple und registriert nur die Nachbarn der Node aus der
+unterliegenden AreaMap, die in der Postions findung erstellt wurde.
+Diese Methode kann nicht in die $\_\_init\_\_$ Methode der AstarNode integriert werden, da Nachbarschaft symmetrisch ist
+und so beide Nachbarn vor dem jeweils anderen erstellt werden müssten, was natürlich unmöglich ist.
+So werden zuerst alle Nodes erstellt und danach die Verbindungen zwischen den Nodes initialisiert.
+\begin{lstlisting}[language=python,label={lst:astar_node_init}]
+def post_init(self):
+    self.neighbors = [self.astar_map.nodes_2d[neighbor.y][neighbor.x]
+                        for neighbor in self.node.neighbors]
+\end{lstlisting}
+
+Kommen wir jetzt zum Kernstück des A* Algorithmus, der $run\_astar$ Methode.
+Sie beginnt damit, sich den Zielknoten zu merken und beginnt dann eine Schleife, die zwei Austrittsmöglichkeiten hat;
+Es sind keine Knoten in der Priority Queue mehr oder die aktuelle Node ist die Target Node, die der Algorithmus sich gemerkt
+hat.
+In dem ersten Scenario bricht die Methode mit einer Fehlermeldung ab, weil sie keinen Weg finden könnte, während im
+zweiten Scenario der Algorithmus den kürzesten Weg zum Ziel gefunden hat.
+In jedem Durchlauf der Schleife wird dann der Knoten mit dem kleinsten Wert aus der Priority Queue entfernt.
+Für jeden befahrbaren Nachbarn wird dann geprüft, ob der Weg über die aktuelle Node schneller ist.
+Wenn ja, wird die Node in der Priority Queue mit dem neuen Wert aktualisiert oder der Queue hinzugefügt, falls sie
+zum ersten Mal gesehen wurde.
+Das ist equivalent zu der Methode zu vermerken, welche Knoten bereits besucht wurden, da wenn ein Knoten evaluiert wird
+hat er die niedrigstmögliche Distanz da der Graph überall die Gewichtung 1 hat und somit die Distanz der evaluierten
+Knoten monoton steigt.
+Auch ist die Inklusion mit aller Knoten mit $\infty$ Distanz equivalent zu ihrer Inklusion erst, wenn ein Nachbar evaluiert wird.
+In dem Standardalgorithmus werden diese Knoten auch erst relevant, wenn eine andere Distanz für diese gesetzt wird, was
+dieselbe Bedingung wie für die Inklusion in die Priority Queue ist.
+\begin{lstlisting}[language=python,label={lst:run_astar}]
+target = self.nodes_2d[int(target.y)][int(target.x)]
+while not len(self.priority_queue) == 0:
+    node_score, node = self.priority_queue.pop()
+    if node == target:
+        self.logger.info('Finished the path to target')
+        return node
+    for neighbor in node.neighbors:
+        if (neighbor.obstructed or
+            not (0 <= node.node.obstruction < free_threshold)):
+            continue
+        neighbor_score_via_current = node_score + 1 + self.heuristic(neighbor, target)
+        if neighbor_score_via_current < neighbor.score:
+            neighbor.predecessor = node
+            neighbor.score = neighbor_score_via_current
+            updated = self.priority_queue.update_elem(
+                neighbor, (neighbor_score_via_current, neighbor)
+            )
+            if not updated:
+                self.priority_queue.put((neighbor_score_via_current, neighbor))
+raise ImpossibleRouteException(f"No Route to {target} found")
+\end{lstlisting}
+
+Nachdem diese Methode durchgelaufen ist, ist die schnellste route zu dem Zielknoten definiert, aber was für die weitere
+Bewegungsplanung interessant ist, ist der nächste Knoten, zu dem der Roboter fahren muss.
+Dafür startet die Bewegungsplanungsmethode mit dem Zielknoten und geht entlang der Vorgängerknoten und registriert alle
+Knoten in eine Liste bis der Startknoten erreicht wird.
+Der zweite Knoten in der Liste (der erste ist der Startknoten) ist dann der nächste Knoten der angefahren werden muss.
+
+\begin{lstlisting}[language=python,label={lst:pathfinding}]
+current_node = end_node
+path = []
+while current_node.predecessor is not None:
+    path = [current_node] + path
+    current_node = current_node.predecessor
+self.task_list = [SlamSpinTask(self.pathfinding),
+                  ForwardTask(self.pathfinding, path[1].node),
+                  RotationTask(self.pathfinding, path[1].node)]
+\end{lstlisting}
+\subsubsection{Verwaltung der aktuellen Aufgabe} \label{subsubsec:taskmanagement}
+Wie am Ende der letzten Sektion vielleicht schon ersichtlich wird, werden in unserem Projekt Bewegungen als einzelne
+Aufgaben dargestellt.
+Diese bestehen meist aus anderen, spezifischeren Aufgaben wie in dem folgenden Abhängigkeitsdiagramm dargestellt.
+\begin{figure}[h]
+    \caption{Ein Diagramm der Abhängigkeiten zwischen Tasks}
+\includegraphics[width=0.8\textwidth]{img/TaskDiagram}\label{fig:taskdiagram}
+\centering
+\end{figure}
+
