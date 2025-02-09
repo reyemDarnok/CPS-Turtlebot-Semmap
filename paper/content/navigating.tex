@@ -1,6 +1,40 @@
 \section{Navigation}\label{sec:navigation}
 \subsection{Genutzte Sensoren}\label{subsec:genutzte-sensoren}
+Um den Turtlebot durch die Umgebung zu navigieren, braucht es selbstverständlich die Information seiner Sensoren.
+Ebenso selbstverständlich sind aber nicht alle Sensoren des Turtlebots gleich für diese Aufgabe geeignet.
+So nutzt die Navigation primär zwei Sensoren: Das Lidar des Roboters und sein Odometer, wobei diese für die Erkennung
+von ungewöhnlichen Situationen noch von den Reifenkontaktsensoren unterstützt werden.
+Sollten die letzteren allerdings auslösen, bleibt dem Algorithmus allerdings leider nichts übrig außer die Bewegung zu
+stoppen, um Schaden zu vermeiden und dann das Kartenmaterial neu aufzubereiten, da keine Routine existiert, um herauszufinden,
+wie weit der Roboter durch Fremdeinwirkung bewegt wurde.\\
 
+
+Hätten die zwei Primärsensoren nicht genug information geliefert, hätte auch noch die Option bestanden die Tiefenkamera
+des Turtlebots in die Navigation einzubinden, indem man versucht Objekten im Blickfeld der Kamera zu folgen und mithilfe
+der Bewegung der Objekte zwischen Bildern festzustellen, wie sich der Roboter bewegt hat.
+Da die Primärsensoren aber ausreichende Information liefern war dieser Schritt nicht notwendig, was sowohl algorithmische
+als auch Laufzeit Komplexität gespart hat und die Tiefenkamera ist so nur im Einsatz für die Objekterkennung der semantischen
+Karte.\\
+
+Die beiden genutzten Sensoren haben hier auch eine Aufgabenteilung: Das Lidar ist primär dafür zuständig, Hindernisse zu
+erkennen, während das Odometer die Positionsänderung zwischen Messungen bestimmen soll.
+Diese Rollen sind allerdings nicht streng getrennt: Die Messungenauigkeit des Odometers kann mit Information des Lidar
+korrigiert werden.
+Wenn zum Beispiel das Odometer angibt, dass der Turtlebot $2cm$ nach vorne gefahren ist während das Lidar nur eine
+Positionsänderung des Hindernis direkt voraus um $1.9cm$ feststellt, kann der Algorithmus annehmen, dass der Turtlebot
+nicht ganz so weit gefahren ist, wie das Odometer angibt.
+Das könnte zum Beispiel der Fall sein, wenn die Reifen des Roboters kurz den Grip verlieren und sich so zwar weiterdrehen
+aber der Roboter sich nicht wirklich bewegt.
+Mithilfe dieser Sensorfusion kann also die relative Position des Roboters bestimmt werden.\\
+
+Hindernisse hingegen werden tatsächlich rein über das Lidar erkannt.
+Jeden Augenblick sendet der Roboter Laserpulse aus, mit denen er den Abstand bis zum nächsten Hindernis in diese Richtung
+bestimmt.
+Hierbei ist noch relevant, dass Teile des Suchfelds des Lidar von der Struktur des Turtlebots geblockt werden und damit
+ignoriert werden müssen.
+Ansonsten findet das Lidar alle Hindernisse mit Sichtlinie zum Roboter.
+Das heißt, dass theoretisch der Roboter in einem leeren Raum eine komplette Karte erstellen könnte, ohne sich zu bewegen,
+aber in der Praxis ist fast immer zumindest ein Teil des Raums vom Startpunkt von Hindernissen verdeckt.
 \subsection{SLAM Bibliothek}\label{subsec:slam-bibliothek}
 
 \subsubsection{Turtlebot Navigate} % TODO richtiger Name
@@ -19,16 +53,16 @@ Dabei ist er ein greedy Algorithmus der schrittweise den kürzesten Weg von dem 
 Die einzigen Limitierungen an den Graphen, die der Dijkstra Algorithmus stellt, sind, dass der Graph verbunden sein muss
 (sonst existieren einige Wege nicht) und dass keine Gewichtung einer Verbindung negativ sind.
 Eine negative Gewichtung kann dazu führen, dass der Algorithmus nicht den optimalen Weg zum Endknoten findet, weil der Algorithmus abbricht, bevor der negative
-Weg in Betrachtung gezogen wird.
+Weg in Betrachtung gezogen wird.\\
 
 Der erste Anspruch kann in unserem Problem nicht garantiert werden - es ist durchaus möglich, dass Teile des sichtbaren
 Gebietes nicht erreichbar sind, weil der Weg dahin zu dünn für den Turtlebot ist.
-Manche Zielpunkte sind also nicht navigierbar, was wir bei der Implementierung beachten werden müssen.
+Manche Zielpunkte sind also nicht navigierbar, was wir bei der Implementierung beachten werden müssen.\\
 
 Die zweite Bedingung können wir hingegen garantieren, weil die Gewichtungen unseres Graphen der Entfernung zwischen
 zwei Knoten entsprechen und damit nicht negativ sein können.
 Das die Realität des Systems negative Gewichte verbietet ist durchaus üblich, was diese Bedingung des Dijkstra Algorithmus
-in der Praxis selten relevant macht.
+in der Praxis selten relevant macht.\\
 
 
 
@@ -37,44 +71,44 @@ wobei die mittleren beiden Schritte wiederholt werden, bis der Algorithmus ferti
 
 In der Initialisierung wird die Distanz bis zum Startknoten auf 0 gesetzt und die Entfernung zu allen anderen Knoten auf
 $\infty$ gesetzt.
-Ebenfalls werden alle Knoten als unbesucht markiert.
+Ebenfalls werden alle Knoten als unbesucht markiert.\\
 
 Dann wird der nächste Knoten gewählt.
 Dieser ist der Knoten mit der kleinsten Distanz, der noch nicht besucht wurde.
 Dieser lässt sich trivial in $O(n)$ Laufzeit finden, indem alle Knoten geprüft werden, aber mithilfe von Datenstrukturen
-wie Priority Queues lässt sich das auf $O(\log n)$ reduzieren.
+wie Priority Queues lässt sich das auf $O(\log n)$ reduzieren.\\
 
 Als letzter Schritt vor der Wiederholung kommt dann die Verarbeitung des Knotens.
 Hierbei wird für jeden Nachbarn des ausgesuchten Knotens geprüft, ob die Distanz des ausgesuchten Knotens zusammen mit der
 Gewichtung der Verbindung zwischen den beiden Knoten kleiner ist als die aktuelle Distanz des Nachbarn.
 Wenn ja, wird die Distanz des Nachbars dann auf diesen Wert gesetzt und der aktuelle Knoten im Nachbarn als Vorgänger
 eingetragen.
-Wenn dieser Schritt abgeschlossen ist, wird der aktuelle Knoten dann noch als besucht markiert.
+Wenn dieser Schritt abgeschlossen ist, wird der aktuelle Knoten dann noch als besucht markiert.\\
 
 Nachdem alle Knoten verarbeitet wurden (oder der Endknoten verarbeitet wurde, wenn nur ein Ziel existiert) kann dann eine
 Route gefunden werden.
 Dafür wird ein Zielknoten gewählt und von diesem dann der Kette von Vorgängerknoten gefolgt, bis diese den Startknoten
 erreicht.
-Diese Kette kann dann invertiert werden, um die Route zum Ziel zu erhalten.
+Diese Kette kann dann invertiert werden, um die Route zum Ziel zu erhalten.\\
 \subsubsection{A* Heuristik}\label{subsubsec:astar}
 Während der Dijkstra Algorithmus den schnellsten Weg zu allen Knoten findet, findet der A* Star Algorithmus nur den
 schnellsten Weg zu einem bestimmten Zielknoten.
 Dafür ist der Algorithmus aber performanter, da er Knoten primär in der Richtung des Zielknotens untersucht mithilfe
-einer Heuristik.
+einer Heuristik.\\
 
 Um diese Richtung festzustellen, nutzt der Algorithmus eine Heuristik.
 Diese muss die Entfernung zwischen zwei beliebigen Knoten angeben und, damit A* tatsächlich die kürzeste Entfernung
 findet, muss diese Heuristik die Entfernung unterschätzen.
-Wenn dies nicht der Fall ist, findet A* zwar immer noch einen Weg, dieser ist aber nicht mehr garantiert der Kürzeste.
+Wenn dies nicht der Fall ist, findet A* zwar immer noch einen Weg, dieser ist aber nicht mehr garantiert der Kürzeste.\\
 
 Der einzige Unterschied im Algorithmus zu Dijkstra ist, wie der nächste Knoten ausgewählt wird: Auch A* betrachtet nur
 Knoten, die noch nicht besucht wurden, nimmt aber nicht den Knoten mit der niedrigsten Distanz, sondern den Knoten mit der
 niedrigsten Summe aus Distanz und Heuristik bis zum Ziel.
-So werden Knoten bevorzugt, die näher am Zielknoten liegen.
+So werden Knoten bevorzugt, die näher am Zielknoten liegen.\\
 
 Sollte man sowohl Dijkstra als auch A* auf einer 2D-Ebene ausführen, lässt sich der Vorteil einfach visualisieren:
 Dijkstra besucht Punkte in einem Kreis um den Startpunkt bis der Kreis den Endpunkt beinhaltet während die besuchten Punkte
-von Dijkstra eine Ellipse bilden, die, wenn der Algorithmus beendet ist den Start und Endpunkt als Brennpunkte hat.
+von Dijkstra eine Ellipse bilden, die, wenn der Algorithmus beendet ist den Start und Endpunkt als Brennpunkte hat.\\
 
 <Graphik> % TODO
 
@@ -92,15 +126,13 @@ wurde daher von uns nicht implementiert.
 \subsubsection{Implementierung}
 Unsere Implementierung in Python besteht aus einer Methode, die Bewegungsaufgaben[\ref{subsubsec:taskmanagement}] erzeugt
 und einer Hilfsklasse, die den Algorithmus implementiert.
-
 Hier haben wir die Implementierung in drei Teile unterteilt: Das Erstellen des Graphen, die Anwendung des A* Algorithmus
-und die Extraktion der Route.
+und die Extraktion der Route.\\
 
 Der erste Aspekt, die Erstellung des Graphen wird in der Initialisierung der AstarMap Hilfsklasse durchgeführt.
 Diese verlangt die AreaMap die bei der Positionsfindung erzeugt wurde und die aktuelle Position.
 Mit diesen Informationen erstellt sie dann eine 2D Liste in der aus jeder Node er AreaMap eine Node der AstarMap erstellt
 wird.
-
 Auch wird eine Priority Queue für die Nodes erstellt, in der die noch nicht besuchten, aber bereits bekannten, Nodes gelistet
 werden und es wird die Node der aktuellen Position mit der Distanz 0 hinzugefügt.
 Das weicht von der Referenzimplementation ab, wird aber näher bei dem Fragment für die $astar\_run$ Methode erklärt.
@@ -200,25 +232,30 @@ Diese bestehen meist aus anderen, spezifischeren Aufgaben wie in dem folgenden A
 \end{figure}
 Die Hierarchie beginnt mit der PathfindingNode, die eine List von Aufgaben registriert hat und alle $0.1s$ prüft, ob die
 aktuelle Aufgabe fertiggestellt ist (und diese aus der Liste entfernt, wenn das der Fall ist) und dann die aktuelle
-Aufgabe ausführt.
+Aufgabe ausführt.\\
+
 Auf dieser Ebene ist die Aufgabe eine Erkundungsstrategie, entweder ExploreTask mit der eine noch unbekannte Umgebung
 erkundet wird oder RevisitTask der aktiviert wird, wenn ExploreTask keine neuen Gebiete mehr sieht und zu dem Punkt
 navigiert, der am längsten nicht besucht wurde.
 Dafür finden sie bei ihrer Initialisierung ein passendes Ziel und erstellen einen AbsoluteMovementTask zu diesem Ziel,
-an den sie alle weitere Ausführung delegieren und mit dessen Fertigstellung sie sich selber als fertig markieren.
+an den sie alle weitere Ausführung delegieren und mit dessen Fertigstellung sie sich selber als fertig markieren.\\
+
 Dieser wiederum führt eine A* Wegfindung[\ref{subsubsec:astar}] während seiner Initialisierung durch und erstellt dabei
 drei weitere Aufgaben, die dann nacheinander abgearbeitet werden bis sie abgeschlossen sind: Ein RotationTask,
 ein ForwardTask und ein SlamSpinTask.
-Diese beschreiben wiederum eine konkrete Bewegung mit einem Zielzustand, dessen Erreichung die Aufgabe als fertig markiert
+Diese beschreiben wiederum eine konkrete Bewegung mit einem Zielzustand, dessen Erreichung die Aufgabe als fertig markiert.\\
+
 RotationTask beginnt damit, die Richtung zu der Zielposition zu ermitteln und dann die Differenz zwischen dieser und der
 aktuellen Ausrichtung festzustellen.
 Nachdem diese bekannt ist, beginnt er eine Drehung und prüft die Ausrichtung des Turtlebots durchgehend bis die
 Zielausrichtung erreicht ist.
-Wenn die Zielausrichtung erreicht ist, sendet dieser Task dann noch das Stop-Signal und markiert sich als fertig.
+Wenn die Zielausrichtung erreicht ist, sendet dieser Task dann noch das Stop-Signal und markiert sich als fertig.\\
+
 Darauf folgt der ForwardTask, der eine Vorwärtsbewegung startet.
 Dabei nimmt er an, dass ein vorhergehender RotationTask bereits die Ausrichtung angepasst hat und wartet, bis die
 aktuelle Position des Turtlebots den Zielknoten erreicht, woraufhin auch diese Aufgabe ein Stop-Signal sendet und sich
-als fertig markiert.
+als fertig markiert.\\
+
 Die letzte Aufgabe, SlamSpinTask, unterscheidet sich dadurch, dass sie nicht von einem Zielknoten abhängig ist.
 Statt näher an das Ziel zu kommen, ist die Aufgabe des SlamSpinTask Daten für die Kartografierung zu liefern.
 Dafür wird der Turtlebot einen Moment rotiert, was zwar die allgemeine Bewegung durch die ``Verschwendung'' von Zeit
