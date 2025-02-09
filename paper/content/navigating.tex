@@ -21,7 +21,7 @@ erkennen, während das Odometer die Positionsänderung zwischen Messungen bestim
 Diese Rollen sind allerdings nicht streng getrennt: Die Messungenauigkeit des Odometers kann mit Information des Lidar
 korrigiert werden.
 Wenn zum Beispiel das Odometer angibt, dass der Turtlebot $2cm$ nach vorne gefahren ist während das Lidar nur eine
-Positionsänderung des Hindernis direkt voraus um $1.9cm$ feststellt, kann der Algorithmus annehmen, dass der Turtlebot
+Positionsänderung des Hindernises direkt voraus um $1.9cm$ feststellt, kann der Algorithmus annehmen, dass der Turtlebot
 nicht ganz so weit gefahren ist, wie das Odometer angibt.
 Das könnte zum Beispiel der Fall sein, wenn die Reifen des Roboters kurz den Grip verlieren und sich so zwar weiterdrehen
 aber der Roboter sich nicht wirklich bewegt.
@@ -36,9 +36,76 @@ Ansonsten findet das Lidar alle Hindernisse mit Sichtlinie zum Roboter.
 Das heißt, dass theoretisch der Roboter in einem leeren Raum eine komplette Karte erstellen könnte, ohne sich zu bewegen,
 aber in der Praxis ist fast immer zumindest ein Teil des Raums vom Startpunkt von Hindernissen verdeckt.
 \subsection{SLAM Bibliothek}\label{subsec:slam-bibliothek}
+Simultaneous Localization and Mapping (SLAM) haben wir nicht selber implementiert, sondern haben hier eine Bibliothek
+genutzt.
+Natürlich mussten wir hier aber trotzdem Arbeit leisten, um die Bibliothek zu nutzen und in den Rest des Codes zu integrieren.
+\subsubsection{turtlebot3\_cartographer} % TODO richtiger Name
+Die Bibliothek <lookup name>\cite{navigate_doku} ist eine der standard Bibliotheken der Turtlebot Hersteller.
+Sie besteht aus einer Node, die mit dem folgenden Befehl gestartet wird:
+\begin{lstlisting}[language=python,label={lst:start_cartographer_node}]
+ros2 launch turtlebot3_cartographer cartographer.launch.py
+\end{lstlisting}
+Das startet die Routine, die das Lidar nutzt, um eine Karte zu erstellen.
+Auch gestartet wird eine grafische Oberfläche, die die aktuelle erkundete Karte und die Position des Turtlebot in dieser
+anzeigt.
+Anfangs ist diese Karte noch größtenteils leer, denn der SLAM Algorithmus braucht zwar nur wenige Informationen um sich
+sicher zu sein, dass ein Hindernis existiert aber mehr Informationen braucht um ein Gebiet als frei zu markieren.
+Relevant ist auch, dass die Karte nicht auf den Turtlebot zentriert ist, wenn der Turtlebot nahe Hindernissen startet.
+Stattdessen wird angenommen, dass diese Hindernisse nahe des Randes des erkundbaren Gebietes, und damit der Karte sind.
+Anfangs sieht die Karte wie folgt aus:
 
-\subsubsection{Turtlebot Navigate} % TODO richtiger Name
+\begin{figure}[h!]
+    \caption{Eine Karte im direkt nach dem Start des Algorithmus} % TODO
+\includegraphics[width=0.8\textwidth]{img/TaskDiagram}\label{fig:map_initial}
+\centering
+\end{figure}
+
+Besonders ist, dass hier die freien Regionen noch nicht als solche markiert sind, weil der Algorithmus noch nicht genug
+Datenpunkte hat.
+Sollte man lange genug ohne Bewegung warten startet der Algorithmus sich sicherer zu werden, aber das Kartenmaterial
+wird schneller besser, wenn der Turtlebot langsam durch die Umgebung navigiert wird.
+Eine fertiggestellte Karte könnte wie folgt aussehen:
+
+\begin{figure}[h!]
+    \caption{Eine Karte eines erkundetes Gebietes} % TODO
+\includegraphics[width=0.8\textwidth]{img/TaskDiagram}\label{fig:map_finished}
+\centering
+\end{figure}
+
 \subsubsection{Übersetzung zwischen Koordinatensystemen}
+Während die Bibliothek zwar ein Koordinatensystem erstellt, ist es leider nicht Deckungsgleich mit dem des Odometers,
+dass den Ursprung des Koordinatensystems an anderer Stelle setzt, oder mit dem Koordinatensystem der Navigierung, die zur
+Einfachheit der Implementierung den Ursprung in die Ecke der Karte platziert.
+Das heißt, dass die Koordinaten die das Odometer angibt in das Koordinatensystem der Navigierung übersetzt werden. \\
+
+Der erste Schritt dabei ist der Transfer von dem Odometer Koordinaten zum SLAM Koordinatensystem.
+Dafür gibt die SLAM Bibliothek an, wo sie den Ursprung des Odometer Koordinatensystems wähnt und so kann eine Rotation
+und Translation mit jedem Update des Kartenmaterials berechnet werden, welche dann nur noch auf die Koordinaten des
+Odometers angewandt werden müssen.
+Der zweite Schritt ist dann die statische Rotation und Translation zwischen dem SLAM Koordinatensystem und unserem
+Koordinatensystem.
+Diese Werte können berechnet werden, da die SLAM Bibliothek auch die Position ihres Ursprungs relativ zur Ecke der Karte
+reportiert.\\
+
+Es muss aber nicht nur die Position des Turtlebots zwischen den Systemen transferiert werden.
+Auch das Kartenmaterial selber muss von unserem System gelesen und in ein von uns lesbares Format übertragen werden.
+Die SLAM Bibliothek gibt die Karte hier im \lstinline{.pgm} Format als zweidimensionale Liste an.
+In diesem Format ist diese Liste eine List von Zeilen, was heißt, dass sie zuerst mit der $y$ und dann mit der $x$
+Koordinate indiziert werden muss, was uns zunächst nicht aufgefallen ist, was zu vermeidbaren Fehlern geführt hat.\\
+
+Jeder Wert in den inneren Listen stellt dann wiederum ein Quadrat des Bodens da, mit einer größe von $5cm$ in der
+Standardkonfiguration.
+Dieser Wert rangiert von -1 bis 100, was in der Standardinterpretation eine Intensität eines Grautons repräsentiert und
+auch als solche in der grafischen Oberfläche der SLAM Bibliothek genutzt wird, stehen diese Werte in dieser Anwendung
+für die Sicherheit, dass an dieser Position ein Hindernis ist.
+Dabei steht ein Wert von -1 für eine Position, die der Roboter noch nie gesehen hat und die unsere Navigationssoftware
+deshalb als blockiert behandelt, Werte unter 25 sind mit hoher Sicherheit frei und Werte über 65 sind mit hoher Sicherheit
+blockiert.
+Das lässt den Bereich zwischen 25 und 65 als einen unsicheren Bereich, bei dem sich der SLAM Algorithmus sich noch nicht
+sicher ist, ob die Kachel blockiert oder frei ist.
+Unser Algorithmus behandelt diese bei der Navigierung, als blockierte Kacheln, um nicht einen Weg durch eine Kachel zu planen,
+die dann schließlich doch blockiert ist, sieht diese aber als Ziel für die Navigation um die Unsicherheit zu besiegen.
+
 \subsection{Findung des Navigationsziels}\label{subsec:findung-des-navigationsziels}
 
 \subsubsection{Erkundung}
@@ -110,7 +177,11 @@ Sollte man sowohl Dijkstra als auch A* auf einer 2D-Ebene ausführen, lässt sic
 Dijkstra besucht Punkte in einem Kreis um den Startpunkt bis der Kreis den Endpunkt beinhaltet während die besuchten Punkte
 von Dijkstra eine Ellipse bilden, die, wenn der Algorithmus beendet ist den Start und Endpunkt als Brennpunkte hat.\\
 
-<Graphik> % TODO
+\begin{figure}[h!]
+    \caption{Ein Vergleich zwischen dem Suchverhalten des Dijkstra und Astar Algorithmus} % TODO
+\includegraphics[width=0.8\textwidth]{img/TaskDiagram}\label{fig:dijkstra_v_astar}
+\centering
+\end{figure}
 
 Solange nur der Weg zu einem Knoten interessant ist, bietet A* gegenüber Dijkstra also eine bessere Performance.
 Da unser Anwendungsfall ist, zu einem bestimmten Punkt zu navigieren, ist das bei uns der Fall.

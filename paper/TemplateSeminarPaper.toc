@@ -6,16 +6,16 @@
 \contentsline {section}{\numberline {2}Navigation}{4}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Genutzte Sensoren}{4}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}SLAM Bibliothek}{5}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Turtlebot Navigate}{5}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.1}turtlebot3\_cartographer}{5}{subsubsection.2.2.1}%
 \contentsline {subsubsection}{\numberline {2.2.2}Übersetzung zwischen Koordinatensystemen}{5}{subsubsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.3}Findung des Navigationsziels}{5}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Erkundung}{5}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {2.3.2}Wiederbesuch}{5}{subsubsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.4}Navigieren zum Ziel}{5}{subsection.2.4}%
-\contentsline {subsubsection}{\numberline {2.4.1}Dijkstra Wegfindung}{5}{subsubsection.2.4.1}%
-\contentsline {subsubsection}{\numberline {2.4.2}A* Heuristik}{6}{subsubsection.2.4.2}%
-\contentsline {subsubsection}{\numberline {2.4.3}Implementierung}{7}{subsubsection.2.4.3}%
-\contentsline {subsubsection}{\numberline {2.4.4}Verwaltung der aktuellen Aufgabe}{9}{subsubsection.2.4.4}%
-\contentsline {section}{\numberline {3}Semantische Karte}{11}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Objekterkennung}{11}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Objekt Positionierung}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {2.3}Findung des Navigationsziels}{7}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Erkundung}{7}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Wiederbesuch}{7}{subsubsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.4}Navigieren zum Ziel}{7}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Dijkstra Wegfindung}{7}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}A* Heuristik}{8}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Implementierung}{9}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Verwaltung der aktuellen Aufgabe}{11}{subsubsection.2.4.4}%
+\contentsline {section}{\numberline {3}Semantische Karte}{13}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Objekterkennung}{13}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Objekt Positionierung}{13}{subsection.3.2}%
