@@ -56,7 +56,7 @@ Route gefunden werden.
 Dafür wird ein Zielknoten gewählt und von diesem dann der Kette von Vorgängerknoten gefolgt, bis diese den Startknoten
 erreicht.
 Diese Kette kann dann invertiert werden, um die Route zum Ziel zu erhalten.
-\subsubsection{A* Heuristik}
+\subsubsection{A* Heuristik}\label{subsubsec:astar}
 Während der Dijkstra Algorithmus den schnellsten Weg zu allen Knoten findet, findet der A* Star Algorithmus nur den
 schnellsten Weg zu einem bestimmten Zielknoten.
 Dafür ist der Algorithmus aber performanter, da er Knoten primär in der Richtung des Zielknotens untersucht mithilfe
@@ -198,4 +198,31 @@ Diese bestehen meist aus anderen, spezifischeren Aufgaben wie in dem folgenden A
 \includegraphics[width=0.8\textwidth]{img/TaskDiagram}\label{fig:taskdiagram}
 \centering
 \end{figure}
+Die Hierarchie beginnt mit der PathfindingNode, die eine List von Aufgaben registriert hat und alle $0.1s$ prüft, ob die
+aktuelle Aufgabe fertiggestellt ist (und diese aus der Liste entfernt, wenn das der Fall ist) und dann die aktuelle
+Aufgabe ausführt.
+Auf dieser Ebene ist die Aufgabe eine Erkundungsstrategie, entweder ExploreTask mit der eine noch unbekannte Umgebung
+erkundet wird oder RevisitTask der aktiviert wird, wenn ExploreTask keine neuen Gebiete mehr sieht und zu dem Punkt
+navigiert, der am längsten nicht besucht wurde.
+Dafür finden sie bei ihrer Initialisierung ein passendes Ziel und erstellen einen AbsoluteMovementTask zu diesem Ziel,
+an den sie alle weitere Ausführung delegieren und mit dessen Fertigstellung sie sich selber als fertig markieren.
+Dieser wiederum führt eine A* Wegfindung[\ref{subsubsec:astar}] während seiner Initialisierung durch und erstellt dabei
+drei weitere Aufgaben, die dann nacheinander abgearbeitet werden bis sie abgeschlossen sind: Ein RotationTask,
+ein ForwardTask und ein SlamSpinTask.
+Diese beschreiben wiederum eine konkrete Bewegung mit einem Zielzustand, dessen Erreichung die Aufgabe als fertig markiert
+RotationTask beginnt damit, die Richtung zu der Zielposition zu ermitteln und dann die Differenz zwischen dieser und der
+aktuellen Ausrichtung festzustellen.
+Nachdem diese bekannt ist, beginnt er eine Drehung und prüft die Ausrichtung des Turtlebots durchgehend bis die
+Zielausrichtung erreicht ist.
+Wenn die Zielausrichtung erreicht ist, sendet dieser Task dann noch das Stop-Signal und markiert sich als fertig.
+Darauf folgt der ForwardTask, der eine Vorwärtsbewegung startet.
+Dabei nimmt er an, dass ein vorhergehender RotationTask bereits die Ausrichtung angepasst hat und wartet, bis die
+aktuelle Position des Turtlebots den Zielknoten erreicht, woraufhin auch diese Aufgabe ein Stop-Signal sendet und sich
+als fertig markiert.
+Die letzte Aufgabe, SlamSpinTask, unterscheidet sich dadurch, dass sie nicht von einem Zielknoten abhängig ist.
+Statt näher an das Ziel zu kommen, ist die Aufgabe des SlamSpinTask Daten für die Kartografierung zu liefern.
+Dafür wird der Turtlebot einen Moment rotiert, was zwar die allgemeine Bewegung durch die ``Verschwendung'' von Zeit
+verlangsamt, aber ideal dafür ist, die Konfidenz des Kartografierungsalgorithmus zu erhöhen, indem mehr Sensordaten ohne
+Bewegung geliefert werden.
+Dadurch wird zukünftige Navigation besser, da das Kartenmaterial verbessert wurde.
 

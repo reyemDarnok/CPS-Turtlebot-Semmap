@@ -16,6 +16,6 @@
 \contentsline {subsubsection}{\numberline {2.4.2}A* Heuristik}{5}{subsubsection.2.4.2}%
 \contentsline {subsubsection}{\numberline {2.4.3}Implementierung}{6}{subsubsection.2.4.3}%
 \contentsline {subsubsection}{\numberline {2.4.4}Verwaltung der aktuellen Aufgabe}{8}{subsubsection.2.4.4}%
-\contentsline {section}{\numberline {3}Semantische Karte}{9}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Objekterkennung}{9}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Objekt Positionierung}{9}{subsection.3.2}%
+\contentsline {section}{\numberline {3}Semantische Karte}{10}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Objekterkennung}{10}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Objekt Positionierung}{10}{subsection.3.2}%
