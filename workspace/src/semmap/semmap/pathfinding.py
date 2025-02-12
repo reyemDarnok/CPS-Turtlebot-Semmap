@@ -27,39 +27,6 @@ from nav_msgs.msg import OccupancyGrid
 
 
 
-def stop_twist():
-    twist = Twist()
-    twist.linear.x = 0.0
-    twist.linear.y = 0.0
-    twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
-    twist.angular.z = 0.0
-    return twist
-
-
-def move_twist():
-    twist = Twist()
-    twist.linear.x = 0.1
-    twist.linear.y = 0.0
-    twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
-    twist.angular.z = 0.0
-    return twist
-
-
-def spin_twist():
-    twist = Twist()
-    twist.linear.x = 0.0
-    twist.linear.y = 0.0
-    twist.linear.z = 0.0
-    twist.angular.x = 0.0
-    twist.angular.y = 0.0
-    twist.angular.z = 0.1
-    return twist
-
-
 
 
 class PathfindingNode(Node):

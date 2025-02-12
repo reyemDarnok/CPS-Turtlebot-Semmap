@@ -1,7 +1,7 @@
 import math
 from abc import abstractmethod, abstractproperty
 import datetime
-from random import choice
+from random import choice, shuffle
 
 import numpy as np
 from geometry_msgs.msg import Twist
@@ -10,6 +10,12 @@ from .astar import AstarMap, ImpossibleRouteException
 from .map_helper import free_threshold, obstruction_threshold
 
 def angle_between_vectors(u, v):
+    """
+    Determine the angle between two vectors.
+    :param u: One vector
+    :param v: Other vector
+    :return: The angle in radians
+    """
     ax = u[0]
     ay = u[1]
     bx = v[0]
@@ -17,17 +23,31 @@ def angle_between_vectors(u, v):
     return math.atan2(ax * by - ay * bx, ax * bx + ay * by)
 
 class MovementTask:
+    """Abstract base class for movement tasks."""
     def __init__(self, pathfinding):
         self.pathfinding = pathfinding
         self._finished = False
 
     @abstractmethod
     def execute(self):
+        """
+        This checks if this movement task needs to do anything and does it if necessary.
+        """
         pass
 
     def finished(self):
+        """
+        This method checks if this movement task has finished.
+        :return: True if this task can be discarded, false otherwise.
+        """
         return self._finished
     def get_angle_offset(self, node, verbose=False):
+        """
+        Get the offset between the current orientation and the orientation required for the target node
+        :param node: The node to get the offset to
+        :param verbose: Whether to log
+        :return: The offset in radians
+        """
         try:
             current_position = self.pathfinding.get_current_position()
         except ValueError:
@@ -53,6 +73,9 @@ class MovementTask:
         return angle_difference
 
     def stop(self):
+        """
+        Stop all movement
+        """
         twist = stop_twist()
         self.pathfinding.command_movement.publish(twist)
         self.pathfinding.get_logger().info("Stopped movement")
@@ -62,6 +85,7 @@ def unit_vector(vector):
     return vector / np.linalg.norm(vector)
 
 def stop_twist():
+    """Stop the robot"""
     twist = Twist()
     twist.linear.x = 0.0
     twist.linear.y = 0.0
@@ -73,6 +97,7 @@ def stop_twist():
 
 
 def move_twist():
+    """Move forward"""
     twist = Twist()
     twist.linear.x = 0.1
     twist.linear.y = 0.0
@@ -84,6 +109,7 @@ def move_twist():
 
 
 def spin_twist():
+    """Start spinnig"""
     twist = Twist()
     twist.linear.x = 0.0
     twist.linear.y = 0.0
@@ -95,6 +121,9 @@ def spin_twist():
 
 
 class RotationTask(MovementTask):
+    """
+    This Task spins towards a target node
+    """
     def __init__(self, pathfinding, to_align_node):
         super().__init__(pathfinding)
         self.pathfinding.get_logger().info(f'Rotating towards {to_align_node}')
@@ -110,11 +139,13 @@ class RotationTask(MovementTask):
             self.pathfinding.get_logger().info("Stopped spin")
             self.stop()
         elif angle_offset > 0:
+            # right spin
             twist = spin_twist()
             twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
 
         else:
+            # left spin
             twist = spin_twist()
             twist.angular.z = -0.1
             self.pathfinding.command_movement.publish(twist)
@@ -124,6 +155,10 @@ class RotationTask(MovementTask):
 
 
 class ForwardTask(MovementTask):
+    """
+    This Task moves forward until the target node is reached.
+    Rotation is assumed to already be correct
+    """
     def __init__(self, pathfinding, to_reach_node):
         super().__init__(pathfinding)
         self.pathfinding.get_logger().info(f'Moving towards {to_reach_node}')
@@ -140,6 +175,9 @@ class ForwardTask(MovementTask):
             self.pathfinding.command_movement.publish(twist)
 
 class SlamSpinTask(MovementTask):
+    """
+    This Task spins the node in place to enhance the quality of the map
+    """
     def __init__(self, pathfinding):
         super().__init__(pathfinding)
         self.started_spin_at = None
@@ -158,6 +196,9 @@ class SlamSpinTask(MovementTask):
 
 
 class ExploreTask(MovementTask):
+    """
+    This task explores the map
+    """
     def __init__(self, pathfinding):
         super().__init__(pathfinding)
         self.task = None
@@ -171,29 +212,36 @@ class ExploreTask(MovementTask):
             if area_map is None:
                 self.pathfinding.get_logger().info("No map available, waiting")
                 return  # System not yet initialized
-            while True:
-                candidates = list(node for node in self.pathfinding.map.all_nodes() if
-                                  not node.obstructed and (0 <= node.obstruction < free_threshold))
-                candidates = [candidate for candidate in candidates if any(
-                    (free_threshold <= neighbor.obstruction <= obstruction_threshold)
-                    or neighbor.complete_unknown
-                    for neighbor in candidate.neighbors)
-                              ]
-                if len(candidates) == 0:
-                    self._finished = True
-                    return
-                node = choice(candidates)
+            # all nodes that are nearby unknown nodes, useful for investigating the above
+            candidates = list(node for node in self.pathfinding.map.all_nodes() if
+                              not node.obstructed and (0 <= node.obstruction < free_threshold))
+            candidates = [candidate for candidate in candidates if any(
+                (free_threshold <= neighbor.obstruction <= obstruction_threshold)
+                or neighbor.complete_unknown
+                for neighbor in candidate.nodes_in_range(4))
+                          ]
+            if len(candidates) == 0:
+                # no nodes are unknown anymore
+                self._finished = True
+                return
+            shuffle(candidates)
+            # Try navigating near target nodes
+            for candidate in candidates:
                 try:
-                    movement_task = AbsoluteMovementTask(self.pathfinding, node)
+                    movement_task = AbsoluteMovementTask(self.pathfinding, candidate)
                     self.task = movement_task
-                    self.pathfinding.get_logger().info(f'Created Navigation to {node}')
+                    self.pathfinding.get_logger().info(f'Created Navigation to {candidate}')
                     return
                 except ImpossibleRouteException:
                     self.task = RotationTask(self.pathfinding, area_map[0][0])
                     return
+        # no interesting nodes can be reached - finished exploring
         self._finished = True
 
 class RevisitTask(MovementTask):
+    """
+    A Task to revisit locations long not visited
+    """
     def __init__(self, pathfinding):
         super().__init__(pathfinding)
         self.task = None
@@ -223,6 +271,13 @@ class RevisitTask(MovementTask):
 
     @staticmethod
     def _score_node(node, path_history, time):
+        """
+        Scores a given node
+        :param node: The node to score
+        :param path_history: A history of locations of the robot
+        :param time: The current time
+        :return: A score for the node. Bigger is better.
+        """
         score = 0
         e_factor = 0.98851 # halflife of 1 minute (x^60 = 1/2)
         for position in path_history:
@@ -232,7 +287,15 @@ class RevisitTask(MovementTask):
         return score
 
 class AbsoluteMovementTask(MovementTask):
+    """
+    A Task to move the Robot to a given position
+    """
     def __init__(self, pathfinding, target_node):
+        """
+        :param pathfinding: The pathfinding node that executes this task
+        :param target_node: The target to navigate to
+        :raises ImpossibleRouteException: If the target node is not reachable
+        """
         super().__init__(pathfinding)
         self.pathfinding.get_logger().info(f'Creating movement towards {target_node}')
         self.target_node = target_node
@@ -258,6 +321,9 @@ class AbsoluteMovementTask(MovementTask):
             self.task_list[-1].execute()
 
     def find_path(self):
+        """
+        Find the path to the target node and create subtasks to navigate there
+        """
         try:
             current_pos = self.pathfinding.get_current_position()
             #self.target_node = self.target_node.parent_map[int(current_pos.y-10)][int(current_pos.x+4)]
