@@ -21,7 +21,10 @@ class Position:
 
 resolution = 0.05
 time_resolution = 0.1
-class LoggingNode(Node):
+class PositionHistoryNode(Node):
+    """
+    A node to manage the position information of the robot
+    """
     def __init__(self) -> None:
         super().__init__("PositionHistoryNode")
         self.create_subscription(Odometry, "/odom", self.map_callback, 10)
@@ -36,6 +39,9 @@ class LoggingNode(Node):
         self.odom_offset_y = None
 
     def origin_callback(self, msg: OccupancyGrid) -> None:
+        """
+        Adjust the required offset from the map offset from map messages
+        """
         self.map_offset_x = - msg.info.origin.position.x
         self.map_offset_y = msg.info.height * resolution + msg.info.origin.position.y
         quat = msg.info.origin.orientation
@@ -44,6 +50,10 @@ class LoggingNode(Node):
 
 
     def map_callback(self, message: Odometry) -> None:
+        """
+        Record a position
+        :param message:
+        """
         if self.map_offset_x is None:
             self.get_logger().info("x_offset is not yet determined, ignoring position")
             return
@@ -80,7 +90,7 @@ class LoggingNode(Node):
 def main():
     rclpy.init()
     args = parse_args()
-    node = LoggingNode()
+    node = PositionHistoryNode()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
