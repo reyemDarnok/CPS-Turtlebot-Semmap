@@ -8,6 +8,9 @@ from rclpy.node import Node
 from rcl_interfaces.msg import Log
 
 class LoggingNode(Node):
+    """
+    A node that writes ros 2 logs to disk
+    """
     def __init__(self, log_file: Path, log_level: int = logging.INFO) -> None:
         super().__init__("LoggingNode")
         self.create_subscription(Log, "/rosout", self.log_callback, 10)
@@ -20,6 +23,7 @@ class LoggingNode(Node):
         self.logger.addHandler(fh)
 
     def log_callback(self, msg: Log) -> None:
+        """Receives the ros 2 log message and writes it to python logging"""
         self.logger.log(msg.level,
                         f"{msg.stamp.sec}.{msg.stamp.nanosec:08}:"
                         f"{msg.file}:"
