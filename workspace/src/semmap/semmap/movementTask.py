@@ -174,8 +174,13 @@ class ExploreTask(MovementTask):
             while True:
                 candidates = list(node for node in self.pathfinding.map.all_nodes() if
                                   not node.obstructed and (0 <= node.obstruction < free_threshold))
+                candidates = [candidate for candidate in candidates if any(
+                    (free_threshold <= neighbor.obstruction <= obstruction_threshold)
+                    or neighbor.complete_unknown
+                    for neighbor in candidate.neighbors)
+                              ]
                 if len(candidates) == 0:
-                    self.task = RotationTask(self.pathfinding, area_map[0][0])
+                    self._finished = True
                     return
                 node = choice(candidates)
                 try:
@@ -186,6 +191,7 @@ class ExploreTask(MovementTask):
                 except ImpossibleRouteException:
                     self.task = RotationTask(self.pathfinding, area_map[0][0])
                     return
+        self._finished = True
 
 class RevisitTask(MovementTask):
     def __init__(self, pathfinding):
