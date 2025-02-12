@@ -4,13 +4,25 @@ from .map_helper import AreaMap, free_threshold
 from .priority_queue import PriorityQueue
 
 class ImpossibleRouteException(Exception):
+    """
+    This exception signifies that a route could not be found.
+    """
     pass
 
 
-def manhatten_distance(node_a, node_b):
-        return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
+def manhattan_distance(node_a, node_b):
+    """
+    This function computes the Manhattan distance between two nodes.
+    :param node_a: First node.
+    :param node_b: Second node.
+    :return: The Manhattan distance.
+    """
+    return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
 
 class AstarNode:
+    """
+    A Node in the A* search algorithm.
+    """
     def __init__(self, node, area_map: 'AreaMap', astar_map: 'AstarMap'):
         self.x = node.x
         self.y = node.y
@@ -32,28 +44,49 @@ class AstarNode:
         return f"{self.x}/{self.y}"
 
     def post_init(self):
+        """
+        This method should be called after all AstarNodes have been created to update the relations to its neighbors.
+        """
         self.neighbors = [self.astar_map.nodes_2d[neighbor.y][neighbor.x] for neighbor in self.node.neighbors]
 
 class AstarMap:
-    def __init__(self, area_map, pos, logger, heuristic=manhatten_distance):
+    """
+    A Map class that implements the A* search algorithm.
+    """
+    def __init__(self, area_map, pos, logger, heuristic=manhattan_distance):
+        """
+
+        :param area_map: The map to navigate
+        :param pos: The current position
+        :param logger: The parent logging object
+        :param heuristic: The heuristic function to use, defaults to manhattan distance
+        """
         self.logger = logger
         self.heuristic = heuristic
         self.priority_queue = PriorityQueue()
         self.nodes_2d: List[List[AstarNode]] = []
+        # create AstarNodes from AreaNode
         for y, row in enumerate(area_map):
             self.nodes_2d.append([])
             for x, node in enumerate(row):
                 astar_node = AstarNode(node, area_map, self)
                 self.nodes_2d[y].append(astar_node)
 
+        # set start node
         pos_node = self.nodes_2d[int(pos.y)][int(pos.x)]
         pos_node.score = 0
         self.priority_queue.put((0, pos_node))
+        # initialise all nodes
         for node in (n for row in self.nodes_2d for n in row):
             node.post_init()
 
 
     def run_astar(self, target):
+        """
+        This method implements the A* search algorithm to a given target.
+        :param target: The node to navigate to
+        :raises: ImpossibleRouteException if a route could not be found.
+        """
         target = self.nodes_2d[int(target.y)][int(target.x)]
         while not len(self.priority_queue) == 0:
             node_score, node = self.priority_queue.pop()
