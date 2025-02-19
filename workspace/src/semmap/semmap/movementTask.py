@@ -51,18 +51,22 @@ class MovementTask:
         try:
             current_position = self.pathfinding.get_current_position()
         except ValueError:
+            # system not yet ready
             self.pathfinding.get_logger().info('Position not yet known')
             raise
         current_angle = current_position.rotation % (2 * math.pi)
         if verbose:
             self.pathfinding.get_logger().info('Current angle: %f' % current_angle)
+        # find the vector between the current position and the target
         goal_vector = (int(node.x) - current_position.x, int(node.y) - current_position.y)
         if verbose:
             self.pathfinding.get_logger().info(f'Goal vector: {goal_vector}')
+        # find the angle between x-axis and goal_vector
         vector_angle = angle_between_vectors((1,0), goal_vector)
         vector_angle = vector_angle % (2 * math.pi)
         if verbose:
             self.pathfinding.get_logger().info('Target angle: %f' % vector_angle)
+        # find difference between vectors
         if vector_angle > current_angle:
             vector_angle += 2 * math.pi
         angle_difference = vector_angle - current_angle
@@ -132,9 +136,11 @@ class RotationTask(MovementTask):
 
     def execute(self):
         tolerance = 1 * math.pi / 180
+        # be verbose in first run to log initial angle offset (and calculation)
         angle_offset = self.get_angle_offset(self.to_align_node, verbose=self.first_run)
         self.first_run = False
         if - tolerance < angle_offset < tolerance:
+            # offset is within tolerance - finished
             self._finished = True
             self.pathfinding.get_logger().info("Stopped spin")
             self.stop()
@@ -166,6 +172,7 @@ class ForwardTask(MovementTask):
 
     def execute(self):
         current_pos = self.pathfinding.get_current_position()
+        # check if x and y position is (near) correct, if so, this is finished
         if abs(current_pos.x - self.to_reach_node.x) < 1 and abs(current_pos.y - self.to_reach_node.y) < 1:
             self._finished = True
             self.pathfinding.get_logger().info(f'Reached goal at {self.to_reach_node}')
@@ -183,14 +190,17 @@ class SlamSpinTask(MovementTask):
         self.started_spin_at = None
 
     def execute(self):
+        # if not yet spinning for 2 seconds, start spinning
         if (self.started_spin_at is None
                 or self.started_spin_at + datetime.timedelta(seconds=2) > datetime.datetime.now()):
             self.stop()
             twist = move_twist()
             self.pathfinding.command_movement.publish(twist)
+            # set start of spinning if not yet set, only happens on first run
             if self.started_spin_at is None:
                 self.started_spin_at = datetime.datetime.now()
         else:
+            # if spun for 2 seconds, stop
             self.stop()
             self._finished = True
 
@@ -250,24 +260,24 @@ class RevisitTask(MovementTask):
         if (self.task is not None) and (not self.task.finished()):
             self.task.execute()
         else:
-            position_history = self.pathfinding.get_path_history()
+            position_history = self.pathfinding._get_position_history()
             area_map = self.pathfinding.map
             oldest_node = area_map.all_nodes()[0]
             best_score = float("inf")
             most_recent_time = max(position.timestamp for position in position_history)
-            for node in area_map.all_nodes():
-                if not node.obstructed:
-                    node_score = self._score_node(node, position_history, most_recent_time)
-                    if node_score < best_score:
-                        best_score = node_score
-                        oldest_node = node
-            try:
-                movement_task = AbsoluteMovementTask(self.pathfinding, oldest_node)
-                self.task = movement_task
-                self.pathfinding.get_logger().info(f'Creating Navigation to {oldest_node.x}/{oldest_node.y}')
-                return
-            except ImpossibleRouteException:
-                pass
+            all_nodes = area_map.all_nodes()
+            # sort nodes by least recent known information
+            all_nodes = sorted(all_nodes, key=lambda current_node: self._score_node(current_node,
+                                                                       position_history, most_recent_time))
+            for node in all_nodes:
+                # move to the first node that is navigable
+                try:
+                    movement_task = AbsoluteMovementTask(self.pathfinding, oldest_node)
+                    self.task = movement_task
+                    self.pathfinding.get_logger().info(f'Creating Navigation to {oldest_node.x}/{oldest_node.y}')
+                    return
+                except ImpossibleRouteException:
+                    pass
 
     @staticmethod
     def _score_node(node, path_history, time):
@@ -305,19 +315,26 @@ class AbsoluteMovementTask(MovementTask):
     def execute(self):
         self.task_list = [task for task in self.task_list if not task.finished()]
         if len(self.task_list) == 0:
-            current_position = self.pathfinding.get_current_position()
+            # if no task is assigned, check if current position is target
+            try:
+                current_position = self.pathfinding.get_current_position()
+            except ValueError:
+                return
             if abs(current_position.x - self.target_node.x) < 2 and abs(current_position.y - self.target_node.y) < 2:
+                # if current position is target, this task is finished
                 self._finished = True
                 self.pathfinding.get_logger().info(
                     f'Finished route to {self.target_node}')
 
             else:
+                # if not, navigate to the target
                 try:
                     self.find_path()
                 except ImpossibleRouteException:
                     self.pathfinding.get_logger().info(f'Could not complete Route to {self.target_node} due to new obstacle')
                     self._finished = True
         else:
+            # execute the current task if any exist
             self.task_list[-1].execute()
 
     def find_path(self):
@@ -326,7 +343,6 @@ class AbsoluteMovementTask(MovementTask):
         """
         try:
             current_pos = self.pathfinding.get_current_position()
-            #self.target_node = self.target_node.parent_map[int(current_pos.y-10)][int(current_pos.x+4)]
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             return
@@ -336,10 +352,12 @@ class AbsoluteMovementTask(MovementTask):
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
         current_node = end_node
         path = []
+        # trace the path from the target node to the current node
         while current_node.predecessor is not None:
             path = [current_node] + path
             current_node = current_node.predecessor
         self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
+        # path[0] is current, path[1] is next in sequence
         self.task_list = [SlamSpinTask(self.pathfinding),
                           ForwardTask(self.pathfinding, path[1].node),
                           RotationTask(self.pathfinding, path[1].node)]

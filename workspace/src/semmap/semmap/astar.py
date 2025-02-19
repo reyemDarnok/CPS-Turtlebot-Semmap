@@ -52,6 +52,7 @@ class AstarNode:
 class AstarMap:
     """
     A Map class that implements the A* search algorithm.
+    Can be reused for a different target in the same map, but not in parallel.
     """
     def __init__(self, area_map, pos, logger, heuristic=manhattan_distance):
         """
@@ -89,20 +90,24 @@ class AstarMap:
         """
         target = self.nodes_2d[int(target.y)][int(target.x)]
         while not len(self.priority_queue) == 0:
+            # while there are still nodes to visit
             node_score, node = self.priority_queue.pop()
             if node == target:
+                # found target, nothing to do left
                 self.logger.info('Finished the path to target')
                 return node
             for neighbor in node.neighbors:
                 if neighbor.obstructed or not (0 <= node.node.obstruction < free_threshold):
-                    print("Skipping node '{}'".format(neighbor))
-                    print("obstruction is '{}".format(node.node.obstruction))
+                    # don't path for nodes that can't be traversed
                     continue
                 neighbor_score_via_current = node_score + 1 + self.heuristic(neighbor, target)
                 if neighbor_score_via_current < neighbor.score:
+                    # found better path
                     neighbor.predecessor = node
                     neighbor.score = neighbor_score_via_current
+                    # this is a no-op that returns false if neighbor is not in priority queue
                     updated = self.priority_queue.update_elem(neighbor, (neighbor_score_via_current, neighbor))
                     if not updated:
+                        # if update failed because node wasn't in the queue, add it instead
                         self.priority_queue.put((neighbor_score_via_current, neighbor))
         raise ImpossibleRouteException(f"No Route to {target} found")

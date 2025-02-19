@@ -12,10 +12,10 @@ class ObjectDetectionNode(Node):
         self.bridge = CvBridge()
 
         self.camera_sub = self.create_subscription(
-            Image, '/camera/rgb/image_raw', self.image_callback, 10
+            Image, '/oakd/rgb/preview/image_raw', self.image_callback, 10
         )
         self.depth_sub = self.create_subscription(
-            Image, '/camera/depth/image_raw', self.depth_callback, 10
+            Image, '/oakd/rgb/preview/depth', self.depth_callback, 10
         )
         self.object_pub = self.create_publisher(Object, 'detected_objects', 10)
 

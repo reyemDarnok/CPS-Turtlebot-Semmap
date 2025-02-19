@@ -55,7 +55,9 @@ class AreaMap:
         width = msg.info.width
         height = msg.info.height
         data = msg.data
+        # convert data format
         normalized_data = [normalize(x) for x in data]
+        # convert 1d list of values into 2d list of values
         data_2d = [normalized_data[i:i+width] for i in range(0, len(normalized_data), width)]
         data_2d.reverse()
         return cls(height, width, data_2d, logger)

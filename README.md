@@ -28,6 +28,10 @@ All commands must be executed in a finished environment, and should be started i
 $ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
 
+```shell
+$ ros2 launch turtlebot4_ignition_bringup turtlebot4_ignition.launch.py
+```
+
 For a sim:
 ```shell
 $ ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True
