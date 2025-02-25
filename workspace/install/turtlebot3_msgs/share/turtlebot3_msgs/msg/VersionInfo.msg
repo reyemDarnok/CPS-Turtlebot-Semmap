@@ -1,0 +1,1 @@
+/home/rosuser/workspace/src/turtlebot3/turtlebot3_msgs/msg/VersionInfo.msg
