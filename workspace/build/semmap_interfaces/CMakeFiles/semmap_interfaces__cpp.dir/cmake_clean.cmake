@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/semmap_interfaces__cpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/invalidate_map__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/invalidate_map__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/invalidate_map__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/invalidate_map__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/location__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/location__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/location__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/location__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/object__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/object__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/object__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/object__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position_history__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position_history__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position_history__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/position_history__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/slam_map__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/slam_map__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/slam_map__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/detail/slam_map__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/invalidate_map.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/location.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/object.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/position.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/position_history.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/msg/slam_map.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/srv/detail/semantic_map__builder.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/srv/detail/semantic_map__struct.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/srv/detail/semantic_map__traits.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/srv/detail/semantic_map__type_support.hpp"
+  "rosidl_generator_cpp/semmap_interfaces/srv/semantic_map.hpp"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang )
+  include(CMakeFiles/semmap_interfaces__cpp.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

@@ -163,6 +163,5 @@ cython_debug/
 
 # Ros2
 workspace/log
-workspace/build
 workspace/yolov8s.pt
 # ignore yolo model

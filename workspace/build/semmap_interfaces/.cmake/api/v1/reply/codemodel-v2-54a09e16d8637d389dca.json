@@ -1,0 +1,233 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-fdb6a48804a1394efbd5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				},
+				{
+					"build" : "semmap_interfaces__py",
+					"jsonFile" : "directory-semmap_interfaces__py-5a89f0a95a22699136b2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "/home/rosuser/workspace/build/semmap_interfaces/semmap_interfaces__py",
+					"targetIndexes" : 
+					[
+						4
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "semmap_interfaces",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_build_semmap_interfaces_egg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_build_semmap_interfaces_egg-168b0ec2eb3dd65faca0.json",
+					"name" : "ament_cmake_python_build_semmap_interfaces_egg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_symlink_semmap_interfaces::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_symlink_semmap_interfaces-b5f544544c66f80329f2.json",
+					"name" : "ament_cmake_python_symlink_semmap_interfaces",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces-a5408ab823721d964f67.json",
+					"name" : "semmap_interfaces",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__cpp-eb70a80a74229c7bd7cd.json",
+					"name" : "semmap_interfaces__cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "semmap_interfaces__py::@e885b0d50d42f8eda512",
+					"jsonFile" : "target-semmap_interfaces__py-18fc27ae78cedf805fa3.json",
+					"name" : "semmap_interfaces__py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_generator_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_generator_c-718fd6310e4c5f1da815.json",
+					"name" : "semmap_interfaces__rosidl_generator_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_generator_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_generator_py-42b35647c35def92944c.json",
+					"name" : "semmap_interfaces__rosidl_generator_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_c-67dd4ff94b82b63868c2.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_c__pyext-cee037312f9435c5e1a6.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_cpp-b35cfc09c05ffe4049d9.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_fastrtps_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_fastrtps_c-307145bf9ebd9a6743fb.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_fastrtps_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_fastrtps_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_fastrtps_c__pyext-4bc2a8cded34807c4ad0.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_fastrtps_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_fastrtps_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_fastrtps_cpp-be2fad318001fa37a573.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_fastrtps_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_introspection_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_introspection_c-9953eaf11b4c55d16bb2.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_introspection_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_introspection_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_introspection_c__pyext-a17c3859a7716fe9ec43.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_introspection_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces__rosidl_typesupport_introspection_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces__rosidl_typesupport_introspection_cpp-794c8805b0655c79a7db.json",
+					"name" : "semmap_interfaces__rosidl_typesupport_introspection_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "semmap_interfaces_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-semmap_interfaces_uninstall-fd983332b450d372982c.json",
+					"name" : "semmap_interfaces_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-bcd9d1227b88e5979817.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/rosuser/workspace/build/semmap_interfaces",
+		"source" : "/home/rosuser/workspace/src/semmap_interfaces"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

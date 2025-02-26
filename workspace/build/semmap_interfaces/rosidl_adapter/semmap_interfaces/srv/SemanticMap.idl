@@ -1,0 +1,29 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from semmap_interfaces/srv/SemanticMap.srv
+// generated code does not contain a copyright notice
+
+
+module semmap_interfaces {
+  module srv {
+    struct SemanticMap_Request {
+      uint8 request_priority;
+    };
+    struct SemanticMap_Response {
+      sequence<boolean> positive_and0_x;
+
+      sequence<boolean> negative_x;
+
+      sequence<boolean> positive_and0_y;
+
+      sequence<boolean> negative_y;
+
+      sequence<string> object_tags;
+
+      sequence<int32> object_x;
+
+      sequence<int32> object_y;
+
+      sequence<int32> object_elevation;
+    };
+  };
+};
