@@ -1,8 +1,0 @@
-[console_scripts]
-emergency_stop = semmap.emergency_stop:main
-logs = semmap.logs:main
-object_detection = semmap.object_detection:main
-pathfinder_direct = semmap.pathfinding_direct:main
-pathfinding = semmap.pathfinding:main
-position_history = semmap.position_history:main
-semantic_map = semmap.semantic_map:main

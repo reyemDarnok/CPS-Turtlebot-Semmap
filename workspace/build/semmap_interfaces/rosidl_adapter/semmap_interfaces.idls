@@ -1,7 +1,0 @@
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/InvalidateMap.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/Location.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/Object.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/SlamMap.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/PositionHistory.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:msg/Position.idl
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_adapter/semmap_interfaces:srv/SemanticMap.idl

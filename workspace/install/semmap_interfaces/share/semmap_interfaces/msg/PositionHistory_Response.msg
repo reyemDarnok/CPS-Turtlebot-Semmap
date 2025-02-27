@@ -1,1 +1,0 @@
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_cmake/msg/PositionHistory_Response.msg

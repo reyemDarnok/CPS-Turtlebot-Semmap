@@ -1,9 +1,0 @@
-
-bool[] positive_and0_x
-bool[] negative_x
-bool[] positive_and0_y
-bool[] negative_y
-string[] object_tags
-int32[] object_x
-int32[] object_y
-int32[] object_elevation

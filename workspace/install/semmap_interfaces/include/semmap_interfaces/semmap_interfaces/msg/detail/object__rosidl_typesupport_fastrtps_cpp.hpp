@@ -1,1 +1,0 @@
-/home/rosuser/workspace/build/semmap_interfaces/rosidl_typesupport_fastrtps_cpp/semmap_interfaces/msg/detail/object__rosidl_typesupport_fastrtps_cpp.hpp

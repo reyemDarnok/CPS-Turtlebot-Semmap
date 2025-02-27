@@ -1,1 +1,0 @@
-/home/rosuser/workspace/src/semmap_interfaces/msg/Position.msg
