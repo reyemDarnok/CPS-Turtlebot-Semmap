@@ -1,1 +1,0 @@
-/home/rosuser/workspace/src/semmap/setup.py
