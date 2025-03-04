@@ -22,8 +22,8 @@ class ObjectDetectionNode(Node):
         self.object_pub = self.create_publisher(Object, '/detected_objects', 10)
 
         self.model = YOLO("yolov8s.pt")
-        self.horizontal_fov = 81  #check if its correct values of our turtlebot!!!
-        self.vertical_fov = 52 #check if its correct values of our turtlebot!!!
+        self.horizontal_fov = 68#81  #check if its correct values of our turtlebot!!!
+        self.vertical_fov = 68#52 #check if its correct values of our turtlebot!!!
         self.depth_data = None
         self.get_logger().info("Object Detection Node Initialized")
 
