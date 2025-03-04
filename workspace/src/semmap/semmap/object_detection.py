@@ -19,7 +19,7 @@ class ObjectDetectionNode(Node):
         self.depth_sub = self.create_subscription(
             Image, f'${prefix}/oakd/rgb/preview/depth', self.depth_callback, 10
         )
-        self.object_pub = self.create_publisher(Object, 'detected_objects', 10)
+        self.object_pub = self.create_publisher(Object, '/detected_objects', 10)
 
         self.model = YOLO("yolov8s.pt")
         self.horizontal_fov = 81  #check if its correct values of our turtlebot!!!

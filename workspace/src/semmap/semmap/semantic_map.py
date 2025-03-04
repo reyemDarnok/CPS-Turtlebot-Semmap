@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import rclpy
 from rclpy.node import Node
 from semmap_interfaces.msg import Object
@@ -9,13 +11,11 @@ class SemanticMapNode(Node):
     def __init__(self):
         super().__init__('semantic_map_node')
 
-        self.object_list = []
-        self.current_obj_detections = []
+        self.object_list: List[Tuple[str, Tuple[float, float, float]]] = []
         self.robot_position = (0, 0, 0)
 
-#check if topic names are correct!!!
         self.create_subscription(
-            Object, 'detected_objects', self.object_callback, 10
+            Object, '/detected_objects', self.object_callback, 10
         )
 
         self.create_subscription(
@@ -23,7 +23,7 @@ class SemanticMapNode(Node):
         )
 
         self.create_service(
-            SemanticMap, 'get_semantic_map', self.handle_get_semantic_map_request
+            SemanticMap, '/get_semantic_map', self.handle_get_semantic_map_request
         )
 
         self.get_logger().info("Semantic Map Node Initialized")
@@ -54,9 +54,6 @@ class SemanticMapNode(Node):
             self.get_logger().warning(f"Missing depth data for object '{msg.tag}'. Skipping.")
             return
 
-        if not self.current_detections:
-            self.current_detections = []
-
         distance = msg.distance
         angle = msg.angle
         elevation = msg.elevation
@@ -69,50 +66,21 @@ class SemanticMapNode(Node):
         #convert local robot-relative coordinates to global map-relative coordinates
         global_x, global_y = self.to_global_coordinates(local_x, local_y)
 
-        self.object_list.append((msg.tag, global_x, global_y, z))
-        self.current_obj_detections.append((msg.tag, global_x, global_y, z))
-
-        #after every 5th detected object, check for ghost objects (might want to change timing of when to check for ghosts?)
-        if len(self.object_list) % 5 == 0:
-            self.get_logger().info("Checking for ghost objects.")
-            self.remove_ghost_objects(detected_objects=self.current_obj_detections)
-            self.current_obj_detections = []
+        if not self._is_object_in_map(msg.tag, (global_x, global_y, z)):
+            self.object_list.append((msg.tag, (global_x, global_y, z)))
 
         self.get_logger().info(f"Object added to Map: {msg.tag} at ({global_x}, {global_y}, {z})")
 
-
-    def remove_ghost_objects(self, detected_objects, threshold = 0.2):
-
-        updated_object_list = []
-
+    def _is_object_in_map(self, tag, position):
         for obj in self.object_list:
-            tag, obj_x, obj_y, obj_z = obj
-            is_ghost = True
-
-            for detected_obj in detected_objects:
-                detected_tag, detected_x, detected_y, detected_z = detected_obj
-
-                if tag == detected_tag:
-                    distance = math.sqrt(
-                        (detected_x - obj_x) ** 2 +
-                        (detected_y - obj_y) ** 2 +
-                        (detected_z - obj_z) ** 2
-                    )
-
-                    # If the distance is within the threshold, its regarded as the same object
-                    if distance <= threshold:
-                        is_ghost = False
-                        break
-
-
-            if is_ghost:
-                self.get_logger().info(f"Ghost object removed: {tag} at ({obj_x}, {obj_y}, {obj_z})")
-            else:
-                updated_object_list.append((detected_tag, detected_x, detected_y, detected_z))
-
-
-        self.object_list = updated_object_list
-
+            if obj[0] == tag:
+                list_position = obj[1]
+                distance = math.sqrt((list_position[0] - position[0]) ** 2
+                                     + (list_position[1] - position[1]) ** 2
+                                     + (list_position[2] - position[2]) ** 2)
+                if distance < 0.1:
+                    return True
+        return False
 
     def handle_get_semantic_map_request(self, request, response):
 
@@ -120,17 +88,10 @@ class SemanticMapNode(Node):
             self.get_logger().warning("Semantic map is empty.")
             return response
 
-        tags = [obj[0] for obj in self.object_list]
-        coordinates = [(obj[1], obj[2], obj[3]) for obj in self.object_list]
-
-        response.positive_and0_x = [coord[0] >= 0 for coord in coordinates]
-        response.negative_x = [coord[0] < 0 for coord in coordinates]
-        response.positive_and0_y = [coord[1] >= 0 for coord in coordinates]
-        response.negative_y = [coord[1] < 0 for coord in coordinates]
-        response.object_tags = tags
-        response.object_x = [coord[0] for coord in coordinates]
-        response.object_y = [coord[1] for coord in coordinates]
-        response.object_elevation = [coord[2] for coord in coordinates]
+        response.x = [obj[1][0] for obj in self.object_list]
+        response.y = [obj[1][1] for obj in self.object_list]
+        response.elevation = [obj[1][2] for obj in self.object_list]
+        response.tag = [obj[0] for obj in self.object_list]
 
         self.get_logger().info(f"Semantic Map Response: {response.object_tags}")
         return response
