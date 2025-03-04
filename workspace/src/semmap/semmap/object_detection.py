@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -7,15 +9,15 @@ import numpy as np
 from ultralytics import YOLO
 
 class ObjectDetectionNode(Node):
-    def __init__(self):
+    def __init__(self, prefix=""):
         super().__init__('object_detection_node')
         self.bridge = CvBridge()
 
         self.camera_sub = self.create_subscription(
-            Image, '/oakd/rgb/preview/image_raw', self.image_callback, 10
+            Image, f'${prefix}/oakd/rgb/preview/image_raw', self.image_callback, 10
         )
         self.depth_sub = self.create_subscription(
-            Image, '/oakd/rgb/preview/depth', self.depth_callback, 10
+            Image, f'${prefix}/oakd/rgb/preview/depth', self.depth_callback, 10
         )
         self.object_pub = self.create_publisher(Object, 'detected_objects', 10)
 
@@ -96,10 +98,16 @@ class ObjectDetectionNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ObjectDetectionNode()
+    args = parse_args()
+    node = ObjectDetectionNode(prefix=args.prefix)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--prefix', default="", help="The Prefix for the topics of the roboter")
+    return parser.parse_args()
 
 if __name__ == "__main__":
     main()

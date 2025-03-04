@@ -30,13 +30,13 @@ from nav_msgs.msg import OccupancyGrid
 
 
 class PathfindingNode(Node):
-    def __init__(self) -> None:
+    def __init__(self, prefix="") -> None:
         super().__init__("PathfindingNode")
         self.task_list = [RevisitTask(self), ExploreTask(self)]
         self.map = None
         self.position_history: List[Position] = []
         self.main_loop_timer = self.create_timer(0.1, self.navigate)
-        self.command_movement = self.create_publisher(Twist, "/cmd_vel", 10)
+        self.command_movement = self.create_publisher(Twist, f"${prefix}/cmd_vel", 10)
         self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
         self.get_logger().info("Pathfinding node initialized")
@@ -79,7 +79,7 @@ class PathfindingNode(Node):
 def main():
     rclpy.init()
     args = parse_args()
-    node = PathfindingNode()
+    node = PathfindingNode(prefix=args.prefix)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
@@ -91,7 +91,9 @@ def main():
 
 def parse_args():
     parser = ArgumentParser()
+    parser.add_argument('-p', '--prefix', default="", help="The Prefix for the topics of the roboter")
     return parser.parse_args()
+
 
 def unit_vector(vector):
     """ Returns the unit vector of the vector.  """

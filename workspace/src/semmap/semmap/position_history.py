@@ -25,9 +25,10 @@ class PositionHistoryNode(Node):
     """
     A node to manage the position information of the robot
     """
-    def __init__(self) -> None:
+    def __init__(self, prefix="") -> None:
         super().__init__("PositionHistoryNode")
-        self.create_subscription(Odometry, "/odom", self.map_callback, 10)
+
+        self.create_subscription(Odometry, f"{prefix}/odom", self.map_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.origin_callback, 10)
         self.p_history_publisher = self.create_publisher(PositionHistory, "/position_history", 10)
         self.p_publisher = self.create_publisher(msg.Position, "/position", 10)
@@ -90,7 +91,7 @@ class PositionHistoryNode(Node):
 def main():
     rclpy.init()
     args = parse_args()
-    node = PositionHistoryNode()
+    node = PositionHistoryNode(prefix=args.prefix)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
@@ -101,9 +102,9 @@ def main():
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("-f", "--file", dest="logfile", help="log file path", type=Path, default=Path("semmap.log"))
-    parser.add_argument("-l", "--log-level", dest="log_level", help="log level", type=int, default=logging.INFO)
+    parser.add_argument('-p', '--prefix', default="", help="The Prefix for the topics of the roboter")
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     main()
