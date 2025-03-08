@@ -16,7 +16,7 @@ class PrefixTranslatorNode(Node):
     """
     def __init__(self, prefix="") -> None:
         super().__init__("PrefixTranslator")
-        self.publishers = []
+        self.translate_publishers = []
         p = run(["ros2", "topic", "list"], capture_output=True, text=True)
         topics = p.stdout.splitlines()
         robot_output_topics = [topic for topic in topics if topic.startswith(prefix) and topic[len(prefix):] not in robot_input_topics]
@@ -26,6 +26,7 @@ class PrefixTranslatorNode(Node):
             message_type = info[len("Type: "):]
             t = __import__(message_type.replace("/", "."))
             pub = self.create_publisher(t, topic, 10)
+            self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
             self.create_subscription(t, prefix + topic, translator, 10)
@@ -35,6 +36,7 @@ class PrefixTranslatorNode(Node):
             message_type = info[len("Type: "):]
             t = __import__(message_type.replace("/", "."))
             pub = self.create_publisher(t, prefix + topic, 10)
+            self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
             self.create_subscription(t, topic, translator, 10)
