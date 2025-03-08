@@ -2,4 +2,4 @@
 rosdep update
 rosdep install --from-paths src --ignore-src -r --rosdistro humble -y
 colcon build
-source install/local_setup.bash
+source install/setup.bash
