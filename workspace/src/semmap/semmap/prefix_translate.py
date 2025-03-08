@@ -27,7 +27,7 @@ class PrefixTranslatorNode(Node):
             self.get_logger().info(topic_info_process.stdout)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
-            t = __import__('.'.join(message_type[:-1])).__getattr__(message_type[-1])
+            t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
             def translator(msg):
@@ -38,7 +38,7 @@ class PrefixTranslatorNode(Node):
             self.get_logger().info(topic_info_process.stdout)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
-            t = __import__('.'.join(message_type[:-1])).__getattr__(message_type[-1])
+            t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
             def translator(msg):
