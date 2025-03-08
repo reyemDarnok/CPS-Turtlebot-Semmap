@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from subprocess import run
 from typing import Tuple, List
-
+from rclpy import qos
 import rclpy
 import sys
 from rclpy.node import Node
@@ -24,29 +24,29 @@ class PrefixTranslatorNode(Node):
         for topic in robot_output_topics:
             prefix_topic = topic
             bare_topic = topic[len(prefix):]
-            topic_info_process = run(["ros2", "topic", "info", prefix_topic], capture_output=True, text=True)
-            info = topic_info_process.stdout.splitlines()[0]
-            message_type = info[len("Type: "):].split('/')
-            t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, bare_topic)
-            self.translate_publishers.append(pub)
-            def translator(msg):
-                pub.publish(msg)
-            self.create_subscription(t, prefix_topic, translator)
+            self.transfer_messages(prefix_topic, bare_topic)
         for topic in robot_input_topics:
             prefix_topic = prefix + topic
             bare_topic = topic
-            self.get_logger().info(f"{topic=}")
-            topic_info_process = run(["ros2", "topic", "info", prefix_topic], capture_output=True, text=True)
-            info = topic_info_process.stdout.splitlines()[0]
-            message_type = info[len("Type: "):].split('/')
-            t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, prefix_topic)
-            self.translate_publishers.append(pub)
-            def translator(msg):
-                pub.publish(msg)
-            self.create_subscription(t, bare_topic, translator)
+            self.transfer_messages(bare_topic, prefix_topic)
         self.get_logger().info(f"Translator finished initialising")
+
+    def transfer_messages(self, from_topic, to_topic):
+        topic_type_process = run(["ros2", "topic", "type", from_topic], capture_output=True, text=True)
+        info = topic_type_process.stdout.splitlines()[0]
+        message_type = info.split('/')
+        t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
+        topic_info_process = run(["ros2", "topic", "info", from_topic, "-v"], capture_output=True, text=True)
+        reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
+        reliability = reliability_line.split()[-1]
+        pub = self.create_publisher(t, to_topic, getattr(qos, reliability))
+        self.translate_publishers.append(pub)
+
+        def translator(msg):
+            pub.publish(msg)
+
+        self.create_subscription(t, from_topic, translator)
+
 
 def main():
     rclpy.init()
