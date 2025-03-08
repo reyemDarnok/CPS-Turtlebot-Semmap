@@ -18,16 +18,15 @@ class PrefixTranslatorNode(Node):
         super().__init__("PrefixTranslator")
         self.translate_publishers = []
         p = run(["ros2", "topic", "list"], capture_output=True, text=True)
-        self.get_logger().info(p.stdout)
         topics = p.stdout.splitlines()
         robot_output_topics = [topic for topic in topics if topic.startswith(prefix) and topic[len(prefix):] not in robot_input_topics]
         self.get_logger().info(f"{robot_output_topics=}")
         for topic in robot_output_topics:
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
-            self.get_logger().info(topic_info_process.stdout)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
+            self.get_logger().info(f"{t=}")
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
             def translator(msg):
@@ -35,7 +34,6 @@ class PrefixTranslatorNode(Node):
             self.create_subscription(t, topic, translator, 10)
         for topic in robot_input_topics:
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
-            self.get_logger().info(topic_info_process.stdout)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
