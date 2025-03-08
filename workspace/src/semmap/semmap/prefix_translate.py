@@ -26,13 +26,13 @@ class PrefixTranslatorNode(Node):
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            self.get_logger().info(f"{t=}")
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
             self.create_subscription(t, topic, translator, 10)
         for topic in robot_input_topics:
+            self.get_logger().info(f"{topic=}")
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
