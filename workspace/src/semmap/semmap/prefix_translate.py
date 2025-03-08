@@ -22,8 +22,8 @@ class PrefixTranslatorNode(Node):
         robot_output_topics = [topic for topic in topics if topic.startswith(prefix) and topic[len(prefix):] not in robot_input_topics]
         self.get_logger().info(f"{robot_output_topics=}")
         for topic in robot_output_topics:
-            prefix_topic = topic[len(prefix):]
-            bare_topic = topic
+            prefix_topic = topic
+            bare_topic = topic[len(prefix):]
             topic_info_process = run(["ros2", "topic", "info", prefix_topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
