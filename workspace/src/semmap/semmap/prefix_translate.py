@@ -49,13 +49,13 @@ class PrefixTranslatorNode(Node):
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.VOLATILE,
             history=HistoryPolicy.KEEP_LAST,
-            depth=1
+            depth=100
         )
         qos_policy_pub = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,
             history=HistoryPolicy.KEEP_LAST,
-            depth=1
+            depth=100
         )
         pub = self.create_publisher(t, to_topic, qos_policy_pub)
         self.translate_publishers.append(pub)
