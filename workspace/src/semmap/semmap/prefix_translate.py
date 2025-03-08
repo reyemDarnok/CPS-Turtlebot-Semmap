@@ -25,7 +25,7 @@ class PrefixTranslatorNode(Node):
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
-            t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
+            t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
             self.get_logger().info(f"{t=}")
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
@@ -36,7 +36,7 @@ class PrefixTranslatorNode(Node):
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
-            t = __import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]])
+            t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
             pub = self.create_publisher(t, topic[len(prefix):], 10)
             self.translate_publishers.append(pub)
             def translator(msg):
