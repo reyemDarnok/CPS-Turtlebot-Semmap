@@ -45,7 +45,7 @@ class PrefixTranslatorNode(Node):
         def translator(msg):
             pub.publish(msg)
 
-        self.create_subscription(t, from_topic, translator)
+        self.create_subscription(t, from_topic, translator, getattr(ReliabilityPolicy, reliability))
 
 
 def main():
