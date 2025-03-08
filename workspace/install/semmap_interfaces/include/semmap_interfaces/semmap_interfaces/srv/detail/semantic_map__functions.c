@@ -236,15 +236,11 @@ semmap_interfaces__srv__SemanticMap_Request__Sequence__copy(
 
 
 // Include directives for member types
-// Member `positive_and0_x`
-// Member `negative_x`
-// Member `positive_and0_y`
-// Member `negative_y`
-// Member `object_x`
-// Member `object_y`
-// Member `object_elevation`
+// Member `x`
+// Member `y`
+// Member `elevation`
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
-// Member `object_tags`
+// Member `tag`
 #include "rosidl_runtime_c/string_functions.h"
 
 bool
@@ -253,43 +249,23 @@ semmap_interfaces__srv__SemanticMap_Response__init(semmap_interfaces__srv__Seman
   if (!msg) {
     return false;
   }
-  // positive_and0_x
-  if (!rosidl_runtime_c__boolean__Sequence__init(&msg->positive_and0_x, 0)) {
+  // x
+  if (!rosidl_runtime_c__int32__Sequence__init(&msg->x, 0)) {
     semmap_interfaces__srv__SemanticMap_Response__fini(msg);
     return false;
   }
-  // negative_x
-  if (!rosidl_runtime_c__boolean__Sequence__init(&msg->negative_x, 0)) {
+  // y
+  if (!rosidl_runtime_c__int32__Sequence__init(&msg->y, 0)) {
     semmap_interfaces__srv__SemanticMap_Response__fini(msg);
     return false;
   }
-  // positive_and0_y
-  if (!rosidl_runtime_c__boolean__Sequence__init(&msg->positive_and0_y, 0)) {
+  // elevation
+  if (!rosidl_runtime_c__int32__Sequence__init(&msg->elevation, 0)) {
     semmap_interfaces__srv__SemanticMap_Response__fini(msg);
     return false;
   }
-  // negative_y
-  if (!rosidl_runtime_c__boolean__Sequence__init(&msg->negative_y, 0)) {
-    semmap_interfaces__srv__SemanticMap_Response__fini(msg);
-    return false;
-  }
-  // object_tags
-  if (!rosidl_runtime_c__String__Sequence__init(&msg->object_tags, 0)) {
-    semmap_interfaces__srv__SemanticMap_Response__fini(msg);
-    return false;
-  }
-  // object_x
-  if (!rosidl_runtime_c__int32__Sequence__init(&msg->object_x, 0)) {
-    semmap_interfaces__srv__SemanticMap_Response__fini(msg);
-    return false;
-  }
-  // object_y
-  if (!rosidl_runtime_c__int32__Sequence__init(&msg->object_y, 0)) {
-    semmap_interfaces__srv__SemanticMap_Response__fini(msg);
-    return false;
-  }
-  // object_elevation
-  if (!rosidl_runtime_c__int32__Sequence__init(&msg->object_elevation, 0)) {
+  // tag
+  if (!rosidl_runtime_c__String__Sequence__init(&msg->tag, 0)) {
     semmap_interfaces__srv__SemanticMap_Response__fini(msg);
     return false;
   }
@@ -302,22 +278,14 @@ semmap_interfaces__srv__SemanticMap_Response__fini(semmap_interfaces__srv__Seman
   if (!msg) {
     return;
   }
-  // positive_and0_x
-  rosidl_runtime_c__boolean__Sequence__fini(&msg->positive_and0_x);
-  // negative_x
-  rosidl_runtime_c__boolean__Sequence__fini(&msg->negative_x);
-  // positive_and0_y
-  rosidl_runtime_c__boolean__Sequence__fini(&msg->positive_and0_y);
-  // negative_y
-  rosidl_runtime_c__boolean__Sequence__fini(&msg->negative_y);
-  // object_tags
-  rosidl_runtime_c__String__Sequence__fini(&msg->object_tags);
-  // object_x
-  rosidl_runtime_c__int32__Sequence__fini(&msg->object_x);
-  // object_y
-  rosidl_runtime_c__int32__Sequence__fini(&msg->object_y);
-  // object_elevation
-  rosidl_runtime_c__int32__Sequence__fini(&msg->object_elevation);
+  // x
+  rosidl_runtime_c__int32__Sequence__fini(&msg->x);
+  // y
+  rosidl_runtime_c__int32__Sequence__fini(&msg->y);
+  // elevation
+  rosidl_runtime_c__int32__Sequence__fini(&msg->elevation);
+  // tag
+  rosidl_runtime_c__String__Sequence__fini(&msg->tag);
 }
 
 bool
@@ -326,51 +294,27 @@ semmap_interfaces__srv__SemanticMap_Response__are_equal(const semmap_interfaces_
   if (!lhs || !rhs) {
     return false;
   }
-  // positive_and0_x
-  if (!rosidl_runtime_c__boolean__Sequence__are_equal(
-      &(lhs->positive_and0_x), &(rhs->positive_and0_x)))
+  // x
+  if (!rosidl_runtime_c__int32__Sequence__are_equal(
+      &(lhs->x), &(rhs->x)))
   {
     return false;
   }
-  // negative_x
-  if (!rosidl_runtime_c__boolean__Sequence__are_equal(
-      &(lhs->negative_x), &(rhs->negative_x)))
+  // y
+  if (!rosidl_runtime_c__int32__Sequence__are_equal(
+      &(lhs->y), &(rhs->y)))
   {
     return false;
   }
-  // positive_and0_y
-  if (!rosidl_runtime_c__boolean__Sequence__are_equal(
-      &(lhs->positive_and0_y), &(rhs->positive_and0_y)))
+  // elevation
+  if (!rosidl_runtime_c__int32__Sequence__are_equal(
+      &(lhs->elevation), &(rhs->elevation)))
   {
     return false;
   }
-  // negative_y
-  if (!rosidl_runtime_c__boolean__Sequence__are_equal(
-      &(lhs->negative_y), &(rhs->negative_y)))
-  {
-    return false;
-  }
-  // object_tags
+  // tag
   if (!rosidl_runtime_c__String__Sequence__are_equal(
-      &(lhs->object_tags), &(rhs->object_tags)))
-  {
-    return false;
-  }
-  // object_x
-  if (!rosidl_runtime_c__int32__Sequence__are_equal(
-      &(lhs->object_x), &(rhs->object_x)))
-  {
-    return false;
-  }
-  // object_y
-  if (!rosidl_runtime_c__int32__Sequence__are_equal(
-      &(lhs->object_y), &(rhs->object_y)))
-  {
-    return false;
-  }
-  // object_elevation
-  if (!rosidl_runtime_c__int32__Sequence__are_equal(
-      &(lhs->object_elevation), &(rhs->object_elevation)))
+      &(lhs->tag), &(rhs->tag)))
   {
     return false;
   }
@@ -385,51 +329,27 @@ semmap_interfaces__srv__SemanticMap_Response__copy(
   if (!input || !output) {
     return false;
   }
-  // positive_and0_x
-  if (!rosidl_runtime_c__boolean__Sequence__copy(
-      &(input->positive_and0_x), &(output->positive_and0_x)))
+  // x
+  if (!rosidl_runtime_c__int32__Sequence__copy(
+      &(input->x), &(output->x)))
   {
     return false;
   }
-  // negative_x
-  if (!rosidl_runtime_c__boolean__Sequence__copy(
-      &(input->negative_x), &(output->negative_x)))
+  // y
+  if (!rosidl_runtime_c__int32__Sequence__copy(
+      &(input->y), &(output->y)))
   {
     return false;
   }
-  // positive_and0_y
-  if (!rosidl_runtime_c__boolean__Sequence__copy(
-      &(input->positive_and0_y), &(output->positive_and0_y)))
+  // elevation
+  if (!rosidl_runtime_c__int32__Sequence__copy(
+      &(input->elevation), &(output->elevation)))
   {
     return false;
   }
-  // negative_y
-  if (!rosidl_runtime_c__boolean__Sequence__copy(
-      &(input->negative_y), &(output->negative_y)))
-  {
-    return false;
-  }
-  // object_tags
+  // tag
   if (!rosidl_runtime_c__String__Sequence__copy(
-      &(input->object_tags), &(output->object_tags)))
-  {
-    return false;
-  }
-  // object_x
-  if (!rosidl_runtime_c__int32__Sequence__copy(
-      &(input->object_x), &(output->object_x)))
-  {
-    return false;
-  }
-  // object_y
-  if (!rosidl_runtime_c__int32__Sequence__copy(
-      &(input->object_y), &(output->object_y)))
-  {
-    return false;
-  }
-  // object_elevation
-  if (!rosidl_runtime_c__int32__Sequence__copy(
-      &(input->object_elevation), &(output->object_elevation)))
+      &(input->tag), &(output->tag)))
   {
     return false;
   }

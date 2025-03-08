@@ -159,78 +159,42 @@ struct SemanticMap_Response_
   }
 
   // field types and members
-  using _positive_and0_x_type =
-    std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>>;
-  _positive_and0_x_type positive_and0_x;
-  using _negative_x_type =
-    std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>>;
-  _negative_x_type negative_x;
-  using _positive_and0_y_type =
-    std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>>;
-  _positive_and0_y_type positive_and0_y;
-  using _negative_y_type =
-    std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>>;
-  _negative_y_type negative_y;
-  using _object_tags_type =
+  using _x_type =
+    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
+  _x_type x;
+  using _y_type =
+    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
+  _y_type y;
+  using _elevation_type =
+    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
+  _elevation_type elevation;
+  using _tag_type =
     std::vector<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>>;
-  _object_tags_type object_tags;
-  using _object_x_type =
-    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
-  _object_x_type object_x;
-  using _object_y_type =
-    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
-  _object_y_type object_y;
-  using _object_elevation_type =
-    std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>>;
-  _object_elevation_type object_elevation;
+  _tag_type tag;
 
   // setters for named parameter idiom
-  Type & set__positive_and0_x(
-    const std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>> & _arg)
+  Type & set__x(
+    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
   {
-    this->positive_and0_x = _arg;
+    this->x = _arg;
     return *this;
   }
-  Type & set__negative_x(
-    const std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>> & _arg)
+  Type & set__y(
+    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
   {
-    this->negative_x = _arg;
+    this->y = _arg;
     return *this;
   }
-  Type & set__positive_and0_y(
-    const std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>> & _arg)
+  Type & set__elevation(
+    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
   {
-    this->positive_and0_y = _arg;
+    this->elevation = _arg;
     return *this;
   }
-  Type & set__negative_y(
-    const std::vector<bool, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bool>> & _arg)
-  {
-    this->negative_y = _arg;
-    return *this;
-  }
-  Type & set__object_tags(
+  Type & set__tag(
     const std::vector<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>> & _arg)
   {
-    this->object_tags = _arg;
-    return *this;
-  }
-  Type & set__object_x(
-    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
-  {
-    this->object_x = _arg;
-    return *this;
-  }
-  Type & set__object_y(
-    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
-  {
-    this->object_y = _arg;
-    return *this;
-  }
-  Type & set__object_elevation(
-    const std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> & _arg)
-  {
-    this->object_elevation = _arg;
+    this->tag = _arg;
     return *this;
   }
 
@@ -276,28 +240,16 @@ struct SemanticMap_Response_
   // comparison operators
   bool operator==(const SemanticMap_Response_ & other) const
   {
-    if (this->positive_and0_x != other.positive_and0_x) {
+    if (this->x != other.x) {
       return false;
     }
-    if (this->negative_x != other.negative_x) {
+    if (this->y != other.y) {
       return false;
     }
-    if (this->positive_and0_y != other.positive_and0_y) {
+    if (this->elevation != other.elevation) {
       return false;
     }
-    if (this->negative_y != other.negative_y) {
-      return false;
-    }
-    if (this->object_tags != other.object_tags) {
-      return false;
-    }
-    if (this->object_x != other.object_x) {
-      return false;
-    }
-    if (this->object_y != other.object_y) {
-      return false;
-    }
-    if (this->object_elevation != other.object_elevation) {
+    if (this->tag != other.tag) {
       return false;
     }
     return true;

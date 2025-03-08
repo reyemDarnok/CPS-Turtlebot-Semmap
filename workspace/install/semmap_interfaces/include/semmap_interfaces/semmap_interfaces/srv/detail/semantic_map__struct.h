@@ -37,28 +37,20 @@ typedef struct semmap_interfaces__srv__SemanticMap_Request__Sequence
 // Constants defined in the message
 
 // Include directives for member types
-// Member 'positive_and0_x'
-// Member 'negative_x'
-// Member 'positive_and0_y'
-// Member 'negative_y'
-// Member 'object_x'
-// Member 'object_y'
-// Member 'object_elevation'
+// Member 'x'
+// Member 'y'
+// Member 'elevation'
 #include "rosidl_runtime_c/primitives_sequence.h"
-// Member 'object_tags'
+// Member 'tag'
 #include "rosidl_runtime_c/string.h"
 
 /// Struct defined in srv/SemanticMap in the package semmap_interfaces.
 typedef struct semmap_interfaces__srv__SemanticMap_Response
 {
-  rosidl_runtime_c__boolean__Sequence positive_and0_x;
-  rosidl_runtime_c__boolean__Sequence negative_x;
-  rosidl_runtime_c__boolean__Sequence positive_and0_y;
-  rosidl_runtime_c__boolean__Sequence negative_y;
-  rosidl_runtime_c__String__Sequence object_tags;
-  rosidl_runtime_c__int32__Sequence object_x;
-  rosidl_runtime_c__int32__Sequence object_y;
-  rosidl_runtime_c__int32__Sequence object_elevation;
+  rosidl_runtime_c__int32__Sequence x;
+  rosidl_runtime_c__int32__Sequence y;
+  rosidl_runtime_c__int32__Sequence elevation;
+  rosidl_runtime_c__String__Sequence tag;
 } semmap_interfaces__srv__SemanticMap_Response;
 
 // Struct for a sequence of semmap_interfaces__srv__SemanticMap_Response.

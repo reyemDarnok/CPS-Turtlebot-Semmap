@@ -63,15 +63,15 @@ namespace srv
 namespace builder
 {
 
-class Init_SemanticMap_Response_object_elevation
+class Init_SemanticMap_Response_tag
 {
 public:
-  explicit Init_SemanticMap_Response_object_elevation(::semmap_interfaces::srv::SemanticMap_Response & msg)
+  explicit Init_SemanticMap_Response_tag(::semmap_interfaces::srv::SemanticMap_Response & msg)
   : msg_(msg)
   {}
-  ::semmap_interfaces::srv::SemanticMap_Response object_elevation(::semmap_interfaces::srv::SemanticMap_Response::_object_elevation_type arg)
+  ::semmap_interfaces::srv::SemanticMap_Response tag(::semmap_interfaces::srv::SemanticMap_Response::_tag_type arg)
   {
-    msg_.object_elevation = std::move(arg);
+    msg_.tag = std::move(arg);
     return std::move(msg_);
   }
 
@@ -79,112 +79,48 @@ private:
   ::semmap_interfaces::srv::SemanticMap_Response msg_;
 };
 
-class Init_SemanticMap_Response_object_y
+class Init_SemanticMap_Response_elevation
 {
 public:
-  explicit Init_SemanticMap_Response_object_y(::semmap_interfaces::srv::SemanticMap_Response & msg)
+  explicit Init_SemanticMap_Response_elevation(::semmap_interfaces::srv::SemanticMap_Response & msg)
   : msg_(msg)
   {}
-  Init_SemanticMap_Response_object_elevation object_y(::semmap_interfaces::srv::SemanticMap_Response::_object_y_type arg)
+  Init_SemanticMap_Response_tag elevation(::semmap_interfaces::srv::SemanticMap_Response::_elevation_type arg)
   {
-    msg_.object_y = std::move(arg);
-    return Init_SemanticMap_Response_object_elevation(msg_);
+    msg_.elevation = std::move(arg);
+    return Init_SemanticMap_Response_tag(msg_);
   }
 
 private:
   ::semmap_interfaces::srv::SemanticMap_Response msg_;
 };
 
-class Init_SemanticMap_Response_object_x
+class Init_SemanticMap_Response_y
 {
 public:
-  explicit Init_SemanticMap_Response_object_x(::semmap_interfaces::srv::SemanticMap_Response & msg)
+  explicit Init_SemanticMap_Response_y(::semmap_interfaces::srv::SemanticMap_Response & msg)
   : msg_(msg)
   {}
-  Init_SemanticMap_Response_object_y object_x(::semmap_interfaces::srv::SemanticMap_Response::_object_x_type arg)
+  Init_SemanticMap_Response_elevation y(::semmap_interfaces::srv::SemanticMap_Response::_y_type arg)
   {
-    msg_.object_x = std::move(arg);
-    return Init_SemanticMap_Response_object_y(msg_);
+    msg_.y = std::move(arg);
+    return Init_SemanticMap_Response_elevation(msg_);
   }
 
 private:
   ::semmap_interfaces::srv::SemanticMap_Response msg_;
 };
 
-class Init_SemanticMap_Response_object_tags
+class Init_SemanticMap_Response_x
 {
 public:
-  explicit Init_SemanticMap_Response_object_tags(::semmap_interfaces::srv::SemanticMap_Response & msg)
-  : msg_(msg)
-  {}
-  Init_SemanticMap_Response_object_x object_tags(::semmap_interfaces::srv::SemanticMap_Response::_object_tags_type arg)
-  {
-    msg_.object_tags = std::move(arg);
-    return Init_SemanticMap_Response_object_x(msg_);
-  }
-
-private:
-  ::semmap_interfaces::srv::SemanticMap_Response msg_;
-};
-
-class Init_SemanticMap_Response_negative_y
-{
-public:
-  explicit Init_SemanticMap_Response_negative_y(::semmap_interfaces::srv::SemanticMap_Response & msg)
-  : msg_(msg)
-  {}
-  Init_SemanticMap_Response_object_tags negative_y(::semmap_interfaces::srv::SemanticMap_Response::_negative_y_type arg)
-  {
-    msg_.negative_y = std::move(arg);
-    return Init_SemanticMap_Response_object_tags(msg_);
-  }
-
-private:
-  ::semmap_interfaces::srv::SemanticMap_Response msg_;
-};
-
-class Init_SemanticMap_Response_positive_and0_y
-{
-public:
-  explicit Init_SemanticMap_Response_positive_and0_y(::semmap_interfaces::srv::SemanticMap_Response & msg)
-  : msg_(msg)
-  {}
-  Init_SemanticMap_Response_negative_y positive_and0_y(::semmap_interfaces::srv::SemanticMap_Response::_positive_and0_y_type arg)
-  {
-    msg_.positive_and0_y = std::move(arg);
-    return Init_SemanticMap_Response_negative_y(msg_);
-  }
-
-private:
-  ::semmap_interfaces::srv::SemanticMap_Response msg_;
-};
-
-class Init_SemanticMap_Response_negative_x
-{
-public:
-  explicit Init_SemanticMap_Response_negative_x(::semmap_interfaces::srv::SemanticMap_Response & msg)
-  : msg_(msg)
-  {}
-  Init_SemanticMap_Response_positive_and0_y negative_x(::semmap_interfaces::srv::SemanticMap_Response::_negative_x_type arg)
-  {
-    msg_.negative_x = std::move(arg);
-    return Init_SemanticMap_Response_positive_and0_y(msg_);
-  }
-
-private:
-  ::semmap_interfaces::srv::SemanticMap_Response msg_;
-};
-
-class Init_SemanticMap_Response_positive_and0_x
-{
-public:
-  Init_SemanticMap_Response_positive_and0_x()
+  Init_SemanticMap_Response_x()
   : msg_(::rosidl_runtime_cpp::MessageInitialization::SKIP)
   {}
-  Init_SemanticMap_Response_negative_x positive_and0_x(::semmap_interfaces::srv::SemanticMap_Response::_positive_and0_x_type arg)
+  Init_SemanticMap_Response_y x(::semmap_interfaces::srv::SemanticMap_Response::_x_type arg)
   {
-    msg_.positive_and0_x = std::move(arg);
-    return Init_SemanticMap_Response_negative_x(msg_);
+    msg_.x = std::move(arg);
+    return Init_SemanticMap_Response_y(msg_);
   }
 
 private:
@@ -202,7 +138,7 @@ template<>
 inline
 auto build<::semmap_interfaces::srv::SemanticMap_Response>()
 {
-  return semmap_interfaces::srv::builder::Init_SemanticMap_Response_positive_and0_x();
+  return semmap_interfaces::srv::builder::Init_SemanticMap_Response_x();
 }
 
 }  // namespace semmap_interfaces

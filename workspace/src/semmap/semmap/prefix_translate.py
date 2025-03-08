@@ -40,16 +40,17 @@ class PrefixTranslatorNode(Node):
         try:
             reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
             reliability = reliability_line.split()[-1]
+            reliability = getattr(ReliabilityPolicy, reliability)
         except IndexError:
             reliability = "BEST_EFFORT"
             self.get_logger.info(f'Failed to read reliability of {ref_topic}, assuming BEST_EFFORT')
-        pub = self.create_publisher(t, to_topic, getattr(ReliabilityPolicy, reliability))
+        pub = self.create_publisher(t, to_topic, reliability)
         self.translate_publishers.append(pub)
 
         def translator(msg):
             pub.publish(msg)
 
-        self.create_subscription(t, from_topic, translator, getattr(ReliabilityPolicy, reliability))
+        self.create_subscription(t, from_topic, translator, reliability)
         self.get_logger().info(f"Translating from {from_topic} to {to_topic} with qos {reliability}")
 
 

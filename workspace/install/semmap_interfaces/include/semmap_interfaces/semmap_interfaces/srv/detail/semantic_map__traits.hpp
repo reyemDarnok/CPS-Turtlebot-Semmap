@@ -117,14 +117,14 @@ inline void to_flow_style_yaml(
   std::ostream & out)
 {
   out << "{";
-  // member: positive_and0_x
+  // member: x
   {
-    if (msg.positive_and0_x.size() == 0) {
-      out << "positive_and0_x: []";
+    if (msg.x.size() == 0) {
+      out << "x: []";
     } else {
-      out << "positive_and0_x: [";
-      size_t pending_items = msg.positive_and0_x.size();
-      for (auto item : msg.positive_and0_x) {
+      out << "x: [";
+      size_t pending_items = msg.x.size();
+      for (auto item : msg.x) {
         rosidl_generator_traits::value_to_yaml(item, out);
         if (--pending_items > 0) {
           out << ", ";
@@ -135,14 +135,14 @@ inline void to_flow_style_yaml(
     out << ", ";
   }
 
-  // member: negative_x
+  // member: y
   {
-    if (msg.negative_x.size() == 0) {
-      out << "negative_x: []";
+    if (msg.y.size() == 0) {
+      out << "y: []";
     } else {
-      out << "negative_x: [";
-      size_t pending_items = msg.negative_x.size();
-      for (auto item : msg.negative_x) {
+      out << "y: [";
+      size_t pending_items = msg.y.size();
+      for (auto item : msg.y) {
         rosidl_generator_traits::value_to_yaml(item, out);
         if (--pending_items > 0) {
           out << ", ";
@@ -153,14 +153,14 @@ inline void to_flow_style_yaml(
     out << ", ";
   }
 
-  // member: positive_and0_y
+  // member: elevation
   {
-    if (msg.positive_and0_y.size() == 0) {
-      out << "positive_and0_y: []";
+    if (msg.elevation.size() == 0) {
+      out << "elevation: []";
     } else {
-      out << "positive_and0_y: [";
-      size_t pending_items = msg.positive_and0_y.size();
-      for (auto item : msg.positive_and0_y) {
+      out << "elevation: [";
+      size_t pending_items = msg.elevation.size();
+      for (auto item : msg.elevation) {
         rosidl_generator_traits::value_to_yaml(item, out);
         if (--pending_items > 0) {
           out << ", ";
@@ -171,86 +171,14 @@ inline void to_flow_style_yaml(
     out << ", ";
   }
 
-  // member: negative_y
+  // member: tag
   {
-    if (msg.negative_y.size() == 0) {
-      out << "negative_y: []";
+    if (msg.tag.size() == 0) {
+      out << "tag: []";
     } else {
-      out << "negative_y: [";
-      size_t pending_items = msg.negative_y.size();
-      for (auto item : msg.negative_y) {
-        rosidl_generator_traits::value_to_yaml(item, out);
-        if (--pending_items > 0) {
-          out << ", ";
-        }
-      }
-      out << "]";
-    }
-    out << ", ";
-  }
-
-  // member: object_tags
-  {
-    if (msg.object_tags.size() == 0) {
-      out << "object_tags: []";
-    } else {
-      out << "object_tags: [";
-      size_t pending_items = msg.object_tags.size();
-      for (auto item : msg.object_tags) {
-        rosidl_generator_traits::value_to_yaml(item, out);
-        if (--pending_items > 0) {
-          out << ", ";
-        }
-      }
-      out << "]";
-    }
-    out << ", ";
-  }
-
-  // member: object_x
-  {
-    if (msg.object_x.size() == 0) {
-      out << "object_x: []";
-    } else {
-      out << "object_x: [";
-      size_t pending_items = msg.object_x.size();
-      for (auto item : msg.object_x) {
-        rosidl_generator_traits::value_to_yaml(item, out);
-        if (--pending_items > 0) {
-          out << ", ";
-        }
-      }
-      out << "]";
-    }
-    out << ", ";
-  }
-
-  // member: object_y
-  {
-    if (msg.object_y.size() == 0) {
-      out << "object_y: []";
-    } else {
-      out << "object_y: [";
-      size_t pending_items = msg.object_y.size();
-      for (auto item : msg.object_y) {
-        rosidl_generator_traits::value_to_yaml(item, out);
-        if (--pending_items > 0) {
-          out << ", ";
-        }
-      }
-      out << "]";
-    }
-    out << ", ";
-  }
-
-  // member: object_elevation
-  {
-    if (msg.object_elevation.size() == 0) {
-      out << "object_elevation: []";
-    } else {
-      out << "object_elevation: [";
-      size_t pending_items = msg.object_elevation.size();
-      for (auto item : msg.object_elevation) {
+      out << "tag: [";
+      size_t pending_items = msg.tag.size();
+      for (auto item : msg.tag) {
         rosidl_generator_traits::value_to_yaml(item, out);
         if (--pending_items > 0) {
           out << ", ";
@@ -266,16 +194,16 @@ inline void to_block_style_yaml(
   const SemanticMap_Response & msg,
   std::ostream & out, size_t indentation = 0)
 {
-  // member: positive_and0_x
+  // member: x
   {
     if (indentation > 0) {
       out << std::string(indentation, ' ');
     }
-    if (msg.positive_and0_x.size() == 0) {
-      out << "positive_and0_x: []\n";
+    if (msg.x.size() == 0) {
+      out << "x: []\n";
     } else {
-      out << "positive_and0_x:\n";
-      for (auto item : msg.positive_and0_x) {
+      out << "x:\n";
+      for (auto item : msg.x) {
         if (indentation > 0) {
           out << std::string(indentation, ' ');
         }
@@ -286,16 +214,16 @@ inline void to_block_style_yaml(
     }
   }
 
-  // member: negative_x
+  // member: y
   {
     if (indentation > 0) {
       out << std::string(indentation, ' ');
     }
-    if (msg.negative_x.size() == 0) {
-      out << "negative_x: []\n";
+    if (msg.y.size() == 0) {
+      out << "y: []\n";
     } else {
-      out << "negative_x:\n";
-      for (auto item : msg.negative_x) {
+      out << "y:\n";
+      for (auto item : msg.y) {
         if (indentation > 0) {
           out << std::string(indentation, ' ');
         }
@@ -306,16 +234,16 @@ inline void to_block_style_yaml(
     }
   }
 
-  // member: positive_and0_y
+  // member: elevation
   {
     if (indentation > 0) {
       out << std::string(indentation, ' ');
     }
-    if (msg.positive_and0_y.size() == 0) {
-      out << "positive_and0_y: []\n";
+    if (msg.elevation.size() == 0) {
+      out << "elevation: []\n";
     } else {
-      out << "positive_and0_y:\n";
-      for (auto item : msg.positive_and0_y) {
+      out << "elevation:\n";
+      for (auto item : msg.elevation) {
         if (indentation > 0) {
           out << std::string(indentation, ' ');
         }
@@ -326,96 +254,16 @@ inline void to_block_style_yaml(
     }
   }
 
-  // member: negative_y
+  // member: tag
   {
     if (indentation > 0) {
       out << std::string(indentation, ' ');
     }
-    if (msg.negative_y.size() == 0) {
-      out << "negative_y: []\n";
+    if (msg.tag.size() == 0) {
+      out << "tag: []\n";
     } else {
-      out << "negative_y:\n";
-      for (auto item : msg.negative_y) {
-        if (indentation > 0) {
-          out << std::string(indentation, ' ');
-        }
-        out << "- ";
-        rosidl_generator_traits::value_to_yaml(item, out);
-        out << "\n";
-      }
-    }
-  }
-
-  // member: object_tags
-  {
-    if (indentation > 0) {
-      out << std::string(indentation, ' ');
-    }
-    if (msg.object_tags.size() == 0) {
-      out << "object_tags: []\n";
-    } else {
-      out << "object_tags:\n";
-      for (auto item : msg.object_tags) {
-        if (indentation > 0) {
-          out << std::string(indentation, ' ');
-        }
-        out << "- ";
-        rosidl_generator_traits::value_to_yaml(item, out);
-        out << "\n";
-      }
-    }
-  }
-
-  // member: object_x
-  {
-    if (indentation > 0) {
-      out << std::string(indentation, ' ');
-    }
-    if (msg.object_x.size() == 0) {
-      out << "object_x: []\n";
-    } else {
-      out << "object_x:\n";
-      for (auto item : msg.object_x) {
-        if (indentation > 0) {
-          out << std::string(indentation, ' ');
-        }
-        out << "- ";
-        rosidl_generator_traits::value_to_yaml(item, out);
-        out << "\n";
-      }
-    }
-  }
-
-  // member: object_y
-  {
-    if (indentation > 0) {
-      out << std::string(indentation, ' ');
-    }
-    if (msg.object_y.size() == 0) {
-      out << "object_y: []\n";
-    } else {
-      out << "object_y:\n";
-      for (auto item : msg.object_y) {
-        if (indentation > 0) {
-          out << std::string(indentation, ' ');
-        }
-        out << "- ";
-        rosidl_generator_traits::value_to_yaml(item, out);
-        out << "\n";
-      }
-    }
-  }
-
-  // member: object_elevation
-  {
-    if (indentation > 0) {
-      out << std::string(indentation, ' ');
-    }
-    if (msg.object_elevation.size() == 0) {
-      out << "object_elevation: []\n";
-    } else {
-      out << "object_elevation:\n";
-      for (auto item : msg.object_elevation) {
+      out << "tag:\n";
+      for (auto item : msg.tag) {
         if (indentation > 0) {
           out << std::string(indentation, ' ');
         }

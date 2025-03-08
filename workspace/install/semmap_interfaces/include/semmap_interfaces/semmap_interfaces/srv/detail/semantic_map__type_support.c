@@ -101,15 +101,11 @@ ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspecti
 
 
 // Include directives for member types
-// Member `positive_and0_x`
-// Member `negative_x`
-// Member `positive_and0_y`
-// Member `negative_y`
-// Member `object_x`
-// Member `object_y`
-// Member `object_elevation`
+// Member `x`
+// Member `y`
+// Member `elevation`
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
-// Member `object_tags`
+// Member `tag`
 #include "rosidl_runtime_c/string_functions.h"
 
 #ifdef __cplusplus
@@ -131,227 +127,172 @@ void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspect
   semmap_interfaces__srv__SemanticMap_Response__fini(message_memory);
 }
 
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__positive_and0_x(
+size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__x(
   const void * untyped_member)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return member->size;
 }
 
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_x(
+const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__x(
   const void * untyped_member, size_t index)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_x(
+void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__x(
   void * untyped_member, size_t index)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__positive_and0_x(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__x(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const bool * item =
-    ((const bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_x(untyped_member, index));
-  bool * value =
-    (bool *)(untyped_value);
+  const int32_t * item =
+    ((const int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__x(untyped_member, index));
+  int32_t * value =
+    (int32_t *)(untyped_value);
   *value = *item;
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__positive_and0_x(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__x(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  bool * item =
-    ((bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_x(untyped_member, index));
-  const bool * value =
-    (const bool *)(untyped_value);
+  int32_t * item =
+    ((int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__x(untyped_member, index));
+  const int32_t * value =
+    (const int32_t *)(untyped_value);
   *item = *value;
 }
 
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__positive_and0_x(
+bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__x(
   void * untyped_member, size_t size)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  rosidl_runtime_c__boolean__Sequence__fini(member);
-  return rosidl_runtime_c__boolean__Sequence__init(member, size);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence__fini(member);
+  return rosidl_runtime_c__int32__Sequence__init(member, size);
 }
 
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__negative_x(
+size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__y(
   const void * untyped_member)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return member->size;
 }
 
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_x(
+const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__y(
   const void * untyped_member, size_t index)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_x(
+void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__y(
   void * untyped_member, size_t index)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__negative_x(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__y(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const bool * item =
-    ((const bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_x(untyped_member, index));
-  bool * value =
-    (bool *)(untyped_value);
+  const int32_t * item =
+    ((const int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__y(untyped_member, index));
+  int32_t * value =
+    (int32_t *)(untyped_value);
   *value = *item;
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__negative_x(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__y(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  bool * item =
-    ((bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_x(untyped_member, index));
-  const bool * value =
-    (const bool *)(untyped_value);
+  int32_t * item =
+    ((int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__y(untyped_member, index));
+  const int32_t * value =
+    (const int32_t *)(untyped_value);
   *item = *value;
 }
 
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__negative_x(
+bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__y(
   void * untyped_member, size_t size)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  rosidl_runtime_c__boolean__Sequence__fini(member);
-  return rosidl_runtime_c__boolean__Sequence__init(member, size);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence__fini(member);
+  return rosidl_runtime_c__int32__Sequence__init(member, size);
 }
 
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__positive_and0_y(
+size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__elevation(
   const void * untyped_member)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return member->size;
 }
 
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_y(
+const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__elevation(
   const void * untyped_member, size_t index)
 {
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  const rosidl_runtime_c__int32__Sequence * member =
+    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_y(
+void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__elevation(
   void * untyped_member, size_t index)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
   return &member->data[index];
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__positive_and0_y(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__elevation(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const bool * item =
-    ((const bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_y(untyped_member, index));
-  bool * value =
-    (bool *)(untyped_value);
+  const int32_t * item =
+    ((const int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__elevation(untyped_member, index));
+  int32_t * value =
+    (int32_t *)(untyped_value);
   *value = *item;
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__positive_and0_y(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__elevation(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  bool * item =
-    ((bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_y(untyped_member, index));
-  const bool * value =
-    (const bool *)(untyped_value);
+  int32_t * item =
+    ((int32_t *)
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__elevation(untyped_member, index));
+  const int32_t * value =
+    (const int32_t *)(untyped_value);
   *item = *value;
 }
 
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__positive_and0_y(
+bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__elevation(
   void * untyped_member, size_t size)
 {
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  rosidl_runtime_c__boolean__Sequence__fini(member);
-  return rosidl_runtime_c__boolean__Sequence__init(member, size);
+  rosidl_runtime_c__int32__Sequence * member =
+    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
+  rosidl_runtime_c__int32__Sequence__fini(member);
+  return rosidl_runtime_c__int32__Sequence__init(member, size);
 }
 
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__negative_y(
-  const void * untyped_member)
-{
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  return member->size;
-}
-
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_y(
-  const void * untyped_member, size_t index)
-{
-  const rosidl_runtime_c__boolean__Sequence * member =
-    (const rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_y(
-  void * untyped_member, size_t index)
-{
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__negative_y(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const bool * item =
-    ((const bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_y(untyped_member, index));
-  bool * value =
-    (bool *)(untyped_value);
-  *value = *item;
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__negative_y(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  bool * item =
-    ((bool *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_y(untyped_member, index));
-  const bool * value =
-    (const bool *)(untyped_value);
-  *item = *value;
-}
-
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__negative_y(
-  void * untyped_member, size_t size)
-{
-  rosidl_runtime_c__boolean__Sequence * member =
-    (rosidl_runtime_c__boolean__Sequence *)(untyped_member);
-  rosidl_runtime_c__boolean__Sequence__fini(member);
-  return rosidl_runtime_c__boolean__Sequence__init(member, size);
-}
-
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_tags(
+size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__tag(
   const void * untyped_member)
 {
   const rosidl_runtime_c__String__Sequence * member =
@@ -359,7 +300,7 @@ size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspe
   return member->size;
 }
 
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_tags(
+const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__tag(
   const void * untyped_member, size_t index)
 {
   const rosidl_runtime_c__String__Sequence * member =
@@ -367,7 +308,7 @@ const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_in
   return &member->data[index];
 }
 
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_tags(
+void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__tag(
   void * untyped_member, size_t index)
 {
   rosidl_runtime_c__String__Sequence * member =
@@ -375,29 +316,29 @@ void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspe
   return &member->data[index];
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_tags(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__tag(
   const void * untyped_member, size_t index, void * untyped_value)
 {
   const rosidl_runtime_c__String * item =
     ((const rosidl_runtime_c__String *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_tags(untyped_member, index));
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__tag(untyped_member, index));
   rosidl_runtime_c__String * value =
     (rosidl_runtime_c__String *)(untyped_value);
   *value = *item;
 }
 
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_tags(
+void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__tag(
   void * untyped_member, size_t index, const void * untyped_value)
 {
   rosidl_runtime_c__String * item =
     ((rosidl_runtime_c__String *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_tags(untyped_member, index));
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__tag(untyped_member, index));
   const rosidl_runtime_c__String * value =
     (const rosidl_runtime_c__String *)(untyped_value);
   *item = *value;
 }
 
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_tags(
+bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__tag(
   void * untyped_member, size_t size)
 {
   rosidl_runtime_c__String__Sequence * member =
@@ -406,314 +347,81 @@ bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspect
   return rosidl_runtime_c__String__Sequence__init(member, size);
 }
 
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_x(
-  const void * untyped_member)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return member->size;
-}
-
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_x(
-  const void * untyped_member, size_t index)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_x(
-  void * untyped_member, size_t index)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_x(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const int32_t * item =
-    ((const int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_x(untyped_member, index));
-  int32_t * value =
-    (int32_t *)(untyped_value);
-  *value = *item;
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_x(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  int32_t * item =
-    ((int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_x(untyped_member, index));
-  const int32_t * value =
-    (const int32_t *)(untyped_value);
-  *item = *value;
-}
-
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_x(
-  void * untyped_member, size_t size)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  rosidl_runtime_c__int32__Sequence__fini(member);
-  return rosidl_runtime_c__int32__Sequence__init(member, size);
-}
-
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_y(
-  const void * untyped_member)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return member->size;
-}
-
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_y(
-  const void * untyped_member, size_t index)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_y(
-  void * untyped_member, size_t index)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_y(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const int32_t * item =
-    ((const int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_y(untyped_member, index));
-  int32_t * value =
-    (int32_t *)(untyped_value);
-  *value = *item;
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_y(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  int32_t * item =
-    ((int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_y(untyped_member, index));
-  const int32_t * value =
-    (const int32_t *)(untyped_value);
-  *item = *value;
-}
-
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_y(
-  void * untyped_member, size_t size)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  rosidl_runtime_c__int32__Sequence__fini(member);
-  return rosidl_runtime_c__int32__Sequence__init(member, size);
-}
-
-size_t semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_elevation(
-  const void * untyped_member)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return member->size;
-}
-
-const void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_elevation(
-  const void * untyped_member, size_t index)
-{
-  const rosidl_runtime_c__int32__Sequence * member =
-    (const rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void * semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_elevation(
-  void * untyped_member, size_t index)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  return &member->data[index];
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_elevation(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const int32_t * item =
-    ((const int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_elevation(untyped_member, index));
-  int32_t * value =
-    (int32_t *)(untyped_value);
-  *value = *item;
-}
-
-void semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_elevation(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  int32_t * item =
-    ((int32_t *)
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_elevation(untyped_member, index));
-  const int32_t * value =
-    (const int32_t *)(untyped_value);
-  *item = *value;
-}
-
-bool semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_elevation(
-  void * untyped_member, size_t size)
-{
-  rosidl_runtime_c__int32__Sequence * member =
-    (rosidl_runtime_c__int32__Sequence *)(untyped_member);
-  rosidl_runtime_c__int32__Sequence__fini(member);
-  return rosidl_runtime_c__int32__Sequence__init(member, size);
-}
-
-static rosidl_typesupport_introspection_c__MessageMember semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__SemanticMap_Response_message_member_array[8] = {
+static rosidl_typesupport_introspection_c__MessageMember semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__SemanticMap_Response_message_member_array[4] = {
   {
-    "positive_and0_x",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_BOOLEAN,  // type
+    "x",  // name
+    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, positive_and0_x),  // bytes offset in struct
+    offsetof(semmap_interfaces__srv__SemanticMap_Response, x),  // bytes offset in struct
     NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__positive_and0_x,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_x,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_x,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__positive_and0_x,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__positive_and0_x,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__positive_and0_x  // resize(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__x,  // size() function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__x,  // get_const(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__x,  // get(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__x,  // fetch(index, &value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__x,  // assign(index, value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__x  // resize(index) function pointer
   },
   {
-    "negative_x",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_BOOLEAN,  // type
+    "y",  // name
+    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, negative_x),  // bytes offset in struct
+    offsetof(semmap_interfaces__srv__SemanticMap_Response, y),  // bytes offset in struct
     NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__negative_x,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_x,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_x,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__negative_x,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__negative_x,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__negative_x  // resize(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__y,  // size() function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__y,  // get_const(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__y,  // get(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__y,  // fetch(index, &value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__y,  // assign(index, value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__y  // resize(index) function pointer
   },
   {
-    "positive_and0_y",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_BOOLEAN,  // type
+    "elevation",  // name
+    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, positive_and0_y),  // bytes offset in struct
+    offsetof(semmap_interfaces__srv__SemanticMap_Response, elevation),  // bytes offset in struct
     NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__positive_and0_y,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__positive_and0_y,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__positive_and0_y,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__positive_and0_y,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__positive_and0_y,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__positive_and0_y  // resize(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__elevation,  // size() function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__elevation,  // get_const(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__elevation,  // get(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__elevation,  // fetch(index, &value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__elevation,  // assign(index, value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__elevation  // resize(index) function pointer
   },
   {
-    "negative_y",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_BOOLEAN,  // type
-    0,  // upper bound of string
-    NULL,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, negative_y),  // bytes offset in struct
-    NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__negative_y,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__negative_y,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__negative_y,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__negative_y,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__negative_y,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__negative_y  // resize(index) function pointer
-  },
-  {
-    "object_tags",  // name
+    "tag",  // name
     rosidl_typesupport_introspection_c__ROS_TYPE_STRING,  // type
     0,  // upper bound of string
     NULL,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, object_tags),  // bytes offset in struct
+    offsetof(semmap_interfaces__srv__SemanticMap_Response, tag),  // bytes offset in struct
     NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_tags,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_tags,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_tags,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_tags,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_tags,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_tags  // resize(index) function pointer
-  },
-  {
-    "object_x",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    NULL,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, object_x),  // bytes offset in struct
-    NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_x,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_x,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_x,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_x,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_x,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_x  // resize(index) function pointer
-  },
-  {
-    "object_y",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    NULL,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, object_y),  // bytes offset in struct
-    NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_y,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_y,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_y,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_y,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_y,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_y  // resize(index) function pointer
-  },
-  {
-    "object_elevation",  // name
-    rosidl_typesupport_introspection_c__ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    NULL,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces__srv__SemanticMap_Response, object_elevation),  // bytes offset in struct
-    NULL,  // default value
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__object_elevation,  // size() function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__object_elevation,  // get_const(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__object_elevation,  // get(index) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__object_elevation,  // fetch(index, &value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__object_elevation,  // assign(index, value) function pointer
-    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__object_elevation  // resize(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__size_function__SemanticMap_Response__tag,  // size() function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_const_function__SemanticMap_Response__tag,  // get_const(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__get_function__SemanticMap_Response__tag,  // get(index) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__fetch_function__SemanticMap_Response__tag,  // fetch(index, &value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__assign_function__SemanticMap_Response__tag,  // assign(index, value) function pointer
+    semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__resize_function__SemanticMap_Response__tag  // resize(index) function pointer
   }
 };
 
 static const rosidl_typesupport_introspection_c__MessageMembers semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__SemanticMap_Response_message_members = {
   "semmap_interfaces__srv",  // message namespace
   "SemanticMap_Response",  // message name
-  8,  // number of fields
+  4,  // number of fields
   sizeof(semmap_interfaces__srv__SemanticMap_Response),
   semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__SemanticMap_Response_message_member_array,  // message members
   semmap_interfaces__srv__SemanticMap_Response__rosidl_typesupport_introspection_c__SemanticMap_Response_init_function,  // function to initialize message memory (memory has to be allocated)

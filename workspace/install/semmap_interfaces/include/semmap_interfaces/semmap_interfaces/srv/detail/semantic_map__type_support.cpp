@@ -156,445 +156,261 @@ void SemanticMap_Response_fini_function(void * message_memory)
   typed_message->~SemanticMap_Response();
 }
 
-size_t size_function__SemanticMap_Response__positive_and0_x(const void * untyped_member)
+size_t size_function__SemanticMap_Response__x(const void * untyped_member)
 {
-  const auto * member = reinterpret_cast<const std::vector<bool> *>(untyped_member);
+  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
   return member->size();
 }
 
-void fetch_function__SemanticMap_Response__positive_and0_x(
+const void * get_const_function__SemanticMap_Response__x(const void * untyped_member, size_t index)
+{
+  const auto & member =
+    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void * get_function__SemanticMap_Response__x(void * untyped_member, size_t index)
+{
+  auto & member =
+    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void fetch_function__SemanticMap_Response__x(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const auto & member = *reinterpret_cast<const std::vector<bool> *>(untyped_member);
-  auto & value = *reinterpret_cast<bool *>(untyped_value);
-  value = member[index];
+  const auto & item = *reinterpret_cast<const int32_t *>(
+    get_const_function__SemanticMap_Response__x(untyped_member, index));
+  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
+  value = item;
 }
 
-void assign_function__SemanticMap_Response__positive_and0_x(
+void assign_function__SemanticMap_Response__x(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  auto & member = *reinterpret_cast<std::vector<bool> *>(untyped_member);
-  const auto & value = *reinterpret_cast<const bool *>(untyped_value);
-  member[index] = value;
+  auto & item = *reinterpret_cast<int32_t *>(
+    get_function__SemanticMap_Response__x(untyped_member, index));
+  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
+  item = value;
 }
 
-void resize_function__SemanticMap_Response__positive_and0_x(void * untyped_member, size_t size)
+void resize_function__SemanticMap_Response__x(void * untyped_member, size_t size)
 {
   auto * member =
-    reinterpret_cast<std::vector<bool> *>(untyped_member);
+    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
   member->resize(size);
 }
 
-size_t size_function__SemanticMap_Response__negative_x(const void * untyped_member)
+size_t size_function__SemanticMap_Response__y(const void * untyped_member)
 {
-  const auto * member = reinterpret_cast<const std::vector<bool> *>(untyped_member);
+  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
   return member->size();
 }
 
-void fetch_function__SemanticMap_Response__negative_x(
+const void * get_const_function__SemanticMap_Response__y(const void * untyped_member, size_t index)
+{
+  const auto & member =
+    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void * get_function__SemanticMap_Response__y(void * untyped_member, size_t index)
+{
+  auto & member =
+    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void fetch_function__SemanticMap_Response__y(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const auto & member = *reinterpret_cast<const std::vector<bool> *>(untyped_member);
-  auto & value = *reinterpret_cast<bool *>(untyped_value);
-  value = member[index];
+  const auto & item = *reinterpret_cast<const int32_t *>(
+    get_const_function__SemanticMap_Response__y(untyped_member, index));
+  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
+  value = item;
 }
 
-void assign_function__SemanticMap_Response__negative_x(
+void assign_function__SemanticMap_Response__y(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  auto & member = *reinterpret_cast<std::vector<bool> *>(untyped_member);
-  const auto & value = *reinterpret_cast<const bool *>(untyped_value);
-  member[index] = value;
+  auto & item = *reinterpret_cast<int32_t *>(
+    get_function__SemanticMap_Response__y(untyped_member, index));
+  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
+  item = value;
 }
 
-void resize_function__SemanticMap_Response__negative_x(void * untyped_member, size_t size)
+void resize_function__SemanticMap_Response__y(void * untyped_member, size_t size)
 {
   auto * member =
-    reinterpret_cast<std::vector<bool> *>(untyped_member);
+    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
   member->resize(size);
 }
 
-size_t size_function__SemanticMap_Response__positive_and0_y(const void * untyped_member)
+size_t size_function__SemanticMap_Response__elevation(const void * untyped_member)
 {
-  const auto * member = reinterpret_cast<const std::vector<bool> *>(untyped_member);
+  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
   return member->size();
 }
 
-void fetch_function__SemanticMap_Response__positive_and0_y(
+const void * get_const_function__SemanticMap_Response__elevation(const void * untyped_member, size_t index)
+{
+  const auto & member =
+    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void * get_function__SemanticMap_Response__elevation(void * untyped_member, size_t index)
+{
+  auto & member =
+    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
+  return &member[index];
+}
+
+void fetch_function__SemanticMap_Response__elevation(
   const void * untyped_member, size_t index, void * untyped_value)
 {
-  const auto & member = *reinterpret_cast<const std::vector<bool> *>(untyped_member);
-  auto & value = *reinterpret_cast<bool *>(untyped_value);
-  value = member[index];
+  const auto & item = *reinterpret_cast<const int32_t *>(
+    get_const_function__SemanticMap_Response__elevation(untyped_member, index));
+  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
+  value = item;
 }
 
-void assign_function__SemanticMap_Response__positive_and0_y(
+void assign_function__SemanticMap_Response__elevation(
   void * untyped_member, size_t index, const void * untyped_value)
 {
-  auto & member = *reinterpret_cast<std::vector<bool> *>(untyped_member);
-  const auto & value = *reinterpret_cast<const bool *>(untyped_value);
-  member[index] = value;
+  auto & item = *reinterpret_cast<int32_t *>(
+    get_function__SemanticMap_Response__elevation(untyped_member, index));
+  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
+  item = value;
 }
 
-void resize_function__SemanticMap_Response__positive_and0_y(void * untyped_member, size_t size)
+void resize_function__SemanticMap_Response__elevation(void * untyped_member, size_t size)
 {
   auto * member =
-    reinterpret_cast<std::vector<bool> *>(untyped_member);
+    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
   member->resize(size);
 }
 
-size_t size_function__SemanticMap_Response__negative_y(const void * untyped_member)
-{
-  const auto * member = reinterpret_cast<const std::vector<bool> *>(untyped_member);
-  return member->size();
-}
-
-void fetch_function__SemanticMap_Response__negative_y(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const auto & member = *reinterpret_cast<const std::vector<bool> *>(untyped_member);
-  auto & value = *reinterpret_cast<bool *>(untyped_value);
-  value = member[index];
-}
-
-void assign_function__SemanticMap_Response__negative_y(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  auto & member = *reinterpret_cast<std::vector<bool> *>(untyped_member);
-  const auto & value = *reinterpret_cast<const bool *>(untyped_value);
-  member[index] = value;
-}
-
-void resize_function__SemanticMap_Response__negative_y(void * untyped_member, size_t size)
-{
-  auto * member =
-    reinterpret_cast<std::vector<bool> *>(untyped_member);
-  member->resize(size);
-}
-
-size_t size_function__SemanticMap_Response__object_tags(const void * untyped_member)
+size_t size_function__SemanticMap_Response__tag(const void * untyped_member)
 {
   const auto * member = reinterpret_cast<const std::vector<std::string> *>(untyped_member);
   return member->size();
 }
 
-const void * get_const_function__SemanticMap_Response__object_tags(const void * untyped_member, size_t index)
+const void * get_const_function__SemanticMap_Response__tag(const void * untyped_member, size_t index)
 {
   const auto & member =
     *reinterpret_cast<const std::vector<std::string> *>(untyped_member);
   return &member[index];
 }
 
-void * get_function__SemanticMap_Response__object_tags(void * untyped_member, size_t index)
+void * get_function__SemanticMap_Response__tag(void * untyped_member, size_t index)
 {
   auto & member =
     *reinterpret_cast<std::vector<std::string> *>(untyped_member);
   return &member[index];
 }
 
-void fetch_function__SemanticMap_Response__object_tags(
+void fetch_function__SemanticMap_Response__tag(
   const void * untyped_member, size_t index, void * untyped_value)
 {
   const auto & item = *reinterpret_cast<const std::string *>(
-    get_const_function__SemanticMap_Response__object_tags(untyped_member, index));
+    get_const_function__SemanticMap_Response__tag(untyped_member, index));
   auto & value = *reinterpret_cast<std::string *>(untyped_value);
   value = item;
 }
 
-void assign_function__SemanticMap_Response__object_tags(
+void assign_function__SemanticMap_Response__tag(
   void * untyped_member, size_t index, const void * untyped_value)
 {
   auto & item = *reinterpret_cast<std::string *>(
-    get_function__SemanticMap_Response__object_tags(untyped_member, index));
+    get_function__SemanticMap_Response__tag(untyped_member, index));
   const auto & value = *reinterpret_cast<const std::string *>(untyped_value);
   item = value;
 }
 
-void resize_function__SemanticMap_Response__object_tags(void * untyped_member, size_t size)
+void resize_function__SemanticMap_Response__tag(void * untyped_member, size_t size)
 {
   auto * member =
     reinterpret_cast<std::vector<std::string> *>(untyped_member);
   member->resize(size);
 }
 
-size_t size_function__SemanticMap_Response__object_x(const void * untyped_member)
-{
-  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return member->size();
-}
-
-const void * get_const_function__SemanticMap_Response__object_x(const void * untyped_member, size_t index)
-{
-  const auto & member =
-    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void * get_function__SemanticMap_Response__object_x(void * untyped_member, size_t index)
-{
-  auto & member =
-    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void fetch_function__SemanticMap_Response__object_x(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const auto & item = *reinterpret_cast<const int32_t *>(
-    get_const_function__SemanticMap_Response__object_x(untyped_member, index));
-  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
-  value = item;
-}
-
-void assign_function__SemanticMap_Response__object_x(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  auto & item = *reinterpret_cast<int32_t *>(
-    get_function__SemanticMap_Response__object_x(untyped_member, index));
-  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
-  item = value;
-}
-
-void resize_function__SemanticMap_Response__object_x(void * untyped_member, size_t size)
-{
-  auto * member =
-    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  member->resize(size);
-}
-
-size_t size_function__SemanticMap_Response__object_y(const void * untyped_member)
-{
-  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return member->size();
-}
-
-const void * get_const_function__SemanticMap_Response__object_y(const void * untyped_member, size_t index)
-{
-  const auto & member =
-    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void * get_function__SemanticMap_Response__object_y(void * untyped_member, size_t index)
-{
-  auto & member =
-    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void fetch_function__SemanticMap_Response__object_y(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const auto & item = *reinterpret_cast<const int32_t *>(
-    get_const_function__SemanticMap_Response__object_y(untyped_member, index));
-  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
-  value = item;
-}
-
-void assign_function__SemanticMap_Response__object_y(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  auto & item = *reinterpret_cast<int32_t *>(
-    get_function__SemanticMap_Response__object_y(untyped_member, index));
-  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
-  item = value;
-}
-
-void resize_function__SemanticMap_Response__object_y(void * untyped_member, size_t size)
-{
-  auto * member =
-    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  member->resize(size);
-}
-
-size_t size_function__SemanticMap_Response__object_elevation(const void * untyped_member)
-{
-  const auto * member = reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return member->size();
-}
-
-const void * get_const_function__SemanticMap_Response__object_elevation(const void * untyped_member, size_t index)
-{
-  const auto & member =
-    *reinterpret_cast<const std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void * get_function__SemanticMap_Response__object_elevation(void * untyped_member, size_t index)
-{
-  auto & member =
-    *reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  return &member[index];
-}
-
-void fetch_function__SemanticMap_Response__object_elevation(
-  const void * untyped_member, size_t index, void * untyped_value)
-{
-  const auto & item = *reinterpret_cast<const int32_t *>(
-    get_const_function__SemanticMap_Response__object_elevation(untyped_member, index));
-  auto & value = *reinterpret_cast<int32_t *>(untyped_value);
-  value = item;
-}
-
-void assign_function__SemanticMap_Response__object_elevation(
-  void * untyped_member, size_t index, const void * untyped_value)
-{
-  auto & item = *reinterpret_cast<int32_t *>(
-    get_function__SemanticMap_Response__object_elevation(untyped_member, index));
-  const auto & value = *reinterpret_cast<const int32_t *>(untyped_value);
-  item = value;
-}
-
-void resize_function__SemanticMap_Response__object_elevation(void * untyped_member, size_t size)
-{
-  auto * member =
-    reinterpret_cast<std::vector<int32_t> *>(untyped_member);
-  member->resize(size);
-}
-
-static const ::rosidl_typesupport_introspection_cpp::MessageMember SemanticMap_Response_message_member_array[8] = {
+static const ::rosidl_typesupport_introspection_cpp::MessageMember SemanticMap_Response_message_member_array[4] = {
   {
-    "positive_and0_x",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_BOOLEAN,  // type
+    "x",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     nullptr,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, positive_and0_x),  // bytes offset in struct
+    offsetof(semmap_interfaces::srv::SemanticMap_Response, x),  // bytes offset in struct
     nullptr,  // default value
-    size_function__SemanticMap_Response__positive_and0_x,  // size() function pointer
-    nullptr,  // get_const(index) function pointer
-    nullptr,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__positive_and0_x,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__positive_and0_x,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__positive_and0_x  // resize(index) function pointer
+    size_function__SemanticMap_Response__x,  // size() function pointer
+    get_const_function__SemanticMap_Response__x,  // get_const(index) function pointer
+    get_function__SemanticMap_Response__x,  // get(index) function pointer
+    fetch_function__SemanticMap_Response__x,  // fetch(index, &value) function pointer
+    assign_function__SemanticMap_Response__x,  // assign(index, value) function pointer
+    resize_function__SemanticMap_Response__x  // resize(index) function pointer
   },
   {
-    "negative_x",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_BOOLEAN,  // type
+    "y",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     nullptr,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, negative_x),  // bytes offset in struct
+    offsetof(semmap_interfaces::srv::SemanticMap_Response, y),  // bytes offset in struct
     nullptr,  // default value
-    size_function__SemanticMap_Response__negative_x,  // size() function pointer
-    nullptr,  // get_const(index) function pointer
-    nullptr,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__negative_x,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__negative_x,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__negative_x  // resize(index) function pointer
+    size_function__SemanticMap_Response__y,  // size() function pointer
+    get_const_function__SemanticMap_Response__y,  // get_const(index) function pointer
+    get_function__SemanticMap_Response__y,  // get(index) function pointer
+    fetch_function__SemanticMap_Response__y,  // fetch(index, &value) function pointer
+    assign_function__SemanticMap_Response__y,  // assign(index, value) function pointer
+    resize_function__SemanticMap_Response__y  // resize(index) function pointer
   },
   {
-    "positive_and0_y",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_BOOLEAN,  // type
+    "elevation",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
     0,  // upper bound of string
     nullptr,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, positive_and0_y),  // bytes offset in struct
+    offsetof(semmap_interfaces::srv::SemanticMap_Response, elevation),  // bytes offset in struct
     nullptr,  // default value
-    size_function__SemanticMap_Response__positive_and0_y,  // size() function pointer
-    nullptr,  // get_const(index) function pointer
-    nullptr,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__positive_and0_y,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__positive_and0_y,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__positive_and0_y  // resize(index) function pointer
+    size_function__SemanticMap_Response__elevation,  // size() function pointer
+    get_const_function__SemanticMap_Response__elevation,  // get_const(index) function pointer
+    get_function__SemanticMap_Response__elevation,  // get(index) function pointer
+    fetch_function__SemanticMap_Response__elevation,  // fetch(index, &value) function pointer
+    assign_function__SemanticMap_Response__elevation,  // assign(index, value) function pointer
+    resize_function__SemanticMap_Response__elevation  // resize(index) function pointer
   },
   {
-    "negative_y",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_BOOLEAN,  // type
-    0,  // upper bound of string
-    nullptr,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, negative_y),  // bytes offset in struct
-    nullptr,  // default value
-    size_function__SemanticMap_Response__negative_y,  // size() function pointer
-    nullptr,  // get_const(index) function pointer
-    nullptr,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__negative_y,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__negative_y,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__negative_y  // resize(index) function pointer
-  },
-  {
-    "object_tags",  // name
+    "tag",  // name
     ::rosidl_typesupport_introspection_cpp::ROS_TYPE_STRING,  // type
     0,  // upper bound of string
     nullptr,  // members of sub message
     true,  // is array
     0,  // array size
     false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, object_tags),  // bytes offset in struct
+    offsetof(semmap_interfaces::srv::SemanticMap_Response, tag),  // bytes offset in struct
     nullptr,  // default value
-    size_function__SemanticMap_Response__object_tags,  // size() function pointer
-    get_const_function__SemanticMap_Response__object_tags,  // get_const(index) function pointer
-    get_function__SemanticMap_Response__object_tags,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__object_tags,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__object_tags,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__object_tags  // resize(index) function pointer
-  },
-  {
-    "object_x",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    nullptr,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, object_x),  // bytes offset in struct
-    nullptr,  // default value
-    size_function__SemanticMap_Response__object_x,  // size() function pointer
-    get_const_function__SemanticMap_Response__object_x,  // get_const(index) function pointer
-    get_function__SemanticMap_Response__object_x,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__object_x,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__object_x,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__object_x  // resize(index) function pointer
-  },
-  {
-    "object_y",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    nullptr,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, object_y),  // bytes offset in struct
-    nullptr,  // default value
-    size_function__SemanticMap_Response__object_y,  // size() function pointer
-    get_const_function__SemanticMap_Response__object_y,  // get_const(index) function pointer
-    get_function__SemanticMap_Response__object_y,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__object_y,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__object_y,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__object_y  // resize(index) function pointer
-  },
-  {
-    "object_elevation",  // name
-    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_INT32,  // type
-    0,  // upper bound of string
-    nullptr,  // members of sub message
-    true,  // is array
-    0,  // array size
-    false,  // is upper bound
-    offsetof(semmap_interfaces::srv::SemanticMap_Response, object_elevation),  // bytes offset in struct
-    nullptr,  // default value
-    size_function__SemanticMap_Response__object_elevation,  // size() function pointer
-    get_const_function__SemanticMap_Response__object_elevation,  // get_const(index) function pointer
-    get_function__SemanticMap_Response__object_elevation,  // get(index) function pointer
-    fetch_function__SemanticMap_Response__object_elevation,  // fetch(index, &value) function pointer
-    assign_function__SemanticMap_Response__object_elevation,  // assign(index, value) function pointer
-    resize_function__SemanticMap_Response__object_elevation  // resize(index) function pointer
+    size_function__SemanticMap_Response__tag,  // size() function pointer
+    get_const_function__SemanticMap_Response__tag,  // get_const(index) function pointer
+    get_function__SemanticMap_Response__tag,  // get(index) function pointer
+    fetch_function__SemanticMap_Response__tag,  // fetch(index, &value) function pointer
+    assign_function__SemanticMap_Response__tag,  // assign(index, value) function pointer
+    resize_function__SemanticMap_Response__tag  // resize(index) function pointer
   }
 };
 
 static const ::rosidl_typesupport_introspection_cpp::MessageMembers SemanticMap_Response_message_members = {
   "semmap_interfaces::srv",  // message namespace
   "SemanticMap_Response",  // message name
-  8,  // number of fields
+  4,  // number of fields
   sizeof(semmap_interfaces::srv::SemanticMap_Response),
   SemanticMap_Response_message_member_array,  // message members
   SemanticMap_Response_init_function,  // function to initialize message memory (memory has to be allocated)
