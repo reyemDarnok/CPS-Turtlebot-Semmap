@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from subprocess import run
 from typing import Tuple, List
-from rclpy import qos
+from rclpy.qos import ReliabilityPolicy
 import rclpy
 import sys
 from rclpy.node import Node
@@ -39,7 +39,7 @@ class PrefixTranslatorNode(Node):
         topic_info_process = run(["ros2", "topic", "info", from_topic, "-v"], capture_output=True, text=True)
         reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
         reliability = reliability_line.split()[-1]
-        pub = self.create_publisher(t, to_topic, getattr(qos, reliability))
+        pub = self.create_publisher(t, to_topic, getattr(ReliabilityPolicy, reliability))
         self.translate_publishers.append(pub)
 
         def translator(msg):
