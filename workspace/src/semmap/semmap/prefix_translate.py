@@ -28,11 +28,11 @@ class PrefixTranslatorNode(Node):
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, bare_topic, 10)
+            pub = self.create_publisher(t, bare_topic)
             self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
-            self.create_subscription(t, prefix_topic, translator, 10)
+            self.create_subscription(t, prefix_topic, translator)
         for topic in robot_input_topics:
             prefix_topic = prefix + topic
             bare_topic = topic
@@ -41,11 +41,11 @@ class PrefixTranslatorNode(Node):
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, prefix_topic, 10)
+            pub = self.create_publisher(t, prefix_topic)
             self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
-            self.create_subscription(t, bare_topic, translator, 10)
+            self.create_subscription(t, bare_topic, translator)
         self.get_logger().info(f"Translator finished initialising")
 
 def main():
