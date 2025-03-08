@@ -36,7 +36,7 @@ class PathfindingNode(Node):
         self.map = None
         self.position_history: List[Position] = []
         self.main_loop_timer = self.create_timer(0.1, self.navigate)
-        self.command_movement = self.create_publisher(Twist, f"${prefix}/cmd_vel", 10)
+        self.command_movement = self.create_publisher(Twist, f"{prefix}/cmd_vel", 10)
         self.create_subscription(PositionHistory, "/position_history", self.position_callback, 10)
         self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
         self.get_logger().info("Pathfinding node initialized")
