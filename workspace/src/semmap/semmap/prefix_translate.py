@@ -24,20 +24,19 @@ class PrefixTranslatorNode(Node):
         for topic in robot_output_topics:
             prefix_topic = topic
             bare_topic = topic[len(prefix):]
-            self.transfer_messages(prefix_topic, bare_topic)
+            self.transfer_messages(prefix_topic, bare_topic, ref_topic=prefix_topic)
         for topic in robot_input_topics:
             prefix_topic = prefix + topic
             bare_topic = topic
-            self.transfer_messages(bare_topic, prefix_topic)
+            self.transfer_messages(bare_topic, prefix_topic, ref_topic=prefix_topic)
         self.get_logger().info(f"Translator finished initialising")
 
-    def transfer_messages(self, from_topic, to_topic):
-
-        topic_type_process = run(["ros2", "topic", "type", from_topic], capture_output=True, text=True)
+    def transfer_messages(self, from_topic, to_topic, ref_topic):
+        topic_type_process = run(["ros2", "topic", "type", ref_topic], capture_output=True, text=True)
         info = topic_type_process.stdout.splitlines()[0]
         message_type = info.split('/')
         t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-        topic_info_process = run(["ros2", "topic", "info", from_topic, "-v"], capture_output=True, text=True)
+        topic_info_process = run(["ros2", "topic", "info", ref_topic, "-v"], capture_output=True, text=True)
         try:
             reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
             reliability = reliability_line.split()[-1]
