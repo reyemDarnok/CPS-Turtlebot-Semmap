@@ -8,6 +8,7 @@ from rclpy.qos import ReliabilityPolicy
 import rclpy
 import sys
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 
 robot_input_topics = ["/cmd_audio", "/cmd_lightring", "/cmd_vel", ]
 class PrefixTranslatorNode(Node):
@@ -36,22 +37,34 @@ class PrefixTranslatorNode(Node):
         info = topic_type_process.stdout.splitlines()[0]
         message_type = info.split('/')
         t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-        topic_info_process = run(["ros2", "topic", "info", ref_topic, "-v"], capture_output=True, text=True)
-        try:
-            reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
-            reliability = reliability_line.split()[-1]
-            reliability = getattr(ReliabilityPolicy, reliability)
-        except IndexError:
-            reliability = "BEST_EFFORT"
-            self.get_logger.info(f'Failed to read reliability of {ref_topic}, assuming BEST_EFFORT')
-        pub = self.create_publisher(t, to_topic, reliability)
+        #topic_info_process = run(["ros2", "topic", "info", ref_topic, "-v"], capture_output=True, text=True)
+        #try:
+        #    reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
+        #    reliability = reliability_line.split()[-1]
+        #    reliability = getattr(ReliabilityPolicy, reliability)
+        #except IndexError:
+        #    reliability = "BEST_EFFORT"
+        #    self.get_logger.info(f'Failed to read reliability of {ref_topic}, assuming BEST_EFFORT')
+        qos_policy_sub = qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+        qos_policy_pub = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+        pub = self.create_publisher(t, to_topic, qos_policy_pub)
         self.translate_publishers.append(pub)
 
         def translator(msg):
             pub.publish(msg)
 
-        self.create_subscription(t, from_topic, translator, reliability)
-        self.get_logger().info(f"Translating from {from_topic} to {to_topic} with qos {reliability}")
+        self.create_subscription(t, from_topic, translator, qos_policy_sub)
+        self.get_logger().info(f"Translating from {from_topic} to {to_topic} ")
 
 
 def main():
