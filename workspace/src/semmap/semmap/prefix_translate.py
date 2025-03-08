@@ -32,20 +32,23 @@ class PrefixTranslatorNode(Node):
         self.get_logger().info(f"Translator finished initialising")
 
     def transfer_messages(self, from_topic, to_topic):
-        topic_type_process = run(["ros2", "topic", "type", from_topic], capture_output=True, text=True)
-        info = topic_type_process.stdout.splitlines()[0]
-        message_type = info.split('/')
-        t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-        topic_info_process = run(["ros2", "topic", "info", from_topic, "-v"], capture_output=True, text=True)
-        reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
-        reliability = reliability_line.split()[-1]
-        pub = self.create_publisher(t, to_topic, getattr(ReliabilityPolicy, reliability))
-        self.translate_publishers.append(pub)
+        try:
+            topic_type_process = run(["ros2", "topic", "type", from_topic], capture_output=True, text=True)
+            info = topic_type_process.stdout.splitlines()[0]
+            message_type = info.split('/')
+            t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
+            topic_info_process = run(["ros2", "topic", "info", from_topic, "-v"], capture_output=True, text=True)
+            reliability_line = [line for line in topic_info_process.stdout.splitlines() if line.startswith("  Reliability")][0]
+            reliability = reliability_line.split()[-1]
+            pub = self.create_publisher(t, to_topic, getattr(ReliabilityPolicy, reliability))
+            self.translate_publishers.append(pub)
 
-        def translator(msg):
-            pub.publish(msg)
+            def translator(msg):
+                pub.publish(msg)
 
-        self.create_subscription(t, from_topic, translator, getattr(ReliabilityPolicy, reliability))
+            self.create_subscription(t, from_topic, translator, getattr(ReliabilityPolicy, reliability))
+        except Exception as e:
+            self.get_logger().warn(f"Failed to translate from {from_topic} to {to_topic}: {e}")
 
 
 def main():
