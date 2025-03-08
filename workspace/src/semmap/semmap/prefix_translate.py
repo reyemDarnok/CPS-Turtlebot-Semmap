@@ -9,15 +9,7 @@ import rclpy
 import sys
 from rclpy.node import Node
 
-@dataclass
-class Position:
-    x: float
-    y: float
-    rotation: float
-    timestamp: float
-
-resolution = 0.05
-time_resolution = 0.1
+robot_input_topics = ["cmd_audio", "cmd_lightring", "cmd_vel", ]
 class PrefixTranslatorNode(Node):
     """
     A node to manage the position information of the robot
@@ -25,18 +17,27 @@ class PrefixTranslatorNode(Node):
     def __init__(self, prefix="") -> None:
         super().__init__("PrefixTranslator")
         self.publishers = []
-        topic_list_process = run(["ros2", "topic", "list"], capture_output=True, text=True)
-        topics = topic_list_process.stdout.splitlines()
-        for topic in topics:
+        p = run(["ros2", "topic", "list"], capture_output=True, text=True)
+        topics = p.stdout.splitlines()
+        robot_output_topics = [topic for topic in topics if topic.startswith(prefix) and topic[len(prefix):] not in robot_input_topics]
+        for topic in robot_output_topics:
+            topic_info_process = run(["ros2", "topic", "info", prefix + topic], capture_output=True, text=True)
+            info = topic_info_process.stdout.splitlines()[0]
+            message_type = info[len("Type: "):]
+            t = __import__(message_type.replace("/", "."))
+            pub = self.create_publisher(t, topic, 10)
+            def translator(msg):
+                pub.publish(msg)
+            self.create_subscription(t, prefix + topic, translator, 10)
+        for topic in robot_input_topics:
             topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):]
             t = __import__(message_type.replace("/", "."))
-            if topic.startswith(prefix):
-                pub = self.create_publisher(t, topic[len(prefix):], 10)
-                def translator(msg):
-                    pub.publish(msg)
-                self.create_subscription(t, topic, translator, 10)
+            pub = self.create_publisher(t, prefix + topic, 10)
+            def translator(msg):
+                pub.publish(msg)
+            self.create_subscription(t, topic, translator, 10)
 
 def main():
     rclpy.init()
