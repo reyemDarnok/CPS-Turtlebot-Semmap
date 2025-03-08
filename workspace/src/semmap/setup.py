@@ -27,6 +27,7 @@ setup(
             'position_history = semmap.position_history:main',
             'semantic_map = semmap.semantic_map:main',
             'pathfinder_direct = semmap.pathfinding_direct:main',
+            'translator = semmap.prefix_translate:main',
 
         ],
     },
