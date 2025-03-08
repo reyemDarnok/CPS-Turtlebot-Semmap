@@ -9,7 +9,7 @@ import rclpy
 import sys
 from rclpy.node import Node
 
-robot_input_topics = ["cmd_audio", "cmd_lightring", "cmd_vel", ]
+robot_input_topics = ["/cmd_audio", "/cmd_lightring", "/cmd_vel", ]
 class PrefixTranslatorNode(Node):
     """
     A node to manage the position information of the robot
@@ -22,26 +22,31 @@ class PrefixTranslatorNode(Node):
         robot_output_topics = [topic for topic in topics if topic.startswith(prefix) and topic[len(prefix):] not in robot_input_topics]
         self.get_logger().info(f"{robot_output_topics=}")
         for topic in robot_output_topics:
-            topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
+            prefix_topic = topic[len(prefix):]
+            bare_topic = topic
+            topic_info_process = run(["ros2", "topic", "info", prefix_topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, topic[len(prefix):], 10)
+            pub = self.create_publisher(t, bare_topic, 10)
             self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
-            self.create_subscription(t, topic, translator, 10)
+            self.create_subscription(t, prefix_topic, translator, 10)
         for topic in robot_input_topics:
+            prefix_topic = prefix + topic
+            bare_topic = topic
             self.get_logger().info(f"{topic=}")
-            topic_info_process = run(["ros2", "topic", "info", topic], capture_output=True, text=True)
+            topic_info_process = run(["ros2", "topic", "info", prefix_topic], capture_output=True, text=True)
             info = topic_info_process.stdout.splitlines()[0]
             message_type = info[len("Type: "):].split('/')
             t = getattr(__import__('.'.join(message_type[:-1]), fromlist=[message_type[-1]]), message_type[-1])
-            pub = self.create_publisher(t, topic[len(prefix):], 10)
+            pub = self.create_publisher(t, prefix_topic, 10)
             self.translate_publishers.append(pub)
             def translator(msg):
                 pub.publish(msg)
-            self.create_subscription(t, topic, translator, 10)
+            self.create_subscription(t, bare_topic, translator, 10)
+        self.get_logger().info(f"Translator finished initialising")
 
 def main():
     rclpy.init()
