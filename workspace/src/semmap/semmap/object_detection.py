@@ -47,8 +47,8 @@ class ObjectDetectionNode(Node):
             conf = box.conf[0].cpu().numpy()
             class_idx = box.cls[0].cpu().numpy()
 
-            if conf < 0.5:
-                continue
+            #if conf < 0.5:
+            #    continue
 
             x = int(x_center - width / 2)
             y = int(y_center - height / 2)
@@ -58,6 +58,7 @@ class ObjectDetectionNode(Node):
             depth = self.get_depth(int(x_center), int(y_center))
 
             if depth is not None:
+                print(f"depth is {depth=}")
                 obj_msg.distance = depth
                 obj_msg.angle = self.calculate_angle(int(x_center), w)
                 obj_msg.elevation = self.calculate_elevation(int(y_center), h, obj_msg.distance)
@@ -80,7 +81,7 @@ class ObjectDetectionNode(Node):
     def get_depth(self, x, y):
         if self.depth_data is None:
             return None
-        depth =  self.depth_data[y, x]  #in meters
+        depth =  self.depth_data[x, y]  #in meters
         if np.isnan(depth) or depth <= 0:
             return None
         return depth
