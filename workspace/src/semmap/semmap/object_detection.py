@@ -48,8 +48,8 @@ class ObjectDetectionNode(Node):
             conf = box.conf[0].numpy()
             class_idx = box.cls[0].numpy()
 
-            if conf < 0.5:
-                continue
+            #if conf < 0.5:
+            #    continue
 
             obj_msg = Object()
             obj_msg.tag = self.model.names[int(class_idx)]
