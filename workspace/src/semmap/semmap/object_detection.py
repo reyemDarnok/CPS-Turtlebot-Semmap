@@ -43,23 +43,21 @@ class ObjectDetectionNode(Node):
 
         h, w = frame.shape[:2]
         for box in results[0].boxes:
-            x_center, y_center, width, height = box.xywh[0].cpu().numpy()
-            conf = box.conf[0].cpu().numpy()
-            class_idx = box.cls[0].cpu().numpy()
+            x_center, y_center, width, height = box.xywh[0].numpy()
+            x1, y1, x2, y2 = box.xyxy[0].numpy()
+            conf = box.conf[0].numpy()
+            class_idx = box.cls[0].numpy()
 
-            #if conf < 0.5:
-            #    continue
-
-            x = int(x_center - width / 2)
-            y = int(y_center - height / 2)
+            if conf < 0.5:
+                continue
 
             obj_msg = Object()
             obj_msg.tag = self.model.names[int(class_idx)]
-            depth = self.get_depth(int(x_center), int(y_center))
+            depth = self.get_depth(int(x1), int(y1), int(x2), int(y2))
 
             if depth is not None:
                 print(f"depth is {depth=}")
-                obj_msg.distance = depth
+                obj_msg.distance = float(depth)
                 obj_msg.angle = self.calculate_angle(int(x_center), w)
                 obj_msg.elevation = self.calculate_elevation(int(y_center), h, obj_msg.distance)
 
@@ -78,13 +76,12 @@ class ObjectDetectionNode(Node):
         except Exception as e:
             self.get_logger().error(f"Error converting depth image: {e}")
 
-    def get_depth(self, x, y):
+    def get_depth(self, x1, y1, x2, y2):
         if self.depth_data is None:
             return None
-        depth =  self.depth_data[x, y]  #in meters
-        if np.isnan(depth) or depth <= 0:
-            return None
-        return depth
+        depth_points = [d for d in self.depth_data[x1:x2, y1:y2]]
+        depth_points.sort()
+        return depth_points[len(depth_points) // 2]
 
     def calculate_angle(self, center_x, width):
         center_x_normalized = (center_x / width) * 2 - 1
