@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
+import random
 from typing import List, Tuple, Dict, Optional
 
 import rclpy
+import setuptools.namespaces
 from rclpy.node import Node
 from semmap_interfaces.msg import Object
 from semmap_interfaces.msg import Position
 from semmap_interfaces.srv import SemanticMap
+from  visualization_msgs.msg import Marker
 import math
 
 from workspace.src.semmap.semmap.movementTask import angle_between_vectors
@@ -22,9 +25,10 @@ class ObjectPosition:
 class SemObject:
     tag: str
     position: ObjectPosition
+    id: int
 
 class SemanticMapNode(Node):
-    def __init__(self):
+    def __init__(self, prefix: str):
         super().__init__('semantic_map_node')
 
         self.object_list: List[SemObject] = []
@@ -42,6 +46,9 @@ class SemanticMapNode(Node):
         self.create_service(
             SemanticMap, '/get_semantic_map', self.handle_get_semantic_map_request
         )
+
+        self.marker_pub = self.create_publisher(Marker, f'{prefix}/marker', 10) #TODO rviz topic
+
 
         self.get_logger().info("Semantic Map Node Initialized")
 
@@ -83,7 +90,7 @@ class SemanticMapNode(Node):
 
         #convert local robot-relative coordinates to global map-relative coordinates
         global_x, global_y = self.to_global_coordinates(local_x, local_y)
-        sem_object = SemObject(tag=msg.tag,position=ObjectPosition(global_x, global_y, z))
+        sem_object = SemObject(tag=msg.tag,position=ObjectPosition(global_x, global_y, z), id=random.randint())
 
         old_object = self._find_eq_object(sem_object)
         if old_object is None:
@@ -94,12 +101,66 @@ class SemanticMapNode(Node):
             average_pos = ObjectPosition(x=(old_object.position.x + sem_object.position.x) / 2,
                                          y=(old_object.position.y + sem_object.position.y) / 2,
                                          elevation=(old_object.position.elevation + sem_object.position.elevation) / 2,)
-            new_object = SemObject(tag=old_object.tag,position=average_pos)
+            new_object = SemObject(tag=old_object.tag,position=average_pos, id=old_object.id)
             self.object_list.append(new_object)
             self.recent_objects.pop(old_object)
             self.recent_objects[new_object] = datetime.now()
+            self.update_map_marker(new_object)
 
         self.get_logger().info(f"Object added to Map: {msg.tag} at ({global_x}, {global_y}, {z})")
+
+    def update_map_marker(self, to_mark: SemObject):
+        self.remove_map_marker(to_mark)
+        self.add_map_marker(to_mark)
+
+    def remove_map_marker(self, to_mark: SemObject):
+        marker = self._create_basic_marker("/objects", to_mark.id)
+        marker_label = self._create_basic_marker("/object_labels", to_mark.id)
+        marker.action = Marker.DELETE
+        marker_label.action = Marker.DELETE
+        self.marker_pub.publish(marker)
+        self.marker_pub.publish(marker_label)
+
+    def add_map_marker(self, to_mark: SemObject):
+        marker = self._create_basic_marker("/objects", to_mark.id)
+        marker_label = self._create_basic_marker("/object_labels", to_mark.id)
+        marker.pose.position.x = to_mark.position.x
+        marker.pose.position.y = to_mark.position.y
+        marker.pose.position.z = to_mark.position.elevation
+        marker_label.pose.position.x = to_mark.position.x
+        marker_label.pose.position.y = to_mark.position.y
+        marker_label.pose.position.z = to_mark.position.elevation + 1
+        marker_label.text = to_mark.tag
+        marker_label.type = Marker.TEXT_VIEW_FACING
+        self.marker_pub.publish(marker)
+        self.marker_pub.publish(marker_label)
+
+    def _create_basic_marker(self, namespace: str, id: int):
+        marker = Marker()
+
+        marker.header.frame_id = "/my_frame"
+        marker.header.stamp = self.get_clock().now().to_msg()
+
+        marker.ns = namespace
+        marker.id = id
+
+        marker.type = Marker.SPHERE
+
+        marker.action = Marker.ADD # ADD
+
+        marker.pose.position.x = 0
+        marker.pose.position.y = 0
+        marker.pose.position.z = 0
+
+        marker.scale.x = 0.1
+        marker.scale.y = 0.1
+        marker.scale.z = 0.1
+
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+        marker.color.a = 1.0
+        return marker
 
     def _find_eq_object(self, sem_object: SemObject) -> Optional[SemObject]:
         for obj in self.object_list:

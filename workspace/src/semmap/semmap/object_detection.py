@@ -79,7 +79,8 @@ class ObjectDetectionNode(Node):
     def get_depth(self, x1, y1, x2, y2):
         if self.depth_data is None:
             return None
-        depth_points = [d for d in self.depth_data[x1:x2, y1:y2]]
+        depth_points = [point for row in self.depth_data[x1:x2, y1:y2] for point in row]
+        print(len(depth_points))
         depth_points.sort()
         return depth_points[len(depth_points) // 2]
 
