@@ -48,8 +48,8 @@ class ObjectDetectionNode(Node):
             conf = box.conf[0].numpy()
             class_idx = box.cls[0].numpy()
 
-            #if conf < 0.5:
-            #    continue
+            if conf < 0.5:
+                continue
 
             obj_msg = Object()
             obj_msg.tag = self.model.names[int(class_idx)]
@@ -78,6 +78,7 @@ class ObjectDetectionNode(Node):
 
     def get_depth(self, x1, y1, x2, y2):
         if self.depth_data is None:
+
             return None
         depth_points = [point for row in self.depth_data[x1:x2, y1:y2] for point in row]
         print(len(depth_points))
