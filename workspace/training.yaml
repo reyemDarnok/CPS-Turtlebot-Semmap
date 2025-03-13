@@ -1,0 +1,26 @@
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: turtlebot_perspective # dataset root dir
+train: images # train images (relative to 'path') 128 images
+val: images # val images (relative to 'path') 128 images
+test: # test images (optional)
+
+# Classes (80 COCO classes)
+names:
+  0: AgileBot
+  1: Cable Port
+  2: Cabling
+  3: Cardboard Box
+  4: Chair
+  5: Computer
+  6: Desk
+  7: Desk Leg
+  8: Dock
+  9: Door
+  10: Electrical Outlet
+  11: Fire Extinguisher
+  12: Laptop
+  13: Monitor
+  14: Suitcase
+  15: Turtlebot
+  16: Wardrobe
+  17: Wastebin

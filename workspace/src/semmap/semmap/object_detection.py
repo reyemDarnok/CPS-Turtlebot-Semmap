@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from pathlib import Path
 
 from inference import get_model
 import rclpy
@@ -22,7 +23,7 @@ class ObjectDetectionNode(Node):
         )
         self.object_pub = self.create_publisher(Object, '/detected_objects', 10)
 
-        self.model = get_model(model_id="furniture-npgea")#YOLO("yolov8s.pt")
+        self.model = YOLO(Path(__file__, '..', '..',"trained.pt").absolute().__str__())# get_model(model_id="furniture-npgea")#YOLO("yolov8s.pt")
         self.horizontal_fov = 68#81  #check if its correct values of our turtlebot!!!
         self.vertical_fov = 68#52 #check if its correct values of our turtlebot!!!
         self.depth_data = None
