@@ -33,9 +33,16 @@ USER $USERNAME
 WORKDIR "/home/$USERNAME"
 COPY bashrc.sh .bashrc
 COPY requirements.txt requirements.txt
-RUN git clone https://github.com/leonhartyao/gazebo_models_worlds_collection.git
-RUN pip install -r requirements.txt
 COPY --chmod=755 setup.sh setup.sh
+COPY --chmod=755 unzipper.sh unzipper.sh
+USER root
+RUN chown "$USERNAME" .bashrc requirements.txt setup.sh unzipper.sh
+USER $USERNAME
+RUN git clone https://github.com/leonhartyao/gazebo_models_worlds_collection.git
+RUN git clone https://github.com/mlherd/Dataset-of-Gazebo-Worlds-Models-and-Maps.git && \
+    ./unzipper.sh
+
+RUN pip install -r requirements.txt
 
 HEALTHCHECK CMD test -f /home/rosuser/initial_install_complete
 ENTRYPOINT ["/home/rosuser/setup.sh"]
