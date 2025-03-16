@@ -9,7 +9,7 @@ def main():
     container_name = "roscontainer"
     dclient = docker.from_env()
     cwd = Path.cwd().absolute()
-    run(["docker", "build", "-t", image_name, (cwd / "docker").absolute().__str__()])
+    run(["docker", "build", "--no-cache", "-t", image_name, (cwd / "docker").absolute().__str__()])
     #dclient.images.build(path=(cwd / "docker").absolute().__str__(), tag=image_name, pull=True)
     try:
         dclient.containers.get(container_name).remove(force=True)

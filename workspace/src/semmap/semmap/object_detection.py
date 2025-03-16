@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from inference import get_model
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -19,11 +18,12 @@ class ObjectDetectionNode(Node):
             Image, f'{prefix}/oakd/rgb/preview/image_raw', self.image_callback, 10
         )
         self.depth_sub = self.create_subscription(
-            Image, f'{prefix}/oakd/rgb/preview/image_ra2/compressedDepth', self.depth_callback, 10
+            Image, f'{prefix}/oakd/rgb/preview/depth', self.depth_callback, 10
         )
         self.object_pub = self.create_publisher(Object, '/detected_objects', 10)
 
-        self.model = YOLO(Path(__file__, '..', '..',"trained.pt").absolute().__str__())# get_model(model_id="furniture-npgea")#YOLO("yolov8s.pt")
+        self.model = YOLO((Path(__file__).parent / '..' / '..' / '..' / "trained.pt").absolute().__str__())# get_model(model_id="furniture-npgea")#YOLO("yolov8s.pt")
+
         self.horizontal_fov = 68#81  #check if its correct values of our turtlebot!!!
         self.vertical_fov = 68#52 #check if its correct values of our turtlebot!!!
         self.depth_data = None

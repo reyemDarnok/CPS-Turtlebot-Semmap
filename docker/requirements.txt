@@ -4,4 +4,3 @@ ultralytics~=8.3.61
 docker~=7.1.0
 setuptools==68 # newer versions fail for colcon
 scipy~=1.15.1
-inference

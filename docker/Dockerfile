@@ -7,12 +7,20 @@ ARG GID=1000
 
 VOLUME "/home/$USERNAME/workspace"
 
+RUN apt update && apt install wget && \
+    sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' && \
+    wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add - && \
+    apt update && apt install -y ignition-fortress
+
 # Keep Image updated
 RUN apt update && \
     apt upgrade -y
 
+RUN apt install -y apt-transport-https
+
 # Install helper packages
-RUN apt install -y vim python3-pip wget
+RUN apt install -y wget python3-pip ros-humble-turtlebot4-simulator ros-humble-irobot-create-nodes nano
+RUN apt update && apt upgrade -y
 
 # Create User
 RUN useradd --uid $UID --create-home --shell /bin/bash rosuser && \
@@ -25,6 +33,7 @@ USER $USERNAME
 WORKDIR "/home/$USERNAME"
 COPY bashrc.sh .bashrc
 COPY requirements.txt requirements.txt
+RUN git clone https://github.com/leonhartyao/gazebo_models_worlds_collection.git
 RUN pip install -r requirements.txt
 COPY --chmod=755 setup.sh setup.sh
 
