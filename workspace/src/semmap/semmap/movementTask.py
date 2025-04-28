@@ -136,7 +136,6 @@ class RotationTask(MovementTask):
         self.first_run = True
 
     def execute(self):
-        return # TODO debug option - undo
         self.pathfinding.get_logger().info('Executing RotationTask')
         tolerance = 1 * math.pi / 180
         # be verbose in first run to log initial angle offset (and calculation)
@@ -150,13 +149,13 @@ class RotationTask(MovementTask):
         elif angle_offset > 0:
             # right spin
             twist = spin_twist()
-            twist.angular.z = 0.1
+            twist.angular.z = -0.1
             self.pathfinding.command_movement.publish(twist)
 
         else:
             # left spin
             twist = spin_twist()
-            twist.angular.z = -0.1
+            twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
 
 
@@ -259,14 +258,13 @@ class ExploreTask(MovementTask):
                 try:
                     self.pathfinding.get_logger().info(f"Trying {candidate}")
                     movement_task = AbsoluteMovementTask(self.pathfinding, candidate)
-                    print("Task created")
                     self.task = movement_task
-                    self.pathfinding.get_logger().info(f'Created Navigation to {candidate}')
                     return
                 except ImpossibleRouteException:
                     print("route impossible")
                     pass
         # no interesting nodes can be reached - finished exploring
+        exit(5)
         self._finished = True
 
 class RevisitTask(MovementTask):
@@ -366,7 +364,6 @@ class AbsoluteMovementTask(MovementTask):
         self.pathfinding.get_logger().info("Finding path")
         try:
             current_pos = self.pathfinding.get_current_position()
-            self.target_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x + 1)] # TODO remove debug option
             self.pathfinding.get_logger().info(f'Creating movement towards {self.target_node}')
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
@@ -374,17 +371,17 @@ class AbsoluteMovementTask(MovementTask):
 
         astar_map = AstarMap(self.pathfinding.map, current_pos, self.pathfinding.get_logger())
         end_node = astar_map.run_astar(self.target_node)
-        print("Ran astar")
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
-        current_node = end_node
-        path = []
+        current_pos_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x)]
+        traversal_node = end_node
+        while not self.pathfinding.map.has_line_of_sight(current_pos_node, traversal_node):
+            if traversal_node.predecessor is not None:
+                traversal_node = traversal_node.predecessor
+            else:
+                raise ImpossibleRouteException("No line of sight to path found")
+        #path = []
         # trace the path from the target node to the current node
-        while current_node.predecessor is not None:
-            path = [current_node] + path
-            current_node = current_node.predecessor
-        print(path)
-        self.pathfinding.destroy_node()
-        self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
+        self.pathfinding.get_logger().info(f"Moving towards {traversal_node}")
         self.task_list = [SlamSpinTask(self.pathfinding),
-                          ForwardTask(self.pathfinding, path[0].node),
-                          RotationTask(self.pathfinding, path[0].node)]
+                          ForwardTask(self.pathfinding, traversal_node.node),
+                          RotationTask(self.pathfinding, traversal_node.node)]

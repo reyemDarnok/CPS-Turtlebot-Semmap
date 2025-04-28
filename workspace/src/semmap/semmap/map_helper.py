@@ -1,5 +1,6 @@
 import logging
 from itertools import product
+from math import floor
 from typing import List
 
 obstruction_threshold = 0.65
@@ -31,6 +32,21 @@ class AreaMap:
         for node in self.all_nodes():
             node.post_init()
 
+    def has_line_of_sight(self, start, end) -> bool:
+        nodes_between = []
+        x_diff = end.x - start.x
+        if x_diff == 0:
+            x_diff = 1
+        slope = (start.y - end.y) / x_diff
+        current_y = start.y
+        x_direction = 1 if end.x > start.x else -1
+        y_direction = 1 if end.y > start.y else -1
+        for x in range(start.x, end.x + x_direction, x_direction):
+            for y in range(floor(current_y), floor(current_y + slope) + y_direction, y_direction):
+                nodes_between.append(self[y][x])
+            current_y += slope
+        los_free = not any(node.obstructed for node in nodes_between)
+        return los_free
 
     def all_nodes(self):
         """Returns all nodes in the map, row by row"""
