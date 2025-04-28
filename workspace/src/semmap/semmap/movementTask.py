@@ -2,6 +2,7 @@ import math
 from abc import abstractmethod, abstractproperty
 import datetime
 from random import choice, shuffle
+import random
 
 import numpy as np
 from geometry_msgs.msg import Twist
@@ -135,6 +136,7 @@ class RotationTask(MovementTask):
         self.first_run = True
 
     def execute(self):
+        self.pathfinding.get_logger().info('Executing RotationTask')
         tolerance = 1 * math.pi / 180
         # be verbose in first run to log initial angle offset (and calculation)
         angle_offset = self.get_angle_offset(self.to_align_node, verbose=self.first_run)
@@ -187,22 +189,35 @@ class SlamSpinTask(MovementTask):
     """
     def __init__(self, pathfinding):
         super().__init__(pathfinding)
+        self.target_rotation = random.uniform(- math.pi, math.pi)
         self.started_spin_at = None
 
     def execute(self):
-        # if not yet spinning for 2 seconds, start spinning
-        if (self.started_spin_at is None
-                or self.started_spin_at + datetime.timedelta(seconds=2) > datetime.datetime.now()):
-            self.stop()
-            twist = move_twist()
-            self.pathfinding.command_movement.publish(twist)
-            # set start of spinning if not yet set, only happens on first run
-            if self.started_spin_at is None:
-                self.started_spin_at = datetime.datetime.now()
-        else:
-            # if spun for 2 seconds, stop
-            self.stop()
+        try:
+            current_position = self.pathfinding.get_current_position()
+        except ValueError:
+            # system not yet ready
+            self.pathfinding.get_logger().info('Position not yet known')
+            raise
+        current_angle = current_position.rotation % (2 * math.pi)
+        angle_offset = (current_angle - self.target_rotation) % (2 * math.pi)
+        tolerance = 1 * math.pi / 180
+        if - tolerance < angle_offset < tolerance:
+            # offset is within tolerance - finished
             self._finished = True
+            self.pathfinding.get_logger().info("Stopped spin")
+            self.stop()
+        elif angle_offset > 0:
+            # right spin
+            twist = spin_twist()
+            twist.angular.z = 0.1
+            self.pathfinding.command_movement.publish(twist)
+
+        else:
+            # left spin
+            twist = spin_twist()
+            twist.angular.z = -0.1
+            self.pathfinding.command_movement.publish(twist)
 
 
 class ExploreTask(MovementTask):
@@ -224,7 +239,10 @@ class ExploreTask(MovementTask):
                 return  # System not yet initialized
             # all nodes that are nearby unknown nodes, useful for investigating the above
             candidates = list(node for node in self.pathfinding.map.all_nodes() if
-                              not node.obstructed and (0 <= node.obstruction < free_threshold))
+                              not node.obstructed and node.neighbors_unknown and not node.complete_unknown)
+            print(candidates)
+            print(len(candidates))
+            print(self.pathfinding.map.height * self.pathfinding.map.width)
             candidates = [candidate for candidate in candidates if any(
                 (free_threshold <= neighbor.obstruction <= obstruction_threshold)
                 or neighbor.complete_unknown
@@ -238,13 +256,14 @@ class ExploreTask(MovementTask):
             # Try navigating near target nodes
             for candidate in candidates:
                 try:
+                    self.pathfinding.get_logger().info(f"Trying {candidate}")
                     movement_task = AbsoluteMovementTask(self.pathfinding, candidate)
+                    print("Task created")
                     self.task = movement_task
                     self.pathfinding.get_logger().info(f'Created Navigation to {candidate}')
                     return
                 except ImpossibleRouteException:
-                    self.task = RotationTask(self.pathfinding, area_map[0][0])
-                    return
+                    pass
         # no interesting nodes can be reached - finished exploring
         self._finished = True
 
@@ -341,12 +360,15 @@ class AbsoluteMovementTask(MovementTask):
         """
         Find the path to the target node and create subtasks to navigate there
         """
+        self.pathfinding.get_logger().info("Finding path")
         try:
             current_pos = self.pathfinding.get_current_position()
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
-            return
+            raise
+
         astar_map = AstarMap(self.pathfinding.map, current_pos, self.pathfinding.get_logger())
+
         end_node = astar_map.run_astar(self.target_node)
 
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
@@ -356,6 +378,8 @@ class AbsoluteMovementTask(MovementTask):
         while current_node.predecessor is not None:
             path = [current_node] + path
             current_node = current_node.predecessor
+        print(path)
+        self.pathfinding.destroy_node()
         self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
         # path[0] is current, path[1] is next in sequence
         self.task_list = [SlamSpinTask(self.pathfinding),

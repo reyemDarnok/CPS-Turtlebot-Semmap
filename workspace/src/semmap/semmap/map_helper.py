@@ -32,6 +32,7 @@ class AreaMap:
             node.post_init()
 
 
+
     def all_nodes(self):
         """Returns all nodes in the map, row by row"""
         return [x for row in self.node_2d for x in row]
@@ -74,13 +75,14 @@ class AreaNode:
         self.neighbors = []
         self.logger = logger
 
-    def __str__(self):
+    def __repr__(self):
         return f"{self.x}/{self.y}"
 
     def post_init(self):
         """Checks the nodes surroundings after all nodes have been created"""
         self.obstructed = self.is_obstruction_within(bot_size)
         self.neighbors = self.nodes_in_range(1)
+        self.neighbors_unknown = self.is_unknown_within(bot_size)
 
 
 
@@ -91,6 +93,9 @@ class AreaNode:
         :return: if any of the considered nodes were obstructed
         """
         return any(node.obstruction > obstruction_threshold for node in self.nodes_in_range(search_distance))
+
+    def is_unknown_within(self, search_distance: int) -> bool:
+        return any(node.complete_unknown for node in self.nodes_in_range(search_distance))
 
     def nodes_in_range(self, search_distance):
         """

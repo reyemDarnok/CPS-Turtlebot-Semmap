@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 rosdep update
 rosdep install --from-paths src --ignore-src -r --rosdistro humble -y
-colcon build
+colcon build --symlink-install
 source install/setup.bash
