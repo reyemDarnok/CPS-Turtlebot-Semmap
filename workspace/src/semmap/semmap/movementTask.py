@@ -49,33 +49,37 @@ class MovementTask:
         :param verbose: Whether to log
         :return: The offset in radians
         """
+        # angle 0 = +x
+        # angle pi/-pi = -x
+        # angle -1/2pi = -y
+        # angle 1/2pi = y
         try:
             current_position = self.pathfinding.get_current_position()
         except ValueError:
             # system not yet ready
             self.pathfinding.get_logger().info('Position not yet known')
             raise
-        current_angle = current_position.rotation % (2 * math.pi)
-        if verbose:
-            self.pathfinding.get_logger().info('Current angle: %f' % current_angle)
-        # find the vector between the current position and the target
-        goal_vector = (int(node.x) - current_position.x, int(node.y) - current_position.y)
-        if verbose:
-            self.pathfinding.get_logger().info(f'Goal vector: {goal_vector}')
-        # find the angle between x-axis and goal_vector
-        vector_angle = angle_between_vectors((1,0), goal_vector)
-        vector_angle = vector_angle % (2 * math.pi)
-        if verbose:
-            self.pathfinding.get_logger().info('Target angle: %f' % vector_angle)
-        # find difference between vectors
-        if vector_angle > current_angle:
-            vector_angle += 2 * math.pi
-        angle_difference = vector_angle - current_angle
-        if angle_difference > math.pi:
-            angle_difference = - (2 * math.pi - angle_difference)
-        if verbose:
-            self.pathfinding.get_logger().info('Angle difference: %f' % angle_difference)
-        return angle_difference
+        current_angle = - current_position.rotation
+        target_vector = node.x - current_position.x, node.y - current_position.y
+        target_angle = math.atan2(target_vector[1], target_vector[0])
+        # right turn offset
+        right_turn_current = current_angle
+        right_turn_target = target_angle
+        if right_turn_current < right_turn_target:
+            right_turn_current += 2 * math.pi
+        right_offset = right_turn_current - right_turn_target
+
+        # left turn offset
+        left_turn_current = current_angle
+        left_turn_target = target_angle
+        if left_turn_target < left_turn_current:
+            left_turn_target += 2 * math.pi
+        left_offset = left_turn_target - left_turn_current
+
+        if right_offset < left_offset:
+            return - right_offset
+        else:
+            return left_offset
 
     def stop(self):
         """
@@ -136,10 +140,10 @@ class RotationTask(MovementTask):
         self.first_run = True
 
     def execute(self):
-        self.pathfinding.get_logger().info('Executing RotationTask')
         tolerance = 1 * math.pi / 180
         # be verbose in first run to log initial angle offset (and calculation)
         angle_offset = self.get_angle_offset(self.to_align_node, verbose=self.first_run)
+        print(angle_offset)
         self.first_run = False
         if - tolerance < angle_offset < tolerance:
             # offset is within tolerance - finished
@@ -231,6 +235,7 @@ class ExploreTask(MovementTask):
     def execute(self):
         if (self.task is not None) and (not self.task.finished()):
             self.task.execute()
+            return
         else:
             self.pathfinding.get_logger().info("Executing explore task")
             area_map = self.pathfinding.map
