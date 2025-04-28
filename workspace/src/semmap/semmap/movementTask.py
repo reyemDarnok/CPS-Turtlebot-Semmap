@@ -59,7 +59,7 @@ class MovementTask:
             # system not yet ready
             self.pathfinding.get_logger().info('Position not yet known')
             raise
-        current_angle = - current_position.rotation
+        current_angle = current_position.rotation
         target_vector = node.x - current_position.x, node.y - current_position.y
         target_angle = math.atan2(target_vector[1], target_vector[0])
         # right turn offset
@@ -69,17 +69,20 @@ class MovementTask:
             right_turn_current += 2 * math.pi
         right_offset = right_turn_current - right_turn_target
 
+
         # left turn offset
         left_turn_current = current_angle
         left_turn_target = target_angle
         if left_turn_target < left_turn_current:
             left_turn_target += 2 * math.pi
         left_offset = left_turn_target - left_turn_current
+        print("Right turn offset:", right_offset)
+        print("Left turn offset:", left_offset)
 
         if right_offset < left_offset:
-            return - right_offset
+            return right_offset
         else:
-            return left_offset
+            return - left_offset
 
     def stop(self):
         """
@@ -143,7 +146,6 @@ class RotationTask(MovementTask):
         tolerance = 1 * math.pi / 180
         # be verbose in first run to log initial angle offset (and calculation)
         angle_offset = self.get_angle_offset(self.to_align_node, verbose=self.first_run)
-        print(angle_offset)
         self.first_run = False
         if - tolerance < angle_offset < tolerance:
             # offset is within tolerance - finished
