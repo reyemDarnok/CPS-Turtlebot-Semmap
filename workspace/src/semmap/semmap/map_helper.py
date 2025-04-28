@@ -1,5 +1,6 @@
 import logging
 from itertools import product
+from math import floor
 from typing import List
 
 obstruction_threshold = 0.65
@@ -31,6 +32,21 @@ class AreaMap:
         for node in self.all_nodes():
             node.post_init()
 
+    def has_line_of_sight(self, start, end) -> bool:
+        nodes_between = []
+        x_diff = end.x - start.x
+        if x_diff == 0:
+            x_diff = 1
+        slope = (start.y - end.y) / x_diff
+        current_y = start.y
+        x_direction = 1 if end.x > start.x else -1
+        y_direction = 1 if end.y > start.y else -1
+        for x in range(start.x, end.x + x_direction, x_direction):
+            for y in range(floor(current_y), floor(current_y + slope) + y_direction, y_direction):
+                nodes_between.append(self[y][x])
+            current_y += slope
+        los_free = not any(node.obstructed for node in nodes_between)
+        return los_free
 
     def all_nodes(self):
         """Returns all nodes in the map, row by row"""
@@ -74,13 +90,14 @@ class AreaNode:
         self.neighbors = []
         self.logger = logger
 
-    def __str__(self):
+    def __repr__(self):
         return f"{self.x}/{self.y}"
 
     def post_init(self):
         """Checks the nodes surroundings after all nodes have been created"""
         self.obstructed = self.is_obstruction_within(bot_size)
         self.neighbors = self.nodes_in_range(1)
+        self.neighbors_unknown = self.is_unknown_within(bot_size)
 
 
 
@@ -92,6 +109,9 @@ class AreaNode:
         """
         return any(node.obstruction > obstruction_threshold for node in self.nodes_in_range(search_distance))
 
+    def is_unknown_within(self, search_distance: int) -> bool:
+        return any(node.complete_unknown for node in self.nodes_in_range(search_distance))
+
     def nodes_in_range(self, search_distance):
         """
         Returns all nodes within a distance of search_distance
@@ -99,9 +119,10 @@ class AreaNode:
         :param search_distance: The maximum Distance for the node
         :return: The nodes within a distance of search_distance
         """
-        return (
+        return [
             self.parent_map[y][x] for x, y in product(*self._coords_in_range(search_distance))
-        )
+            if not (x == self.x and y == self.y)
+        ]
 
     def _coords_in_range(self, search_distance):
         """
@@ -110,9 +131,9 @@ class AreaNode:
         :return: A tupel of all valid x coordinates and y coordinates
         """
         x_coords = [x for x in range(self.x - search_distance, self.x + search_distance + 1)
-                    if 0 <= x < self.parent_map.width and x != self.x]
+                    if 0 <= x < self.parent_map.width]
         y_coords = [y for y in range(self.y - search_distance, self.y + search_distance + 1)
-                    if 0 <= y < self.parent_map.height and y != self.y]
+                    if 0 <= y < self.parent_map.height]
         return x_coords, y_coords
 
 

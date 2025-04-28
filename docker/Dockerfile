@@ -19,7 +19,7 @@ RUN apt update && \
 RUN apt install -y apt-transport-https
 
 # Install helper packages
-RUN apt install -y wget python3-pip ros-humble-turtlebot4-simulator ros-humble-irobot-create-nodes nano
+RUN apt install -y wget python3-pip ros-humble-turtlebot4-simulator ros-humble-irobot-create-nodes nano ros-humble-turtlebot3* bash-completion
 RUN apt update && apt upgrade -y
 
 # Create User
