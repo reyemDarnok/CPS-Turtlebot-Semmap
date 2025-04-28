@@ -136,6 +136,7 @@ class RotationTask(MovementTask):
         self.first_run = True
 
     def execute(self):
+        return # TODO debug option - undo
         self.pathfinding.get_logger().info('Executing RotationTask')
         tolerance = 1 * math.pi / 180
         # be verbose in first run to log initial angle offset (and calculation)
@@ -263,6 +264,7 @@ class ExploreTask(MovementTask):
                     self.pathfinding.get_logger().info(f'Created Navigation to {candidate}')
                     return
                 except ImpossibleRouteException:
+                    print("route impossible")
                     pass
         # no interesting nodes can be reached - finished exploring
         self._finished = True
@@ -337,6 +339,7 @@ class AbsoluteMovementTask(MovementTask):
             # if no task is assigned, check if current position is target
             try:
                 current_position = self.pathfinding.get_current_position()
+
             except ValueError:
                 return
             if abs(current_position.x - self.target_node.x) < 2 and abs(current_position.y - self.target_node.y) < 2:
@@ -363,14 +366,15 @@ class AbsoluteMovementTask(MovementTask):
         self.pathfinding.get_logger().info("Finding path")
         try:
             current_pos = self.pathfinding.get_current_position()
+            self.target_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x + 1)] # TODO remove debug option
+            self.pathfinding.get_logger().info(f'Creating movement towards {self.target_node}')
         except ValueError:
             self.pathfinding.get_logger().info('Position not yet known, aborting movement planning')
             raise
 
         astar_map = AstarMap(self.pathfinding.map, current_pos, self.pathfinding.get_logger())
-
         end_node = astar_map.run_astar(self.target_node)
-
+        print("Ran astar")
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
         current_node = end_node
         path = []
@@ -381,7 +385,6 @@ class AbsoluteMovementTask(MovementTask):
         print(path)
         self.pathfinding.destroy_node()
         self.pathfinding.get_logger().info(f"Found path from {current_pos} to {self.target_node}: {[str(p) for p in path]}")
-        # path[0] is current, path[1] is next in sequence
         self.task_list = [SlamSpinTask(self.pathfinding),
-                          ForwardTask(self.pathfinding, path[1].node),
-                          RotationTask(self.pathfinding, path[1].node)]
+                          ForwardTask(self.pathfinding, path[0].node),
+                          RotationTask(self.pathfinding, path[0].node)]

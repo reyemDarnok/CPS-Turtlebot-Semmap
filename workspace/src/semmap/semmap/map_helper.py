@@ -32,7 +32,6 @@ class AreaMap:
             node.post_init()
 
 
-
     def all_nodes(self):
         """Returns all nodes in the map, row by row"""
         return [x for row in self.node_2d for x in row]
@@ -104,9 +103,10 @@ class AreaNode:
         :param search_distance: The maximum Distance for the node
         :return: The nodes within a distance of search_distance
         """
-        return (
+        return [
             self.parent_map[y][x] for x, y in product(*self._coords_in_range(search_distance))
-        )
+            if not (x == self.x and y == self.y)
+        ]
 
     def _coords_in_range(self, search_distance):
         """
@@ -115,9 +115,9 @@ class AreaNode:
         :return: A tupel of all valid x coordinates and y coordinates
         """
         x_coords = [x for x in range(self.x - search_distance, self.x + search_distance + 1)
-                    if 0 <= x < self.parent_map.width and x != self.x]
+                    if 0 <= x < self.parent_map.width]
         y_coords = [y for y in range(self.y - search_distance, self.y + search_distance + 1)
-                    if 0 <= y < self.parent_map.height and y != self.y]
+                    if 0 <= y < self.parent_map.height]
         return x_coords, y_coords
 
 
