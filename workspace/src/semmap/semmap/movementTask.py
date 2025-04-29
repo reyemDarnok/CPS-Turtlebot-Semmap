@@ -1,4 +1,5 @@
 import math
+import time
 from abc import abstractmethod, abstractproperty
 import datetime
 from random import choice, shuffle
@@ -76,8 +77,6 @@ class MovementTask:
         if left_turn_target < left_turn_current:
             left_turn_target += 2 * math.pi
         left_offset = left_turn_target - left_turn_current
-        print("Right turn offset:", right_offset)
-        print("Left turn offset:", left_offset)
 
         if right_offset < left_offset:
             return right_offset
@@ -195,35 +194,19 @@ class SlamSpinTask(MovementTask):
     """
     def __init__(self, pathfinding):
         super().__init__(pathfinding)
-        self.target_rotation = random.uniform(- math.pi, math.pi)
         self.started_spin_at = None
 
     def execute(self):
-        try:
-            current_position = self.pathfinding.get_current_position()
-        except ValueError:
-            # system not yet ready
-            self.pathfinding.get_logger().info('Position not yet known')
-            raise
-        current_angle = current_position.rotation % (2 * math.pi)
-        angle_offset = (current_angle - self.target_rotation) % (2 * math.pi)
-        tolerance = 1 * math.pi / 180
-        if - tolerance < angle_offset < tolerance:
-            # offset is within tolerance - finished
-            self._finished = True
-            self.pathfinding.get_logger().info("Stopped spin")
-            self.stop()
-        elif angle_offset > 0:
-            # right spin
+        if self.started_spin_at is None:
+            self.pathfinding.get_logger().info("Starting SlamSpinTask task")
+            self.started_spin_at = datetime.datetime.now()
+        elif self.started_spin_at < datetime.datetime.now() - datetime.timedelta(seconds=1):
             twist = spin_twist()
-            twist.angular.z = 0.1
             self.pathfinding.command_movement.publish(twist)
-
         else:
-            # left spin
-            twist = spin_twist()
-            twist.angular.z = -0.1
-            self.pathfinding.command_movement.publish(twist)
+            self.stop()
+            self.pathfinding.get_logger().info("Finished SlamSpinTask task")
+            self._finished = True
 
 
 class ExploreTask(MovementTask):
@@ -247,9 +230,6 @@ class ExploreTask(MovementTask):
             # all nodes that are nearby unknown nodes, useful for investigating the above
             candidates = list(node for node in self.pathfinding.map.all_nodes() if
                               not node.obstructed and node.neighbors_unknown and not node.complete_unknown)
-            print(candidates)
-            print(len(candidates))
-            print(self.pathfinding.map.height * self.pathfinding.map.width)
             candidates = [candidate for candidate in candidates if any(
                 (free_threshold <= neighbor.obstruction <= obstruction_threshold)
                 or neighbor.complete_unknown

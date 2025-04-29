@@ -9,7 +9,7 @@ free_threshold = 0.25
 """Below this threshold nodes are considered free"""
 resolution = 0.05
 """The resolution of the map in meters"""
-bot_size = 4
+bot_size = 5
 """The radius of the bot in resolution steps, rounded up"""
 
 class AreaMap:
@@ -37,15 +37,19 @@ class AreaMap:
         x_diff = end.x - start.x
         if x_diff == 0:
             x_diff = 1
-        slope = (start.y - end.y) / x_diff
+        slope = (end.y - start.y) / x_diff
         current_y = start.y
         x_direction = 1 if end.x > start.x else -1
         y_direction = 1 if end.y > start.y else -1
         for x in range(start.x, end.x + x_direction, x_direction):
             for y in range(floor(current_y), floor(current_y + slope) + y_direction, y_direction):
-                nodes_between.append(self[y][x])
+                if 0 <= y < self.height and 0 <= x < self.width:
+                    center_intercept = self[y][x]
+                    nodes_between.append(center_intercept)
+                    #nodes_between += center_intercept.nodes_in_range(1)
             current_y += slope
         los_free = not any(node.obstructed for node in nodes_between)
+        print("Line of sight between", start, "and", end, "is", los_free)
         return los_free
 
     def all_nodes(self):

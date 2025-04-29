@@ -40,7 +40,7 @@ class SemanticMapNode(Node):
         )
 
         self.create_subscription(
-            Position, '/position', self.robot_location_callback, 10 # TODO correct service
+            Position, '/position', self.robot_location_callback, 10
         )
 
         self.create_service(
