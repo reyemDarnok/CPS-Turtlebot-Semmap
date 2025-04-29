@@ -360,15 +360,40 @@ class AbsoluteMovementTask(MovementTask):
         end_node = astar_map.run_astar(self.target_node)
         self.pathfinding.get_logger().info(f"Navigating towards {self.target_node} from {current_pos}")
         current_pos_node = self.pathfinding.map[int(current_pos.y)][int(current_pos.x)]
-        traversal_node = end_node
-        while not self.pathfinding.map.has_line_of_sight(current_pos_node, traversal_node):
-            if traversal_node.predecessor is not None:
-                traversal_node = traversal_node.predecessor
-            else:
-                raise ImpossibleRouteException("No line of sight to path found")
+        backtrack_node = end_node
+        previous_traversal_node = None
+        traversal_node = end_node.predecessor
+        path = []
+        steps = 0
+        max_steps = 10
+        while traversal_node is not None:
+            print(traversal_node, backtrack_node)
+            steps += 1
+            if not self.pathfinding.map.has_line_of_sight(traversal_node, backtrack_node) or steps > max_steps:
+                path.append(previous_traversal_node)
+                if previous_traversal_node is not None:
+                    backtrack_node = previous_traversal_node
+                steps = 0
+            previous_traversal_node = traversal_node
+            traversal_node = traversal_node.predecessor
+        if not path:
+            path = [self.target_node]
+        self.pathfinding.get_logger().info(f"Moving towards {self.target_node} from {current_pos} via {path}")
+        self.task_list = []
+        for node in path:
+            self.task_list += [SlamSpinTask(self.pathfinding),
+                          ForwardTask(self.pathfinding, node),
+                          RotationTask(self.pathfinding, node)]
+
+        #while not self.pathfinding.map.has_line_of_sight(current_pos_node, backtrack_node):
+        #    steps
+        #    if backtrack_node.predecessor is not None:
+        #        backtrack_node = backtrack_node.predecessor
+        #    else:
+        #        raise ImpossibleRouteException("No line of sight to path found")
         #path = []
         # trace the path from the target node to the current node
-        self.pathfinding.get_logger().info(f"Moving towards {traversal_node}")
-        self.task_list = [SlamSpinTask(self.pathfinding),
-                          ForwardTask(self.pathfinding, traversal_node.node),
-                          RotationTask(self.pathfinding, traversal_node.node)]
+        #self.pathfinding.get_logger().info(f"Moving towards {backtrack_node}")
+        #self.task_list = [SlamSpinTask(self.pathfinding),
+        #                  ForwardTask(self.pathfinding, backtrack_node.node),
+        #                  RotationTask(self.pathfinding, backtrack_node.node)]
