@@ -101,7 +101,7 @@ class AreaNode:
         """Checks the nodes surroundings after all nodes have been created"""
         self.obstructed = self.is_obstruction_within(bot_size)
         self.neighbors = self.nodes_in_range(1)
-        self.neighbors_unknown = self.is_unknown_within(bot_size)
+        self.neighbors_unknown = self.is_unknown_within(int(bot_size * 1.5)) and not self.is_obstruction_within(bot_size)
 
 
 
